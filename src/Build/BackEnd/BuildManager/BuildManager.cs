@@ -78,7 +78,7 @@ namespace Microsoft.Build.Execution
         /// <summary>
         /// The object responsible for creating and managing nodes.
         /// </summary>
-        private INodeManager _nodeManager;
+        private NodeManager _nodeManager;
 
         /// <summary>
         /// The object responsible for creating and managing task host nodes.
@@ -88,7 +88,7 @@ namespace Microsoft.Build.Execution
         /// <summary>
         /// The object which determines which projects to build, and where.
         /// </summary>
-        private IScheduler _scheduler;
+        private Scheduler _scheduler;
 
         /// <summary>
         /// The node configuration to use for spawning new nodes.
@@ -396,14 +396,14 @@ namespace Microsoft.Build.Execution
                 }
 
                 // Initialize components.
-                _nodeManager = ((IBuildComponentHost)this).GetComponent(BuildComponentType.NodeManager) as INodeManager;
+                _nodeManager = ((IBuildComponentHost)this).GetComponent(BuildComponentType.NodeManager) as NodeManager;
 
                 var loggingService = InitializeLoggingService();
 
                 InitializeCaches();
 
                 _taskHostNodeManager = ((IBuildComponentHost)this).GetComponent(BuildComponentType.TaskHostNodeManager) as INodeManager;
-                _scheduler = ((IBuildComponentHost)this).GetComponent(BuildComponentType.Scheduler) as IScheduler;
+                _scheduler = ((IBuildComponentHost)this).GetComponent(BuildComponentType.Scheduler) as Scheduler;
 
                 _nodeManager.RegisterPacketHandler(NodePacketType.BuildRequestBlocker, BuildRequestBlocker.FactoryForDeserialization, this);
                 _nodeManager.RegisterPacketHandler(NodePacketType.BuildRequestConfiguration, BuildRequestConfiguration.FactoryForDeserialization, this);
@@ -863,7 +863,7 @@ namespace Microsoft.Build.Execution
         {
             if (null == _nodeManager)
             {
-                _nodeManager = ((IBuildComponentHost)this).GetComponent(BuildComponentType.NodeManager) as INodeManager;
+                _nodeManager = ((IBuildComponentHost)this).GetComponent(BuildComponentType.NodeManager) as NodeManager;
             }
 
             _nodeManager.ShutdownAllNodes();
@@ -1932,7 +1932,7 @@ namespace Microsoft.Build.Execution
 
                         for (int i = 0; i < response.NumberOfNodesToCreate; i++)
                         {
-                            NodeInfo createdNode = _nodeManager.CreateNode(GetNodeConfiguration(), response.RequiredNodeType);
+                            NodeInfo createdNode = ((NodeManager)_nodeManager).CreateHighPriorityNode(GetNodeConfiguration(), response.RequiredNodeType);
 
                             if (null != createdNode)
                             {

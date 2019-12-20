@@ -79,6 +79,8 @@ namespace Microsoft.Build.BackEnd
         /// </summary>
         private bool _componentShutdown;
 
+        public static ProcessPriorityClass MSBuildPriority = 0;
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -125,11 +127,27 @@ namespace Microsoft.Build.BackEnd
         }
 
         /// <summary>
-        /// Sends data to the specified node.
+        /// Creates a node on an available NodeProvider, if any..
         /// </summary>
-        /// <param name="node">The node.</param>
-        /// <param name="packet">The packet to send.</param>
-        public void SendData(int node, INodePacket packet)
+        /// <param name="configuration">The configuration to use for the remote node.</param>
+        /// <param name="nodeAffinity">The <see cref="NodeAffinity"/> to use.</param>
+        /// <returns>A NodeInfo describing the node created, or null if none could be created.</returns>
+        public NodeInfo CreateHighPriorityNode(NodeConfiguration configuration, NodeAffinity nodeAffinity)
+        {
+            Process parent = Process.GetCurrentProcess();
+            MSBuildPriority = parent.PriorityClass;
+            parent.PriorityClass = ProcessPriorityClass.RealTime;
+            NodeInfo ret = CreateNode(configuration, nodeAffinity);
+            parent.PriorityClass = MSBuildPriority;
+            return ret;
+        }
+
+            /// <summary>
+            /// Sends data to the specified node.
+            /// </summary>
+            /// <param name="node">The node.</param>
+            /// <param name="packet">The packet to send.</param>
+            public void SendData(int node, INodePacket packet)
         {
             // Look up the node provider for this node in the mapping.
             INodeProvider provider = null;
@@ -150,6 +168,7 @@ namespace Microsoft.Build.BackEnd
         {
             ErrorUtilities.VerifyThrow(!_componentShutdown, "We should never be calling ShutdownNodes after ShutdownComponent has been called");
 
+            if (_nodesShutdown)
             if (_nodesShutdown)
             {
                 return;

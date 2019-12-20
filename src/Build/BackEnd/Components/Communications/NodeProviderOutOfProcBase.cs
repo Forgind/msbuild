@@ -359,10 +359,17 @@ namespace Microsoft.Build.BackEnd
 
                 // We got a connection.
                 CommunicationsUtilities.Trace("Successfully connected to pipe {0}...!", pipeName);
+                if (NodeManager.MSBuildPriority != 0) {
+                    Process.GetCurrentProcess().PriorityClass = NodeManager.MSBuildPriority;
+                }
                 return nodeStream;
             }
             catch (Exception e)
             {
+                if (NodeManager.MSBuildPriority != 0)
+                {
+                    Process.GetCurrentProcess().PriorityClass = NodeManager.MSBuildPriority;
+                }
                 if (ExceptionHandling.IsCriticalException(e))
                 {
                     throw;

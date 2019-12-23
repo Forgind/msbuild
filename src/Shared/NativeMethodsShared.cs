@@ -1585,9 +1585,7 @@ namespace Microsoft.Build.Shared
         internal static bool DirectoryExistsWindows(string fullPath)
         {
             NativeMethodsShared.WIN32_FILE_ATTRIBUTE_DATA data = new NativeMethodsShared.WIN32_FILE_ATTRIBUTE_DATA();
-            bool success = false;
-
-            success = NativeMethodsShared.GetFileAttributesEx(fullPath, 0, ref data);
+            bool success = NativeMethodsShared.GetFileAttributesEx(fullPath.Length > MAX_PATH ? @"\?" + fullPath : fullPath, 0, ref data);
             return success && (data.fileAttributes & NativeMethodsShared.FILE_ATTRIBUTE_DIRECTORY) != 0;
         }
 

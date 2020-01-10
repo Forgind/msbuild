@@ -564,6 +564,7 @@ namespace Microsoft.Build.CommandLine
                 bool interactive = false;
                 bool isolateProjects = false;
                 bool graphBuild = false;
+                bool lowPriority = false;
                 string[] inputResultsCaches = null;
                 string outputResultsCache = null;
 
@@ -600,6 +601,7 @@ namespace Microsoft.Build.CommandLine
                         ref graphBuild,
                         ref inputResultsCaches,
                         ref outputResultsCache,
+                        ref lowPriority,
                         recursing: false
                         ))
                 {
@@ -618,6 +620,14 @@ namespace Microsoft.Build.CommandLine
                         // Indicate to the engine that it can NOT toss extraneous file content: we want to 
                         // see that in preprocessing/debugging
                         Environment.SetEnvironmentVariable("MSBUILDLOADALLFILESASWRITEABLE", "1");
+                    }
+
+                    // Honor the low priority flag, we place our selves below normal
+                    // priority and let sub processes inherit that priority.
+                    if (lowPriority)
+                    {
+                        Process currentProc = Process.GetCurrentProcess();
+                        currentProc.PriorityClass = ProcessPriorityClass.BelowNormal;
                     }
 
                     DateTime t1 = DateTime.Now;
@@ -660,6 +670,7 @@ namespace Microsoft.Build.CommandLine
                                     interactive,
                                     isolateProjects,
                                     graphBuild,
+                                    lowPriority,
                                     inputResultsCaches,
                                     outputResultsCache))
                             {
@@ -968,6 +979,7 @@ namespace Microsoft.Build.CommandLine
             bool interactive,
             bool isolateProjects,
             bool graphBuild,
+            bool lowPriority,
             string[] inputResultsCaches,
             string outputResultsCache
         )
@@ -1114,6 +1126,7 @@ namespace Microsoft.Build.CommandLine
                     }
 
                     parameters.EnableNodeReuse = enableNodeReuse;
+                    parameters.LowPriority = lowPriority;
 #if FEATURE_ASSEMBLY_LOCATION
                     parameters.NodeExeLocation = Assembly.GetExecutingAssembly().Location;
 #else
@@ -2023,6 +2036,7 @@ namespace Microsoft.Build.CommandLine
             ref bool graphBuild,
             ref string[] inputResultsCaches,
             ref string outputResultsCache,
+            ref bool lowPriority,
             bool recursing
         )
         {
@@ -2138,6 +2152,7 @@ namespace Microsoft.Build.CommandLine
                                                                ref graphBuild,
                                                                ref inputResultsCaches,
                                                                ref outputResultsCache,
+                                                               ref lowPriority,
                                                                recursing: true
                                                              );
                         }
@@ -2193,6 +2208,11 @@ namespace Microsoft.Build.CommandLine
                     if (commandLineSwitches.IsParameterizedSwitchSet(CommandLineSwitches.ParameterizedSwitch.GraphBuild))
                     {
                         graphBuild = ProcessBooleanSwitch(commandLineSwitches[CommandLineSwitches.ParameterizedSwitch.GraphBuild], defaultValue: true, resourceName: "InvalidGraphBuildValue");
+                    }
+
+                    if (commandLineSwitches.IsParameterizedSwitchSet(CommandLineSwitches.ParameterizedSwitch.LowPriority))
+                    {
+                        lowPriority = ProcessBooleanSwitch(commandLineSwitches[CommandLineSwitches.ParameterizedSwitch.LowPriority], defaultValue: true, resourceName: "InvalidLowPriorityValue");
                     }
 
                     inputResultsCaches = ProcessInputResultsCaches(commandLineSwitches);
@@ -3672,6 +3692,7 @@ namespace Microsoft.Build.CommandLine
             Console.WriteLine(AssemblyResources.GetString("HelpMessage_InputCachesFiles"));
             Console.WriteLine(AssemblyResources.GetString("HelpMessage_OutputCacheFile"));
             Console.WriteLine(AssemblyResources.GetString("HelpMessage_36_GraphBuildSwitch"));
+            Console.WriteLine(AssemblyResources.GetString("HelpMessage_37_LowPrioritySwitch"));
             Console.WriteLine(AssemblyResources.GetString("HelpMessage_7_ResponseFile"));
             Console.WriteLine(AssemblyResources.GetString("HelpMessage_8_NoAutoResponseSwitch"));
             Console.WriteLine(AssemblyResources.GetString("HelpMessage_5_NoLogoSwitch"));

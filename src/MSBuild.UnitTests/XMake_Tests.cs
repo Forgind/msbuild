@@ -2009,7 +2009,7 @@ namespace Microsoft.Build.UnitTests
                 }
             };
 
-            string logContents = ExecuteMSBuildExeExpectSuccess(projectContents, filesToCreate: preExistingProps, arguments: "/restore");
+            string logContents = ExecuteMSBuildExeExpectSuccess(projectContents, preExistingProps, "/restore");
 
             logContents.ShouldContain(guid1);
             logContents.ShouldContain(guid2);

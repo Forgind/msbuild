@@ -431,12 +431,12 @@ namespace Microsoft.Build.BackEnd
                     startInfo.hStdInput = BackendNativeMethods.InvalidHandle;
                     startInfo.hStdOutput = BackendNativeMethods.InvalidHandle;
                     startInfo.dwFlags = BackendNativeMethods.STARTFUSESTDHANDLES;
-                    creationFlags = creationFlags | BackendNativeMethods.CREATENOWINDOW;
+                    creationFlags |= BackendNativeMethods.CREATENOWINDOW;
                 }
             }
             else
             {
-                creationFlags = creationFlags | BackendNativeMethods.CREATE_NEW_CONSOLE;
+                creationFlags |= BackendNativeMethods.CREATE_NEW_CONSOLE;
             }
 
             BackendNativeMethods.SECURITY_ATTRIBUTES processSecurityAttributes = new BackendNativeMethods.SECURITY_ATTRIBUTES();
@@ -521,6 +521,11 @@ namespace Microsoft.Build.BackEnd
 
                 if (!result)
                 {
+                    if (NodeManager.MSBuildPriority != 0)
+                    {
+                        Process.GetCurrentProcess().PriorityClass = NodeManager.MSBuildPriority;
+                    }
+
                     // Creating an instance of this exception calls GetLastWin32Error and also converts it to a user-friendly string.
                     System.ComponentModel.Win32Exception e = new System.ComponentModel.Win32Exception();
 

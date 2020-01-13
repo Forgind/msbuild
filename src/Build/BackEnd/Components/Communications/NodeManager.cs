@@ -169,7 +169,6 @@ namespace Microsoft.Build.BackEnd
             ErrorUtilities.VerifyThrow(!_componentShutdown, "We should never be calling ShutdownNodes after ShutdownComponent has been called");
 
             if (_nodesShutdown)
-            if (_nodesShutdown)
             {
                 return;
             }

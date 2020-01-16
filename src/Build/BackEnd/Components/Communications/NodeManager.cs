@@ -79,6 +79,8 @@ namespace Microsoft.Build.BackEnd
         /// </summary>
         private bool _componentShutdown;
 
+        public static ProcessPriorityClass MSBuildPriority = 0;
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -103,6 +105,9 @@ namespace Microsoft.Build.BackEnd
             // out-of-proc, then remote.
             // When we support distributed build, we will also consider the remote provider.
             int nodeId = InvalidNodeId;
+            Process parent = Process.GetCurrentProcess();
+            MSBuildPriority = parent.PriorityClass;
+            parent.PriorityClass = ProcessPriorityClass.RealTime;
             if ((nodeAffinity == NodeAffinity.Any || nodeAffinity == NodeAffinity.InProc) && !_componentHost.BuildParameters.DisableInProcNode)
             {
                 nodeId = AttemptCreateNode(_inProcNodeProvider, configuration);

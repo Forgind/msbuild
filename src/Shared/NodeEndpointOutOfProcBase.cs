@@ -456,6 +456,13 @@ namespace Microsoft.Build.BackEnd
                     ChangeLinkStatus(LinkStatus.Failed);
                     return;
                 }
+                finally
+                {
+                    if (NodeManager.MSBuildPriority != 0)
+                    {
+                        Process.GetCurrentProcess().PriorityClass = NodeManager.MSBuildPriority;
+                    }
+                }
             }
 
             RunReadLoop(

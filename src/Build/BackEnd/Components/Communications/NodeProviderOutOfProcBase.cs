@@ -392,6 +392,13 @@ namespace Microsoft.Build.BackEnd
                     nodeStream.Dispose();
                 }
             }
+            finally
+            {
+                if (NodeManager.MSBuildPriority != 0)
+                {
+                    Process.GetCurrentProcess().PriorityClass = NodeManager.MSBuildPriority;
+                }
+            }
 
             return null;
         }

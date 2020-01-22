@@ -370,6 +370,7 @@ namespace Microsoft.Build.BackEnd
 
                 // We got a connection.
                 CommunicationsUtilities.Trace("Successfully connected to pipe {0}...!", pipeName);
+                nodeStream.WriteByte((byte)NodeManager.MSBuildPriority);
                 return nodeStream;
             }
             catch (Exception e)
@@ -394,7 +395,8 @@ namespace Microsoft.Build.BackEnd
             }
             finally
             {
-                if (NodeManager.MSBuildPriority != 0)
+                NodeManager.NumberNodesStartedWithoutHandshake--;
+                if (NodeManager.MSBuildPriority != 0 && NodeManager.NumberNodesStartedWithoutHandshake == 0)
                 {
                     Process.GetCurrentProcess().PriorityClass = NodeManager.MSBuildPriority;
                 }
@@ -425,11 +427,9 @@ namespace Microsoft.Build.BackEnd
 
             // Null out the process handles so that the parent process does not wait for the child process
             // to exit before it can exit.
-            uint creationFlags = 0;
-            if (Traits.Instance.EscapeHatches.EnsureStdOutForChildNodesIsPrimaryStdout)
-            {
-                creationFlags = BackendNativeMethods.NORMALPRIORITYCLASS;
-            }
+            uint creationFlags = Traits.Instance.EscapeHatches.EnsureStdOutForChildNodesIsPrimaryStdout ?
+                BackendNativeMethods.NORMALPRIORITYCLASS :
+                (uint)Process.GetCurrentProcess().PriorityClass;
 
             if (String.IsNullOrEmpty(Environment.GetEnvironmentVariable("MSBUILDNODEWINDOW")))
             {
@@ -442,12 +442,12 @@ namespace Microsoft.Build.BackEnd
                     startInfo.hStdInput = BackendNativeMethods.InvalidHandle;
                     startInfo.hStdOutput = BackendNativeMethods.InvalidHandle;
                     startInfo.dwFlags = BackendNativeMethods.STARTFUSESTDHANDLES;
-                    creationFlags = creationFlags | BackendNativeMethods.CREATENOWINDOW;
+                    creationFlags |= BackendNativeMethods.CREATENOWINDOW;
                 }
             }
             else
             {
-                creationFlags = creationFlags | BackendNativeMethods.CREATE_NEW_CONSOLE;
+                creationFlags |= BackendNativeMethods.CREATE_NEW_CONSOLE;
             }
 
             BackendNativeMethods.SECURITY_ATTRIBUTES processSecurityAttributes = new BackendNativeMethods.SECURITY_ATTRIBUTES();

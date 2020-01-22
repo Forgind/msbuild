@@ -81,6 +81,8 @@ namespace Microsoft.Build.BackEnd
 
         public static ProcessPriorityClass MSBuildPriority = 0;
 
+        public static int NumberNodesStartedWithoutHandshake = 0;
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -106,8 +108,12 @@ namespace Microsoft.Build.BackEnd
             // When we support distributed build, we will also consider the remote provider.
             int nodeId = InvalidNodeId;
             Process parent = Process.GetCurrentProcess();
-            MSBuildPriority = parent.PriorityClass;
-            parent.PriorityClass = ProcessPriorityClass.RealTime;
+            if (MSBuildPriority == 0)
+            {
+                MSBuildPriority = parent.PriorityClass;
+            }
+
+            parent.PriorityClass = ProcessPriorityClass.High;
             if ((nodeAffinity == NodeAffinity.Any || nodeAffinity == NodeAffinity.InProc) && !_componentHost.BuildParameters.DisableInProcNode)
             {
                 nodeId = AttemptCreateNode(_inProcNodeProvider, configuration);
@@ -120,12 +126,16 @@ namespace Microsoft.Build.BackEnd
 
             if (nodeId == InvalidNodeId)
             {
+                if (NumberNodesStartedWithoutHandshake == 0)
+                {
+                    parent.PriorityClass = MSBuildPriority;
+                }
                 return null;
             }
 
             // If we created a node, they should no longer be considered shut down.
             _nodesShutdown = false;
-
+            NumberNodesStartedWithoutHandshake++;
             return new NodeInfo(nodeId, _nodeIdToProvider[nodeId].ProviderType);
         }
 

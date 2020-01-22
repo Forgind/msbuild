@@ -330,6 +330,7 @@ namespace Microsoft.Build.BackEnd
 
             DateTime originalWaitStartTime = DateTime.UtcNow;
             bool gotValidConnection = false;
+            Process p = Process.GetCurrentProcess();
             while (!gotValidConnection)
             {
                 DateTime restartWaitTime = DateTime.UtcNow;
@@ -438,9 +439,11 @@ namespace Microsoft.Build.BackEnd
                     CommunicationsUtilities.Trace("Writing handshake to parent");
                     localWritePipe.WriteLongForHandshake(GetClientHandshake());
                     ChangeLinkStatus(LinkStatus.Active);
+                    Process.GetCurrentProcess().PriorityClass = (ProcessPriorityClass)localReadPipe.ReadByte(); ;
                 }
                 catch (Exception e)
                 {
+                    Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Normal;
                     if (ExceptionHandling.IsCriticalException(e))
                     {
                         throw;
@@ -455,13 +458,6 @@ namespace Microsoft.Build.BackEnd
                     ExceptionHandling.DumpExceptionToFile(e);
                     ChangeLinkStatus(LinkStatus.Failed);
                     return;
-                }
-                finally
-                {
-                    if (NodeManager.MSBuildPriority != 0)
-                    {
-                        Process.GetCurrentProcess().PriorityClass = NodeManager.MSBuildPriority;
-                    }
                 }
             }
 

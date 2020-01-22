@@ -11,6 +11,7 @@ using Microsoft.Build.Shared;
 
 using BuildParameters = Microsoft.Build.Execution.BuildParameters;
 using System.Globalization;
+using Microsoft.Build.Execution;
 
 namespace Microsoft.Build.BackEnd
 {
@@ -425,16 +426,12 @@ namespace Microsoft.Build.BackEnd
                             exitLoop = true;
                             break;
                         case 1:
+                            INodePacket packet;
+                            while (_packetQueue.TryDequeue(out packet))
                             {
-                                INodePacket packet;
-                                while (_packetQueue.TryDequeue(out packet))
-                                {
-                                    _peerEndpoint._packetFactory.RoutePacket(0, packet);
-                                }
+                                _peerEndpoint._packetFactory.RoutePacket(0, packet);
                             }
-
                             break;
-
                         default:
                             ErrorUtilities.ThrowInternalError("waitId {0} out of range.", waitId);
                             break;
@@ -449,6 +446,13 @@ namespace Microsoft.Build.BackEnd
                 // event of a failure
                 ExceptionHandling.DumpExceptionToFile(e);
                 throw;
+            }
+            finally
+            {
+                if (NodeManager.MSBuildPriority != 0)
+                {
+                    Process.GetCurrentProcess().PriorityClass = NodeManager.MSBuildPriority;
+                }
             }
         }
 

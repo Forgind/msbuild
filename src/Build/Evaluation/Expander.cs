@@ -1126,7 +1126,7 @@ namespace Microsoft.Build.Evaluation
                         if (results != null)
                         {
                             bool lastEntryWasEmpty = false;
-                            string? previousEntry = null;
+                            string previousEntry = null;
                             // Create a combined result string from the result components that we've gathered
                             foreach (object component in results)
                             {

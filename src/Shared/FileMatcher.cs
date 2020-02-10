@@ -805,13 +805,13 @@ namespace Microsoft.Build.Shared
             Dictionary<string, List<RecursionState>> searchesToExcludeInSubdirs,
             TaskOptions taskOptions)
         {
-            ErrorUtilities.VerifyThrow((recursionState.SearchData.Filespec== null) || (recursionState.SearchData.RegexFileMatch == null),
+            ErrorUtilities.VerifyThrow((recursionState.SearchData.Filespec == null) || (recursionState.SearchData.RegexFileMatch == null),
                 "File-spec overrides the regular expression -- pass null for file-spec if you want to use the regular expression.");
 
             ErrorUtilities.VerifyThrow((recursionState.SearchData.Filespec != null) || (recursionState.SearchData.RegexFileMatch != null),
                 "Need either a file-spec or a regular expression to match files.");
 
-            ErrorUtilities.VerifyThrow(recursionState.RemainingWildcardDirectory != null, "Expected non-null remaning wildcard directory.");
+            ErrorUtilities.VerifyThrow(recursionState.RemainingWildcardDirectory != null, "Expected non-null remaining wildcard directory.");
 
             RecursiveStepResult[] excludeNextSteps = null;
             //  Determine if any of searchesToExclude is necessarily a superset of the results that will be returned.
@@ -867,7 +867,7 @@ namespace Microsoft.Build.Shared
                         continue;
                     }
                 }
-                files = files ?? new List<string>();
+                files ??= new List<string>();
                 files.Add(file);
             }
             // Add all matched files at once to reduce thread contention
@@ -2405,6 +2405,7 @@ namespace Microsoft.Build.Shared
                     AvailableTasks = maxTasks,
                     MaxTasksPerIteration = maxTasks
                 };
+                ErrorUtilities.VerifyThrow(projectDirectoryUnescaped.Equals(string.Empty), "hi");
                 GetFilesRecursive(
                     listOfFiles,
                     state,

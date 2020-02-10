@@ -1125,10 +1125,30 @@ namespace Microsoft.Build.Evaluation
                         // Append our collected results
                         if (results != null)
                         {
+                            bool lastEntryWasEmpty = false;
+                            string? previousEntry = null;
                             // Create a combined result string from the result components that we've gathered
                             foreach (object component in results)
                             {
-                                result.Append(FileUtilities.MaybeAdjustFilePath(component.ToString()));
+                                string entry = component.ToString();
+                                string adjustedEntry = FileUtilities.MaybeAdjustFilePath(entry);
+                                if (entry.Length == 0)
+                                {
+                                    lastEntryWasEmpty = true;
+                                }
+                                else
+                                {
+                                    if (lastEntryWasEmpty && !entry.Equals(adjustedEntry))
+                                    {
+                                        if (!Regex.Match(previousEntry, @"[A-Za-z0-9\/]$").Success && (adjustedEntry.StartsWith("\\") || adjustedEntry.StartsWith("/"))) // StartsWith("\\**")?
+                                        {
+                                            // Prevent excessive globbing...throw an exception?
+                                        }
+                                    }
+                                    lastEntryWasEmpty = false;
+                                    previousEntry = adjustedEntry;
+                                }
+                                result.Append(adjustedEntry);
                             }
                         }
 

@@ -2677,38 +2677,37 @@ namespace Microsoft.Build.Evaluation
 
             private ProvenanceResult ComputeProvenanceResult(string itemToMatch, ProjectItemElement itemElement)
             {
-                ProvenanceResult SingleItemSpecProvenance(string itemSpec, IElementLocation elementLocation, Operation operation)
+                if (itemElement.IncludeLocation != null)
                 {
-                    if (elementLocation == null)
+                    int matchIncludeOccurences = ItemMatchesInItemSpecString(itemToMatch, itemElement.Include, itemElement.IncludeLocation, itemElement.ContainingProject.DirectoryPath, _data.Expander, out Provenance provenanceInclude);
+                    if (matchIncludeOccurences > 0)
                     {
-                        return null;
+                        Provenance provenanceExclude = 0;
+                        int matchExcludeOccurences = itemElement.ExcludeLocation != null ?
+                            ItemMatchesInItemSpecString(itemToMatch, itemElement.Exclude, itemElement.IncludeLocation, itemElement.ContainingProject.DirectoryPath, _data.Expander, out provenanceExclude) : 0;
+                        return matchExcludeOccurences > 0 ? new ProvenanceResult(itemElement, Operation.Exclude, provenanceExclude, matchExcludeOccurences) : new ProvenanceResult(itemElement, Operation.Include, provenanceInclude, matchIncludeOccurences);
                     }
-
-                    var matchOccurrences = ItemMatchesInItemSpecString(itemToMatch, itemSpec, elementLocation, itemElement.ContainingProject.DirectoryPath, _data.Expander, out Provenance provenance);
-                    return matchOccurrences > 0 ? new ProvenanceResult(itemElement, operation, provenance, matchOccurrences) : null;
                 }
 
-                Func<ProvenanceResult>[] provenanceProviders =
+                if (itemElement.UpdateLocation != null)
                 {
-                () =>
-                {
-                    ProvenanceResult includeResult = SingleItemSpecProvenance(itemElement.Include, itemElement.IncludeLocation, Operation.Include);
-                    if (includeResult == null)
+                    int matchUpdateOccurrences = ItemMatchesInItemSpecString(itemToMatch, itemElement.Update, itemElement.UpdateLocation, itemElement.ContainingProject.DirectoryPath, _data.Expander, out Provenance provenanceUpdate);
+                    if (matchUpdateOccurrences > 0)
                     {
-                        return null;
+                        return new ProvenanceResult(itemElement, Operation.Update, provenanceUpdate, matchUpdateOccurrences);
                     }
+                }
 
-                    ProvenanceResult excludeResult = SingleItemSpecProvenance(itemElement.Exclude, itemElement.ExcludeLocation, Operation.Exclude);
+                if (itemElement.RemoveLocation != null)
+                {
+                    int matchRemoveOccurrences = ItemMatchesInItemSpecString(itemToMatch, itemElement.Remove, itemElement.RemoveLocation, itemElement.ContainingProject.DirectoryPath, _data.Expander, out Provenance provenanceRemove);
+                    if (matchRemoveOccurrences > 0)
+                    {
+                        return new ProvenanceResult(itemElement, Operation.Remove, provenanceRemove, matchRemoveOccurrences);
+                    }
+                }
 
-                    return excludeResult == null ? includeResult : null;
-                },
-
-                () => SingleItemSpecProvenance(itemElement.Update, itemElement.UpdateLocation, Operation.Update),
-                
-                () => SingleItemSpecProvenance(itemElement.Remove, itemElement.RemoveLocation, Operation.Remove)
-            };
-
-                return provenanceProviders.Select(provider => provider()).FirstOrDefault(provenanceResult => provenanceResult != null);
+                return null;
             }
 
             /// <summary>

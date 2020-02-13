@@ -2690,7 +2690,6 @@ namespace Microsoft.Build.Evaluation
 
                 Func<ProvenanceResult>[] provenanceProviders =
                 {
-                // provenance provider for include item elements
                 () =>
                 {
                     ProvenanceResult includeResult = SingleItemSpecProvenance(itemElement.Include, itemElement.IncludeLocation, Operation.Include);
@@ -2701,13 +2700,11 @@ namespace Microsoft.Build.Evaluation
 
                     ProvenanceResult excludeResult = SingleItemSpecProvenance(itemElement.Exclude, itemElement.ExcludeLocation, Operation.Exclude);
 
-                    return excludeResult == null ? null : includeResult;
+                    return excludeResult == null ? includeResult : null;
                 },
 
-                // provenance provider for update item elements
                 () => SingleItemSpecProvenance(itemElement.Update, itemElement.UpdateLocation, Operation.Update),
                 
-                // provenance provider for remove item elements
                 () => SingleItemSpecProvenance(itemElement.Remove, itemElement.RemoveLocation, Operation.Remove)
             };
 

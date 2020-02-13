@@ -195,7 +195,7 @@ namespace Microsoft.Build.Evaluation
         {
             [DebuggerStepThrough]
             get
-            { return Link != null ? Link.EvaluatedInclude : EscapingUtilities.UnescapeAll(_evaluatedIncludeEscaped); }
+            { return Link?.EvaluatedInclude?? EscapingUtilities.UnescapeAll(_evaluatedIncludeEscaped); }
         }
 
         /// <summary>

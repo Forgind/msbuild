@@ -32,7 +32,6 @@ using Microsoft.Build.Utilities;
 using EvaluationItemSpec = Microsoft.Build.Evaluation.ItemSpec<Microsoft.Build.Evaluation.ProjectProperty, Microsoft.Build.Evaluation.ProjectItem>;
 using EvaluationItemExpressionFragment = Microsoft.Build.Evaluation.ItemExpressionFragment<Microsoft.Build.Evaluation.ProjectProperty, Microsoft.Build.Evaluation.ProjectItem>;
 using SdkResult = Microsoft.Build.BackEnd.SdkResolution.SdkResult;
-using System.Data.OleDb;
 
 namespace Microsoft.Build.Evaluation
 {
@@ -2686,11 +2685,7 @@ namespace Microsoft.Build.Evaluation
                     }
 
                     var matchOccurrences = ItemMatchesInItemSpecString(itemToMatch, itemSpec, elementLocation, itemElement.ContainingProject.DirectoryPath, _data.Expander, out Provenance provenance);
-                    Tuple<Provenance, int> result = matchOccurrences > 0 ? Tuple.Create(provenance, matchOccurrences) : null;
-
-                    return result?.Item2 > 0
-                        ? new ProvenanceResult(itemElement, operation, result.Item1, result.Item2)
-                        : null;
+                    return matchOccurrences > 0 ? new ProvenanceResult(itemElement, operation, provenance, matchOccurrences) : null;
                 }
 
                 Func<ProvenanceResult>[] provenanceProviders =
@@ -2698,15 +2693,15 @@ namespace Microsoft.Build.Evaluation
                 // provenance provider for include item elements
                 () =>
                 {
-                    var includeResult = SingleItemSpecProvenance(itemElement.Include, itemElement.IncludeLocation, Operation.Include);
+                    ProvenanceResult includeResult = SingleItemSpecProvenance(itemElement.Include, itemElement.IncludeLocation, Operation.Include);
                     if (includeResult == null)
                     {
                         return null;
                     }
 
-                    var excludeResult = SingleItemSpecProvenance(itemElement.Exclude, itemElement.ExcludeLocation, Operation.Exclude);
+                    ProvenanceResult excludeResult = SingleItemSpecProvenance(itemElement.Exclude, itemElement.ExcludeLocation, Operation.Exclude);
 
-                    return excludeResult ?? includeResult;
+                    return excludeResult == null ? null : includeResult;
                 },
 
                 // provenance provider for update item elements

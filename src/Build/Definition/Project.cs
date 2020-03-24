@@ -2677,37 +2677,21 @@ namespace Microsoft.Build.Evaluation
 
             private ProvenanceResult ComputeProvenanceResult(string itemToMatch, ProjectItemElement itemElement)
             {
-                if (itemElement.IncludeLocation != null)
+                ProvenanceResult SingleItemSpecProvenance(string itemSpec, IElementLocation elementLocation, Operation operation)
                 {
-                    int matchIncludeOccurences = ItemMatchesInItemSpecString(itemToMatch, itemElement.Include, itemElement.IncludeLocation, itemElement.ContainingProject.DirectoryPath, _data.Expander, out Provenance provenanceInclude);
-                    if (matchIncludeOccurences > 0)
+                    if (elementLocation != null)
                     {
-                        Provenance provenanceExclude = 0;
-                        int matchExcludeOccurences = itemElement.ExcludeLocation != null ?
-                            ItemMatchesInItemSpecString(itemToMatch, itemElement.Exclude, itemElement.IncludeLocation, itemElement.ContainingProject.DirectoryPath, _data.Expander, out provenanceExclude) : 0;
-                        return matchExcludeOccurences > 0 ? new ProvenanceResult(itemElement, Operation.Exclude, provenanceExclude, matchExcludeOccurences) : new ProvenanceResult(itemElement, Operation.Include, provenanceInclude, matchIncludeOccurences);
+                        int matchOccurrences = ItemMatchesInItemSpecString(itemToMatch, itemSpec, elementLocation, itemElement.ContainingProject.DirectoryPath, _data.Expander, out Provenance provenance);
+                        return matchOccurrences > 0 ? new ProvenanceResult(itemElement, operation, provenance, matchOccurrences) : null;
                     }
+                    return null;
                 }
-
-                if (itemElement.UpdateLocation != null)
+                ProvenanceResult result = SingleItemSpecProvenance(itemElement.Include, itemElement.IncludeLocation, Operation.Include);
+                if (result != null)
                 {
-                    int matchUpdateOccurrences = ItemMatchesInItemSpecString(itemToMatch, itemElement.Update, itemElement.UpdateLocation, itemElement.ContainingProject.DirectoryPath, _data.Expander, out Provenance provenanceUpdate);
-                    if (matchUpdateOccurrences > 0)
-                    {
-                        return new ProvenanceResult(itemElement, Operation.Update, provenanceUpdate, matchUpdateOccurrences);
-                    }
+                    return SingleItemSpecProvenance(itemElement.Exclude, itemElement.ExcludeLocation, Operation.Exclude) ?? result;
                 }
-
-                if (itemElement.RemoveLocation != null)
-                {
-                    int matchRemoveOccurrences = ItemMatchesInItemSpecString(itemToMatch, itemElement.Remove, itemElement.RemoveLocation, itemElement.ContainingProject.DirectoryPath, _data.Expander, out Provenance provenanceRemove);
-                    if (matchRemoveOccurrences > 0)
-                    {
-                        return new ProvenanceResult(itemElement, Operation.Remove, provenanceRemove, matchRemoveOccurrences);
-                    }
-                }
-
-                return null;
+                return SingleItemSpecProvenance(itemElement.Update, itemElement.UpdateLocation, Operation.Update) ?? SingleItemSpecProvenance(itemElement.Remove, itemElement.RemoveLocation, Operation.Remove);
             }
 
             /// <summary>

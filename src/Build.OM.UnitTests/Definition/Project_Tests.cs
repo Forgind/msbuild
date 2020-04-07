@@ -2764,6 +2764,45 @@ namespace Microsoft.Build.UnitTests.OM.Definition
         }
 
         [Fact]
+        public void GetItemProvenanceMSBuildThisFileDirectoryDiffersFromCurrentDirectory()
+        {
+            using (TestEnvironment testEnv = TestEnvironment.Create())
+            {
+                TransientTestFolder folder = testEnv.CreateFolder();
+                TransientTestFolder projFolder = testEnv.CreateFolder(Path.Combine(folder.Path, "sampleProject"));
+                TransientTestFolder targetsFolder = testEnv.CreateFolder(Path.Combine(folder.Path, "targetsFolder"));
+                TransientTestProjectWithFiles project = testEnv.CreateTestProjectWithFiles("project.csproj", @$"
+<Project>
+<Import Project=""{Path.Combine("..", "targetsFolder", "targetsFile.targets")}"" />
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+</Project>
+", relativePathFromRootToProject: Path.Combine("..", folder.Path.Substring(folder.Path.LastIndexOf('\\') + 1), "sampleProject"));
+                TransientTestFile targetsFile=testEnv.CreateFile(targetsFolder, "targetsFile.targets", @"
+<Project>
+  <ItemGroup>
+    <None Include=""$(MSBuildThisFileDirectory)\**"" />
+  </ItemGroup>
+  <Target Name=""MyAfterBuild"" AfterTargets=""Build"">
+    <Message Importance=""high"" Text=""MSBuildThisFileDirectory: $(MSBuildThisFileDirectory)"" />
+  </Target>
+</Project>
+");
+                Project p = new Project(project.ProjectFile);
+
+                var provenance = p.GetItemProvenance("Class.cs");
+
+                var expected = new ProvenanceResultTupleList
+                {
+                };
+
+                AssertProvenanceResult(expected, provenance);
+            }
+        }
+
+        [Fact]
         public void GetItemProvenanceShouldNotReportMatchesInExcludesIfNoIncludeMatchesExist()
         {
             var project =
@@ -3142,6 +3181,33 @@ namespace Microsoft.Build.UnitTests.OM.Definition
             };
 
             AssertProvenanceResult(expected, project, "1");
+        }
+
+        [Fact]
+        public void GetItemProvenanceWithUpOneLevel()
+        {
+            var project =
+                @"<Project ToolsVersion='msbuilddefaulttoolsversion' DefaultTargets='Build' xmlns='msbuildnamespace'>
+                  <ItemGroup>
+<Compile Include=""**/*$(DefaultLanguageSourceExtension)"" Exclude=""NothingRelevant"" />
+<None Include=""**/*"" Exclude=""NothingRelevant""/>
+<None Include=""$(MSBuildThisFileDirectory)\\**"" Exclude=""$(MSBuildThisFileDirectory)\\**\\*.targets"">
+<Metadata1>hi</Metadata1>
+<Metadata2>bye</Metadata2>
+</None>
+</ItemGroup>
+                  <PropertyGroup>
+                    <DefaultLanguageSourceExtension>.cs</DefaultLanguageSourceExtension>
+                  </PropertyGroup>
+
+                </Project>
+                ";
+
+            var expected = new ProvenanceResultTupleList
+            {
+            };
+
+            AssertProvenanceResult(expected, project, "Class1.cs");
         }
 
         [Fact]

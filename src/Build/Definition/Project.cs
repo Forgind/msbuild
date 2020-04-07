@@ -2675,23 +2675,23 @@ namespace Microsoft.Build.Evaluation
                     .ToList();
             }
 
+            // TODO: cache result?
             private ProvenanceResult ComputeProvenanceResult(string itemToMatch, ProjectItemElement itemElement)
             {
                 ProvenanceResult SingleItemSpecProvenance(string itemSpec, IElementLocation elementLocation, Operation operation)
                 {
-                    if (elementLocation != null)
+                    if (elementLocation != null && !string.IsNullOrEmpty(itemSpec))
                     {
-                        int matchOccurrences = ItemMatchesInItemSpecString(itemToMatch, itemSpec, elementLocation, itemElement.ContainingProject.DirectoryPath, _data.Expander, out Provenance provenance);
+                        EvaluationItemSpec expandedItemSpec = new EvaluationItemSpec(itemSpec, _data.Expander, elementLocation, itemElement.ContainingProject.DirectoryPath, expandProperties: true);
+                        int matchOccurrences = ItemMatchesInItemSpec(itemToMatch, expandedItemSpec, out Provenance provenance);
                         return matchOccurrences > 0 ? new ProvenanceResult(itemElement, operation, provenance, matchOccurrences) : null;
                     }
                     return null;
                 }
                 ProvenanceResult result = SingleItemSpecProvenance(itemElement.Include, itemElement.IncludeLocation, Operation.Include);
-                if (result != null)
-                {
-                    return SingleItemSpecProvenance(itemElement.Exclude, itemElement.ExcludeLocation, Operation.Exclude) ?? result;
-                }
-                return SingleItemSpecProvenance(itemElement.Update, itemElement.UpdateLocation, Operation.Update) ?? SingleItemSpecProvenance(itemElement.Remove, itemElement.RemoveLocation, Operation.Remove);
+                return result == null ?
+                    SingleItemSpecProvenance(itemElement.Update, itemElement.UpdateLocation, Operation.Update) ?? SingleItemSpecProvenance(itemElement.Remove, itemElement.RemoveLocation, Operation.Remove) :
+                    SingleItemSpecProvenance(itemElement.Exclude, itemElement.ExcludeLocation, Operation.Exclude) ?? result;
             }
 
             /// <summary>
@@ -2701,27 +2701,6 @@ namespace Microsoft.Build.Evaluation
             /// 
             /// The temporary hack is to use the expander to expand the strings, and if any property or item references were encountered, return Provenance.Inconclusive
             /// </summary>
-            private static int ItemMatchesInItemSpecString(string itemToMatch, string itemSpec, IElementLocation elementLocation, string projectDirectory, Expander<ProjectProperty, ProjectItem> expander, out Provenance provenance)
-            {
-                if (string.IsNullOrEmpty(itemSpec))
-                {
-                    provenance = Provenance.Undefined;
-                    return 0;
-                }
-
-                // expand the properties
-                var expandedItemSpec = new EvaluationItemSpec(itemSpec, expander, elementLocation, projectDirectory, expandProperties: true);
-                var numberOfMatches = ItemMatchesInItemSpec(itemToMatch, expandedItemSpec, out provenance);
-
-                // Result is inconclusive if properties are present
-                if (itemSpec.Contains("$("))
-                {
-                    provenance |= Provenance.Inconclusive;
-                }
-
-                return numberOfMatches;
-            }
-
             private static int ItemMatchesInItemSpec(string itemToMatch, EvaluationItemSpec itemSpec, out Provenance provenance)
             {
                 provenance = Provenance.Undefined;
@@ -2744,6 +2723,12 @@ namespace Microsoft.Build.Evaluation
                     else
                     {
                         ErrorUtilities.ThrowInternalErrorUnreachable();
+                    }
+
+                    // Result is inconclusive if properties are present
+                    if (itemSpec.ItemSpecString.Contains("$("))
+                    {
+                        provenance |= Provenance.Inconclusive;
                     }
                 }
 

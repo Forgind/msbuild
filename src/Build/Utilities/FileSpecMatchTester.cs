@@ -79,13 +79,12 @@ namespace Microsoft.Build.Internal
 
             var recombinedFileSpec = string.Join("", normalizedFixedDirPart, wildcardDirectoryPart, filenamePart);
 
-            bool isRecursive;
             bool isLegal;
 
             FileMatcher.Default.GetFileSpecInfoWithRegexObject(
                 recombinedFileSpec,
                 out regex,
-                out isRecursive,
+                out _,
                 out isLegal);
 
             return isLegal ? regex : null;

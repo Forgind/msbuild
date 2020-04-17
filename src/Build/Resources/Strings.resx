@@ -1067,8 +1067,8 @@
     </comment>
   </data>
   <data name="TaskReturnedFalseButDidNotLogError">
-    <value>MSB4132: The "{0}" task returned false but did not log an error.</value>
-    <comment>{StrBegin="MSB4132: "}</comment>
+    <value>MSB4181: The "{0}" task returned false but did not log an error.</value>
+    <comment>{StrBegin="MSB4181: "}</comment>
   </data>
   <data name="LoggerCreationError" UESanitized="true" Visibility="Public">
     <value>MSB1021: Cannot create an instance of the logger. {0}</value>

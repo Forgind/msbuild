@@ -20,6 +20,53 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Build.Internal
 {
+    internal static class HandshakeOption
+    {
+        /// <summary>
+        /// Given the appropriate information, return the equivalent HandshakeOptions.
+        /// </summary>
+        internal static HandshakeOptions From(bool taskHost, bool is64Bit = false, int clrVersion = 0, bool nodeReuse = false, bool lowPriority = false, IDictionary<string, string> taskHostParameters = null)
+        {
+            HandshakeOptions context = taskHost ? HandshakeOptions.TaskHost : HandshakeOptions.None;
+
+            // We don't know about the TaskHost. Figure it out.
+            if (taskHost && clrVersion == 0)
+            {
+                // Take the current TaskHost context
+                if (taskHostParameters == null)
+                {
+                    clrVersion = typeof(bool).GetTypeInfo().Assembly.GetName().Version.Major;
+                    is64Bit = XMakeAttributes.GetCurrentMSBuildArchitecture().Equals(XMakeAttributes.MSBuildArchitectureValues.x64);
+                }
+                else
+                {
+                    ErrorUtilities.VerifyThrow(taskHostParameters.ContainsKey(XMakeAttributes.runtime), "Should always have an explicit runtime when we call this method.");
+                    ErrorUtilities.VerifyThrow(taskHostParameters.ContainsKey(XMakeAttributes.architecture), "Should always have an explicit architecture when we call this method.");
+
+                    clrVersion = taskHostParameters[XMakeAttributes.runtime].Equals(XMakeAttributes.MSBuildRuntimeValues.clr4, StringComparison.OrdinalIgnoreCase) ? 4 : 2;
+                    is64Bit = taskHostParameters[XMakeAttributes.architecture].Equals(XMakeAttributes.MSBuildArchitectureValues.x64);
+                }
+            }
+            if (is64Bit)
+            {
+                context |= HandshakeOptions.X64;
+            }
+            if (clrVersion == 2)
+            {
+                context |= HandshakeOptions.CLR2;
+            }
+            if (nodeReuse)
+            {
+                context |= HandshakeOptions.NodeReuse;
+            }
+            if (lowPriority)
+            {
+                context |= HandshakeOptions.LowPriority;
+            }
+            return context;
+        }
+    }
+
     /// <summary>
     /// Enumeration of all possible (currently supported) options for handshakes.
     /// </summary>
@@ -489,50 +536,6 @@ namespace Microsoft.Build.Internal
             return totalBytesRead;
         }
 #endif
-
-        /// <summary>
-        /// Given the appropriate information, return the equivalent HandshakeOptions.
-        /// </summary>
-        internal static HandshakeOptions GetHandshakeOptions(bool taskHost, bool is64Bit = false, int clrVersion = 0, bool nodeReuse = false, bool lowPriority = false, IDictionary<string, string> taskHostParameters = null)
-        {
-            HandshakeOptions context = taskHost ? HandshakeOptions.TaskHost : HandshakeOptions.None;
-
-            // We don't know about the TaskHost. Figure it out.
-            if (taskHost && clrVersion == 0)
-            {
-                // Take the current TaskHost context
-                if (taskHostParameters == null)
-                {
-                    clrVersion = typeof(bool).GetTypeInfo().Assembly.GetName().Version.Major;
-                    is64Bit = XMakeAttributes.GetCurrentMSBuildArchitecture().Equals(XMakeAttributes.MSBuildArchitectureValues.x64);
-                }
-                else
-                {
-                    ErrorUtilities.VerifyThrow(taskHostParameters.ContainsKey(XMakeAttributes.runtime), "Should always have an explicit runtime when we call this method.");
-                    ErrorUtilities.VerifyThrow(taskHostParameters.ContainsKey(XMakeAttributes.architecture), "Should always have an explicit architecture when we call this method.");
-
-                    clrVersion = taskHostParameters[XMakeAttributes.runtime].Equals(XMakeAttributes.MSBuildRuntimeValues.clr4, StringComparison.OrdinalIgnoreCase) ? 4 : 2;
-                    is64Bit = taskHostParameters[XMakeAttributes.architecture].Equals(XMakeAttributes.MSBuildArchitectureValues.x64);
-                }
-            }
-            if (is64Bit)
-            {
-                context |= HandshakeOptions.X64;
-            }
-            if (clrVersion == 2)
-            {
-                context |= HandshakeOptions.CLR2;
-            }
-            if (nodeReuse)
-            {
-                context |= HandshakeOptions.NodeReuse;
-            }
-            if (lowPriority)
-            {
-                context |= HandshakeOptions.LowPriority;
-            }
-            return context;
-        }
 
         /// <summary>
         /// Gets the value of an integer environment variable, or returns the default if none is set or it cannot be converted.

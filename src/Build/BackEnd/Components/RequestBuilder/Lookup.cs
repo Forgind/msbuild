@@ -456,6 +456,15 @@ namespace Microsoft.Build.BackEnd
         }
 
         /// <summary>
+        /// Returns whether a property of the given value exists and is true.
+        /// </summary>
+        /// <returns></returns>
+        public bool IsPropertyTrue(string name)
+        {
+            return string.Equals(GetProperty(name)?.EvaluatedValue, "true", StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
         /// Gets the items of the specified type that are visible in the current scope.
         /// If no match is found, returns an empty list.
         /// Caller must not modify the group returned.

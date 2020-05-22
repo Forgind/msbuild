@@ -503,7 +503,7 @@ namespace Microsoft.Build.Construction
                 }
 
                 // Update the hash table with this unique name
-                bool didntAlreadyExist = projectsByUniqueName.Add(uniqueName);
+                bool didntAlreadyExist = projectsByUniqueName.Add(Path.GetFileName(proj.AbsolutePath));
                 ProjectFileErrorUtilities.VerifyThrowInvalidProjectFile(
                     didntAlreadyExist,
                     "SubCategoryForSolutionParsingErrors",

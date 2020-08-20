@@ -35,7 +35,8 @@ namespace Microsoft.Build.Evaluation
             string projectFile,
             OpenProjectRootElement openProjectRootElement,
             bool isExplicitlyLoaded,
-            bool? preserveFormatting)
+            bool? preserveFormatting,
+            string parentProject = null)
         {
             // Should already have been canonicalized
             ErrorUtilities.VerifyThrowInternalRooted(projectFile);

@@ -172,6 +172,8 @@ namespace Microsoft.Build.Construction
 
             XmlDocumentWithLocation document = LoadDocument(xmlReader, preserveFormatting);
 
+            ParentProject = "false";
+
             ProjectParser.Parse(document, this);
         }
 
@@ -200,6 +202,8 @@ namespace Microsoft.Build.Construction
                 document.Load(xr);
             }
 
+            ParentProject = "fourth";
+
             ProjectParser.Parse(document, this);
         }
 
@@ -209,7 +213,7 @@ namespace Microsoft.Build.Construction
         /// May throw InvalidProjectFileException.
         /// </summary>
         private ProjectRootElement(string path, ProjectRootElementCacheBase projectRootElementCache,
-            bool preserveFormatting)
+            bool preserveFormatting, string parentProject = null)
         {
             ErrorUtilities.VerifyThrowArgumentLength(path, nameof(path));
             ErrorUtilities.VerifyThrowInternalRooted(path);
@@ -220,7 +224,14 @@ namespace Microsoft.Build.Construction
             _versionOnDisk = Version;
             _timeLastChangedUtc = DateTime.UtcNow;
 
+            if (parentProject != null)
+            {
+                ParentProject = parentProject;
+            }
+
             XmlDocumentWithLocation document = LoadDocument(path, preserveFormatting, projectRootElementCache.LoadProjectsReadOnly);
+
+            document.ParentPath = parentProject;
 
             ProjectParser.Parse(document, this);
 
@@ -243,6 +254,7 @@ namespace Microsoft.Build.Construction
             ProjectRootElementCache = projectRootElementCache;
             _directory = NativeMethodsShared.GetCurrentDirectory();
             IncrementVersion();
+            ParentProject = "hi";
 
             ProjectParser.Parse(document, this);
         }
@@ -256,6 +268,7 @@ namespace Microsoft.Build.Construction
         /// </remarks>
         private ProjectRootElement(XmlDocumentWithLocation document)
         {
+            ParentProject = "bye";
             ProjectParser.Parse(document, this);
         }
 
@@ -437,6 +450,11 @@ namespace Microsoft.Build.Construction
                 MarkDirty("Set project FullPath to '{0}'", FullPath);
             }
         }
+
+        /// <summary>
+        /// Used when importing a project from outisde the cone.
+        /// </summary>
+        public string ParentProject { get; private set; }
 
         /// <summary>
         /// Encoding that the project file is saved in, or will be saved in, unless
@@ -1756,16 +1774,17 @@ namespace Microsoft.Build.Construction
         /// Path provided must be a canonicalized full path.
         /// May throw InvalidProjectFileException or an IO-related exception.
         /// </summary>
-        internal static ProjectRootElement OpenProjectOrSolution(string fullPath, IDictionary<string, string> globalProperties, string toolsVersion, ProjectRootElementCacheBase projectRootElementCache, bool isExplicitlyLoaded)
+        internal static ProjectRootElement OpenProjectOrSolution(string fullPath, IDictionary<string, string> globalProperties, string toolsVersion, ProjectRootElementCacheBase projectRootElementCache, bool isExplicitlyLoaded, string parentProject = null)
         {
             ErrorUtilities.VerifyThrowInternalRooted(fullPath);
 
             ProjectRootElement projectRootElement = projectRootElementCache.Get(
                 fullPath,
-                (path, cache) => CreateProjectFromPath(path, cache, preserveFormatting: false),
+                (path, cache, parentProject) => CreateProjectFromPath(path, cache, preserveFormatting: false, parentProject),
                 isExplicitlyLoaded,
                 // don't care about formatting, reuse whatever is there
-                preserveFormatting: null);
+                preserveFormatting: null,
+                parentProject);
 
             return projectRootElement;
         }
@@ -1969,22 +1988,23 @@ namespace Microsoft.Build.Construction
         /// </summary>
         /// <param name="path">The path to the file to load.</param>
         /// <param name="projectRootElementCache">The cache to load the PRE into.</param>
-        private static ProjectRootElement OpenLoader(string path, ProjectRootElementCacheBase projectRootElementCache)
+        private static ProjectRootElement OpenLoader(string path, ProjectRootElementCacheBase projectRootElementCache, string parentProject = null)
         {
-            return OpenLoader(path, projectRootElementCache, preserveFormatting: false);
+            return OpenLoader(path, projectRootElementCache, preserveFormatting: false, parentProject);
         }
 
-        private static ProjectRootElement OpenLoaderPreserveFormatting(string path, ProjectRootElementCacheBase projectRootElementCache)
+        private static ProjectRootElement OpenLoaderPreserveFormatting(string path, ProjectRootElementCacheBase projectRootElementCache, string parentProject = null)
         {
-            return OpenLoader(path, projectRootElementCache, preserveFormatting: true);
+            return OpenLoader(path, projectRootElementCache, preserveFormatting: true, parentProject);
         }
 
-        private static ProjectRootElement OpenLoader(string path, ProjectRootElementCacheBase projectRootElementCache, bool preserveFormatting)
+        private static ProjectRootElement OpenLoader(string path, ProjectRootElementCacheBase projectRootElementCache, bool preserveFormatting, string parentProject = null)
         {
             return new ProjectRootElement(
                 path,
                 projectRootElementCache,
-                preserveFormatting);
+                preserveFormatting,
+                parentProject);
         }
 
         /// <summary>
@@ -1998,7 +2018,8 @@ namespace Microsoft.Build.Construction
             (
                 string projectFile,
                 ProjectRootElementCacheBase projectRootElementCache,
-                bool preserveFormatting
+                bool preserveFormatting,
+                string parentProject
             )
         {
             ErrorUtilities.VerifyThrowInternalRooted(projectFile);
@@ -2011,7 +2032,7 @@ namespace Microsoft.Build.Construction
                 }
 
                 // OK it's a regular project file, load it normally.
-                return new ProjectRootElement(projectFile, projectRootElementCache, preserveFormatting);
+                return new ProjectRootElement(projectFile, projectRootElementCache, preserveFormatting, parentProject);
             }
             catch (InvalidProjectFileException)
             {
@@ -2081,7 +2102,6 @@ namespace Microsoft.Build.Construction
                 ProjectFileErrorUtilities.ThrowInvalidProjectFile(fileInfo, ex, "InvalidProjectFile", ex.Message);
             }
             MSBuildEventSource.Log.LoadDocumentStop(fullPath);
-
             return document;
         }
 

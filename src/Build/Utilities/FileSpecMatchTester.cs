@@ -29,8 +29,8 @@ namespace Microsoft.Build.Internal
         {
             string unescapedFileSpec = fileSpec.Unescape();
             Regex regex = EngineFileUtilities.FilespecHasWildcards(fileSpec) ? CreateRegex(unescapedFileSpec, currentDirectory) : null;
-
-            return new FileSpecMatcherTester(currentDirectory, unescapedFileSpec, regex);
+            
+            return new FileSpecMatcherTester(currentDirectory/*.Replace("targetsFolder", "sampleProject")*/, unescapedFileSpec, regex);
         }
 
         public bool IsMatch(string fileToMatch)

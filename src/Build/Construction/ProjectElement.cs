@@ -59,6 +59,7 @@ namespace Microsoft.Build.Construction
         internal ProjectElement(XmlElement xmlElement, ProjectElementContainer parent, ProjectRootElement containingProject)
         {
             ErrorUtilities.VerifyThrowArgumentNull(xmlElement, nameof(xmlElement));
+            Console.WriteLine("");
             ErrorUtilities.VerifyThrowArgumentNull(containingProject, nameof(containingProject));
 
             _xmlSource = (XmlElementWithLocation)xmlElement;
@@ -289,7 +290,7 @@ namespace Microsoft.Build.Construction
         /// In the case of an unsaved edit, the location only
         /// contains the path to the file that the element originates from.
         /// </summary>
-        public ElementLocation Location => Link != null ? Link.Location :  XmlElement.Location;
+        public ElementLocation Location { get { return Link?.Location ?? XmlElement.Location; } set { XmlElement.Location = value; } }
 
         /// <inheritdoc/>
         public string ElementName => Link != null? Link.ElementName : XmlElement.Name;

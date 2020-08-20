@@ -265,14 +265,12 @@ namespace Microsoft.Build.Evaluation
         {
             get
             {
-                if (_fileMatcherInitialized)
+                if (!_fileMatcherInitialized)
                 {
-                    return _fileMatcher;
+                    _fileMatcher = CreateFileSpecMatcher();
+                    _fileMatcherInitialized = true;
                 }
-
-                _fileMatcher = CreateFileSpecMatcher();
-                _fileMatcherInitialized = true;
-
+                
                 return _fileMatcher;
             }
         }
@@ -284,12 +282,7 @@ namespace Microsoft.Build.Evaluation
         {
             get
             {
-                if (_msbuildGlob == null)
-                {
-                    _msbuildGlob = CreateMsBuildGlob();
-                }
-
-                return _msbuildGlob;
+                return _msbuildGlob ?? (_msbuildGlob = CreateMsBuildGlob());
             }
         }
 

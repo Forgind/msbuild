@@ -832,92 +832,48 @@ namespace Microsoft.Build.Evaluation
 
                 foreach (ProjectElement element in currentProjectOrImport.Children)
                 {
-                    ProjectPropertyGroupElement propertyGroup = element as ProjectPropertyGroupElement;
-
-                    if (propertyGroup != null)
+                    switch (element)
                     {
-                        EvaluatePropertyGroupElement(propertyGroup);
-                        continue;
+                        case ProjectPropertyGroupElement propertyGroup:
+                            EvaluatePropertyGroupElement(propertyGroup);
+                            break;
+                        case ProjectItemGroupElement itemGroup:
+                            _itemGroupElements.Add(itemGroup);
+                            break;
+                        case ProjectItemDefinitionGroupElement itemDefinitionGroup:
+                            _itemDefinitionGroupElements.Add(itemDefinitionGroup);
+                            break;
+                        case ProjectTargetElement target:
+                            if (_projectSupportsReturnsAttribute.ContainsKey(currentProjectOrImport))
+                            {
+                                _projectSupportsReturnsAttribute[currentProjectOrImport] |= (target.Returns != null);
+                            }
+                            else
+                            {
+                                _projectSupportsReturnsAttribute[currentProjectOrImport] = (target.Returns != null);
+                            }
+
+                            _targetElements.Add(target);
+                            break;
+                        case ProjectImportElement import:
+                            EvaluateImportElement(currentProjectOrImport.FullPath, import);
+                            break;
+                        case ProjectImportGroupElement importGroup:
+                            EvaluateImportGroupElement(currentProjectOrImport.DirectoryPath, importGroup);
+                            break;
+                        case ProjectUsingTaskElement usingTask:
+                            _usingTaskElements.Add(new Pair<string, ProjectUsingTaskElement>(currentProjectOrImport.DirectoryPath, usingTask));
+                            break;
+                        case ProjectChooseElement choose:
+                            EvaluateChooseElement(choose);
+                            break;
+                        case ProjectExtensionsElement extension:
+                        case ProjectSdkElement sdk: // This case is handled by implicit imports.
+                            break;
+                        default:
+                            ErrorUtilities.ThrowInternalError("Unexpected child type");
+                            break;
                     }
-
-                    ProjectItemGroupElement itemGroup = element as ProjectItemGroupElement;
-
-                    if (itemGroup != null)
-                    {
-                        _itemGroupElements.Add(itemGroup);
-
-                        continue;
-                    }
-
-                    ProjectItemDefinitionGroupElement itemDefinitionGroup = element as ProjectItemDefinitionGroupElement;
-
-                    if (itemDefinitionGroup != null)
-                    {
-                        _itemDefinitionGroupElements.Add(itemDefinitionGroup);
-
-                        continue;
-                    }
-
-                    ProjectTargetElement target = element as ProjectTargetElement;
-
-                    if (target != null)
-                    {
-                        if (_projectSupportsReturnsAttribute.ContainsKey(currentProjectOrImport))
-                        {
-                            _projectSupportsReturnsAttribute[currentProjectOrImport] |= (target.Returns != null);
-                        }
-                        else
-                        {
-                            _projectSupportsReturnsAttribute[currentProjectOrImport] = (target.Returns != null);
-                        }
-
-                        _targetElements.Add(target);
-
-                        continue;
-                    }
-
-                    ProjectImportElement import = element as ProjectImportElement;
-                    if (import != null)
-                    {
-                        EvaluateImportElement(currentProjectOrImport.DirectoryPath, import);
-                        continue;
-                    }
-
-                    ProjectImportGroupElement importGroup = element as ProjectImportGroupElement;
-
-                    if (importGroup != null)
-                    {
-                        EvaluateImportGroupElement(currentProjectOrImport.DirectoryPath, importGroup);
-                        continue;
-                    }
-
-                    ProjectUsingTaskElement usingTask = element as ProjectUsingTaskElement;
-
-                    if (usingTask != null)
-                    {
-                        _usingTaskElements.Add(new Pair<string, ProjectUsingTaskElement>(currentProjectOrImport.DirectoryPath, usingTask));
-                        continue;
-                    }
-
-                    ProjectChooseElement choose = element as ProjectChooseElement;
-
-                    if (choose != null)
-                    {
-                        EvaluateChooseElement(choose);
-                        continue;
-                    }
-
-                    if (element is ProjectExtensionsElement)
-                    {
-                        continue;
-                    }
-
-                    if (element is ProjectSdkElement)
-                    {
-                        continue; // This case is handled by implicit imports.
-                    }
-
-                    ErrorUtilities.ThrowInternalError("Unexpected child type");
                 }
 
                 // Evaluate the "bottom" implicit imports as if they were the last entry in the file.
@@ -1445,11 +1401,11 @@ namespace Microsoft.Build.Evaluation
         /// <remarks>
         /// UNDONE: Protect against overflowing the stack by having too many nested imports.
         /// </remarks>
-        private void EvaluateImportElement(string directoryOfImportingFile, ProjectImportElement importElement)
+        private void EvaluateImportElement(string importingFile, ProjectImportElement importElement)
         {
             using (_evaluationProfiler.TrackElement(importElement))
             {
-                List<ProjectRootElement> importedProjectRootElements = ExpandAndLoadImports(directoryOfImportingFile, importElement, out var sdkResult);
+                List<ProjectRootElement> importedProjectRootElements = ExpandAndLoadImports(importingFile, importElement, out var sdkResult);
 
                 foreach (ProjectRootElement importedProjectRootElement in importedProjectRootElements)
                 {
@@ -1521,31 +1477,21 @@ namespace Microsoft.Build.Evaluation
             {
                 using (_evaluationProfiler.TrackElement(element))
                 {
-                    ProjectPropertyGroupElement propertyGroup = element as ProjectPropertyGroupElement;
-
-                    if (propertyGroup != null)
+                    switch (element)
                     {
-                        EvaluatePropertyGroupElement(propertyGroup);
-                        continue;
+                        case ProjectPropertyGroupElement propertyGroup:
+                            EvaluatePropertyGroupElement(propertyGroup);
+                            break;
+                        case ProjectItemGroupElement itemGroup:
+                            _itemGroupElements.Add(itemGroup);
+                            break;
+                        case ProjectChooseElement choose:
+                            EvaluateChooseElement(choose);
+                            break;
+                        default:
+                            ErrorUtilities.ThrowInternalError("Unexpected child type");
+                            break;
                     }
-
-                    ProjectItemGroupElement itemGroup = element as ProjectItemGroupElement;
-
-                    if (itemGroup != null)
-                    {
-                        _itemGroupElements.Add(itemGroup);
-                        continue;
-                    }
-
-                    ProjectChooseElement choose = element as ProjectChooseElement;
-
-                    if (choose != null)
-                    {
-                        EvaluateChooseElement(choose);
-                        continue;
-                    }
-
-                    ErrorUtilities.ThrowInternalError("Unexpected child type");
                 }
             }
 
@@ -1560,7 +1506,7 @@ namespace Microsoft.Build.Evaluation
         /// in those additional paths if the default fails.
         /// </remarks>
         /// </summary>
-        private List<ProjectRootElement> ExpandAndLoadImports(string directoryOfImportingFile, ProjectImportElement importElement, out SdkResult sdkResult)
+        private List<ProjectRootElement> ExpandAndLoadImports(string importingFile, ProjectImportElement importElement, out SdkResult sdkResult)
         {
             var fallbackSearchPathMatch = _data.Toolset.GetProjectImportSearchPaths(importElement.Project);
             sdkResult = null;
@@ -1570,7 +1516,7 @@ namespace Microsoft.Build.Evaluation
             if (fallbackSearchPathMatch.Equals(ProjectImportPathMatch.None))
             {
                 List<ProjectRootElement> projects;
-                ExpandAndLoadImportsFromUnescapedImportExpressionConditioned(directoryOfImportingFile, importElement, out projects, out sdkResult);
+                ExpandAndLoadImportsFromUnescapedImportExpressionConditioned(importingFile, importElement, out projects, out sdkResult);
                 return projects;
             }
 
@@ -1664,7 +1610,7 @@ namespace Microsoft.Build.Evaluation
                 _evaluationLoggingContext.LogComment(MessageImportance.Low, "TryingExtensionsPath", newExpandedImportPath, extensionPathExpanded);
 
                 List<ProjectRootElement> projects;
-                var result = ExpandAndLoadImportsFromUnescapedImportExpression(directoryOfImportingFile, importElement, newExpandedImportPath, false, out projects);
+                var result = ExpandAndLoadImportsFromUnescapedImportExpression(Path.GetDirectoryName(importingFile), importElement, newExpandedImportPath, false, out projects);
 
                 if (result == LoadImportsResult.ProjectsImported)
                 {
@@ -1719,7 +1665,7 @@ namespace Microsoft.Build.Evaluation
         /// requests can be satisfied without re-parsing it.
         /// </summary>
         private void ExpandAndLoadImportsFromUnescapedImportExpressionConditioned(
-            string directoryOfImportingFile,
+            string importingFile,
             ProjectImportElement importElement,
             out List<ProjectRootElement> projects,
             out SdkResult sdkResult,
@@ -1803,7 +1749,7 @@ namespace Microsoft.Build.Evaluation
                 project = Path.Combine(sdkResult.Path, project);
             }
 
-            ExpandAndLoadImportsFromUnescapedImportExpression(directoryOfImportingFile, importElement, project,
+            ExpandAndLoadImportsFromUnescapedImportExpression(importingFile, importElement, project,
                 throwOnFileNotExistsError, out projects);
         }
 
@@ -1813,9 +1759,10 @@ namespace Microsoft.Build.Evaluation
         /// Caches the parsed import into the provided collection, so future 
         /// requests can be satisfied without re-parsing it.
         /// </summary>
-        private LoadImportsResult ExpandAndLoadImportsFromUnescapedImportExpression(string directoryOfImportingFile, ProjectImportElement importElement, string unescapedExpression,
+        private LoadImportsResult ExpandAndLoadImportsFromUnescapedImportExpression(string importingFile, ProjectImportElement importElement, string unescapedExpression,
                                             bool throwOnFileNotExistsError, out List<ProjectRootElement> imports)
         {
+            string directoryOfImportingFile = Path.GetDirectoryName(importingFile);
             string importExpressionEscaped = _expander.ExpandIntoStringLeaveEscaped(unescapedExpression, ExpanderOptions.ExpandProperties, importElement.ProjectLocation);
             ElementLocation importLocationInProject = importElement.Location;
 
@@ -1958,7 +1905,7 @@ namespace Microsoft.Build.Evaluation
                         bool explicitlyLoaded = importElement.ContainingProject.IsExplicitlyLoaded;
                         importedProjectElement = _projectRootElementCache.Get(
                             importFileUnescaped,
-                            (p, c) =>
+                            (p, c, parentProject) =>
                             {
                                 return ProjectRootElement.OpenProjectOrSolution(
                                     importFileUnescaped,
@@ -1967,11 +1914,13 @@ namespace Microsoft.Build.Evaluation
                                         instance => ((IProperty)instance).EvaluatedValueEscaped),
                                     _data.ExplicitToolsVersion,
                                     _projectRootElementCache,
-                                    explicitlyLoaded);
+                                    explicitlyLoaded,
+                                    parentProject);
                             },
                             explicitlyLoaded,
                             // don't care about formatting, reuse whatever is there
-                            preserveFormatting: null);
+                            preserveFormatting: null,
+                            importingFile);
 
                         if (duplicateImport)
                         {

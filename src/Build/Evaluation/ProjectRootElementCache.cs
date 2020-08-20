@@ -131,8 +131,6 @@ namespace Microsoft.Build.Evaluation
             LoadProjectsReadOnly = loadProjectsReadOnly;
         }
 
-
-
         /// <summary>
         /// Returns an existing ProjectRootElement for the specified file path, if any.
         /// If none exists, calls the provided delegate to load one, and adds that to the cache.
@@ -155,7 +153,7 @@ namespace Microsoft.Build.Evaluation
         /// <param name="preserveFormatting"><code>true</code> to the project was loaded with the formated preserved, otherwise <code>false</code>.</param>
         /// <returns>The ProjectRootElement instance if one exists.  Null otherwise.</returns>
         internal override ProjectRootElement Get(string projectFile, OpenProjectRootElement openProjectRootElement, bool isExplicitlyLoaded,
-            bool? preserveFormatting)
+            bool? preserveFormatting, string parentProject)
         {
             // Should already have been canonicalized
             ErrorUtilities.VerifyThrowInternalRooted(projectFile);
@@ -225,7 +223,7 @@ namespace Microsoft.Build.Evaluation
 
                 if (projectRootElement == null && openProjectRootElement != null)
                 {
-                    projectRootElement = openProjectRootElement(projectFile, this);
+                    projectRootElement = openProjectRootElement(projectFile, this, parentProject);
 
                     ErrorUtilities.VerifyThrowInternalNull(projectRootElement, "projectRootElement");
                     ErrorUtilities.VerifyThrow(projectRootElement.FullPath == projectFile, "Got project back with incorrect path");
@@ -292,7 +290,8 @@ namespace Microsoft.Build.Evaluation
                 projectFile,
                 openProjectRootElement: null, // no delegate to load it
                 isExplicitlyLoaded: false, // Since we are not creating a PRE this can be true or false
-                preserveFormatting: preserveFormatting);
+                preserveFormatting: preserveFormatting,
+                null);
 
             return result;
         }

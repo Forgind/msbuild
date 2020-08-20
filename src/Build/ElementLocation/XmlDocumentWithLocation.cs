@@ -57,6 +57,8 @@ namespace Microsoft.Build.Construction
         /// </summary>
         private bool? _loadAsReadOnly;
 
+        public string ParentPath { get; set; }
+
         /// <summary>
         /// Constructor
         /// </summary>

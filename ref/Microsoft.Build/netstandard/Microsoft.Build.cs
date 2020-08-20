@@ -46,7 +46,7 @@ namespace Microsoft.Build.Construction
         public string ElementName { get { throw null; } }
         public string Label { get { throw null; } set { } }
         public Microsoft.Build.Construction.ElementLocation LabelLocation { get { throw null; } }
-        public Microsoft.Build.Construction.ElementLocation Location { get { throw null; } }
+        public Microsoft.Build.Construction.ElementLocation Location { get { throw null; } set { } }
         public Microsoft.Build.Construction.ProjectElement NextSibling { get { throw null; } }
         public string OuterElement { get { throw null; } }
         public Microsoft.Build.Construction.ProjectElementContainer Parent { get { throw null; } }
@@ -248,6 +248,7 @@ namespace Microsoft.Build.Construction
         public System.Collections.Generic.ICollection<Microsoft.Build.Construction.ProjectItemGroupElement> ItemGroupsReversed { get { throw null; } }
         public System.Collections.Generic.ICollection<Microsoft.Build.Construction.ProjectItemElement> Items { get { throw null; } }
         public System.DateTime LastWriteTimeWhenRead { get { throw null; } }
+        public string ParentProject { get { throw null; } }
         public bool PreserveFormatting { get { throw null; } }
         public Microsoft.Build.Construction.ElementLocation ProjectFileLocation { get { throw null; } }
         public System.Collections.Generic.ICollection<Microsoft.Build.Construction.ProjectPropertyElement> Properties { get { throw null; } }

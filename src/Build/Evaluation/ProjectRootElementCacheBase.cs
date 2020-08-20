@@ -23,7 +23,7 @@ namespace Microsoft.Build.Evaluation
         /// <summary>
         /// Callback to create a ProjectRootElement if need be
         /// </summary>
-        internal delegate ProjectRootElement OpenProjectRootElement(string path, ProjectRootElementCacheBase cache);
+        internal delegate ProjectRootElement OpenProjectRootElement(string path, ProjectRootElementCacheBase cache, string parentProject = null);
 
         /// <summary>
         /// Event that is fired when an entry in the Strong Cache is removed.
@@ -47,7 +47,8 @@ namespace Microsoft.Build.Evaluation
 
         internal abstract ProjectRootElement Get(string projectFile, OpenProjectRootElement openProjectRootElement,
             bool isExplicitlyLoaded,
-            bool? preserveFormatting);
+            bool? preserveFormatting,
+            string parentProject = null);
 
         internal abstract void AddEntry(ProjectRootElement projectRootElement);
 

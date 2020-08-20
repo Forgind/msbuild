@@ -2682,7 +2682,7 @@ namespace Microsoft.Build.Evaluation
                 {
                     if (elementLocation != null && !string.IsNullOrEmpty(itemSpec))
                     {
-                        EvaluationItemSpec expandedItemSpec = new EvaluationItemSpec(itemSpec, _data.Expander, elementLocation, itemElement.ContainingProject.DirectoryPath, expandProperties: true);
+                        EvaluationItemSpec expandedItemSpec = new EvaluationItemSpec(itemSpec, _data.Expander, elementLocation, itemElement.ContainingProject.ParentProject ?? itemElement.ContainingProject.DirectoryPath, expandProperties: true);
                         int matchOccurrences = ItemMatchesInItemSpec(itemToMatch, expandedItemSpec, out Provenance provenance);
                         return matchOccurrences > 0 ? new ProvenanceResult(itemElement, operation, provenance, matchOccurrences) : null;
                     }

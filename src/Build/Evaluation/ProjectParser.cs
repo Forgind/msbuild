@@ -203,6 +203,9 @@ namespace Microsoft.Build.Construction
                         break;
                 }
             }
+            for (var x = _project.FirstChild; x != null; x = x.NextSibling) {
+                x.Location = _project.Parent?.Location ?? x.Location;
+            }
         }
 
         /// <summary>

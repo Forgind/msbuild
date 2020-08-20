@@ -58,7 +58,7 @@ namespace Microsoft.Build.Engine.UnitTests.Evaluation
             string projectFile = NativeMethodsShared.IsUnixLike ? "/foo" : "c:\\foo";
             string projectFileToCache = NativeMethodsShared.IsUnixLike ? "/foo" : "c:\\foo";
             ProjectRootElement rootElementToCache = ProjectRootElement.Create(projectFileToCache);
-            ProjectRootElement OpenFunc(string pathArg, ProjectRootElementCacheBase cacheArg)
+            ProjectRootElement OpenFunc(string pathArg, ProjectRootElementCacheBase cacheArg, string parentProject)
             {
                 cacheArg.AddEntry(rootElementToCache);
                 return rootElementToCache;
@@ -77,7 +77,7 @@ namespace Microsoft.Build.Engine.UnitTests.Evaluation
             string projectFile = NativeMethodsShared.IsUnixLike ? "/foo" : "c:\\foo";
             string projectFileToCache = NativeMethodsShared.IsUnixLike ? "/Foo" : "c:\\Foo";
             ProjectRootElement rootElementToCache = ProjectRootElement.Create(projectFileToCache);
-            ProjectRootElement OpenFunc(string pathArg, ProjectRootElementCacheBase cacheArg)
+            ProjectRootElement OpenFunc(string pathArg, ProjectRootElementCacheBase cacheArg, string parentProject)
             {
                 cacheArg.AddEntry(rootElementToCache);
                 return rootElementToCache;
@@ -94,7 +94,7 @@ namespace Microsoft.Build.Engine.UnitTests.Evaluation
         public void Get_GivenOpenFuncWhichReturnsNull_ThrowsInternalErrorException()
         {
             string projectFile = NativeMethodsShared.IsUnixLike ? "/foo" : "c:\\foo";
-            ProjectRootElement OpenFunc(string pathArg, ProjectRootElementCacheBase cacheArg) => null;
+            ProjectRootElement OpenFunc(string pathArg, ProjectRootElementCacheBase cacheArg, string parentProject) => null;
 
             var cache = new SimpleProjectRootElementCache();
 
@@ -110,7 +110,7 @@ namespace Microsoft.Build.Engine.UnitTests.Evaluation
             string projectFile = NativeMethodsShared.IsUnixLike ? "/foo" : "c:\\foo";
             string projectFileToCache = NativeMethodsShared.IsUnixLike ? "/bar" : "c:\\bar";
             ProjectRootElement rootElementToCache = ProjectRootElement.Create(projectFileToCache);
-            ProjectRootElement OpenFunc(string pathArg, ProjectRootElementCacheBase cacheArg)
+            ProjectRootElement OpenFunc(string pathArg, ProjectRootElementCacheBase cacheArg, string parentProject = null)
             {
                 cacheArg.AddEntry(rootElementToCache);
                 return rootElementToCache;
@@ -130,7 +130,7 @@ namespace Microsoft.Build.Engine.UnitTests.Evaluation
             string projectFile = NativeMethodsShared.IsUnixLike ? "/foo" : "c:\\foo";
             string openFuncPath = NativeMethodsShared.IsUnixLike ? "/foo" : "c:\\foo";
             ProjectRootElement openFuncElement = ProjectRootElement.Create(openFuncPath);
-            ProjectRootElement OpenFunc(string pathArg, ProjectRootElementCacheBase cacheArg) => openFuncElement;
+            ProjectRootElement OpenFunc(string pathArg, ProjectRootElementCacheBase cacheArg, string parentProject = null) => openFuncElement;
 
             var cache = new SimpleProjectRootElementCache();
 

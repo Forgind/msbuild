@@ -53,16 +53,11 @@ namespace Microsoft.Build.Internal
         // todo: glob rooting knowledge partially duplicated with MSBuildGlob.Parse and FileMatcher.ComputeFileEnumerationCacheKey
         private static Regex CreateRegex(string unescapedFileSpec, string currentDirectory)
         {
-            Regex regex = null;
-            string fixedDirPart = null;
-            string wildcardDirectoryPart = null;
-            string filenamePart = null;
-
             FileMatcher.Default.SplitFileSpec(
-                unescapedFileSpec,
-                out fixedDirPart,
-                out wildcardDirectoryPart,
-                out filenamePart);
+            unescapedFileSpec,
+            out string fixedDirPart,
+            out string wildcardDirectoryPart,
+            out string filenamePart);
 
             if (FileUtilities.PathIsInvalid(fixedDirPart))
             {
@@ -77,15 +72,13 @@ namespace Microsoft.Build.Internal
 
             normalizedFixedDirPart = FileUtilities.EnsureTrailingSlash(normalizedFixedDirPart);
 
-            var recombinedFileSpec = string.Join("", normalizedFixedDirPart, wildcardDirectoryPart, filenamePart);
-
-            bool isLegal;
+            var recombinedFileSpec = string.Concat(normalizedFixedDirPart, wildcardDirectoryPart, filenamePart);
 
             FileMatcher.Default.GetFileSpecInfoWithRegexObject(
                 recombinedFileSpec,
-                out regex,
-                out _,
-                out isLegal);
+                out Regex regex,
+                out bool _,
+                out bool isLegal);
 
             return isLegal ? regex : null;
         }

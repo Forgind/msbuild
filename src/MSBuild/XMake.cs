@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 #if FEATURE_SYSTEM_CONFIGURATION
 using System.Configuration;
 #endif
@@ -13,6 +14,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Resources;
 using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -292,7 +294,7 @@ namespace Microsoft.Build.CommandLine
 
             if (!initializeOnly)
             {
-                Console.WriteLine("\n{0}{1}{0}", new String('=', 41 - "Process".Length / 2), "Process");
+                Console.WriteLine("\n{0}{1}{0}", new String('=', 41 - ("Process".Length / 2)), "Process");
                 Console.WriteLine("||{0,50}|{1,20:N0}|{2,8}|", "Peak Working Set", currentProcess.PeakWorkingSet64, "bytes");
                 Console.WriteLine("||{0,50}|{1,20:N0}|{2,8}|", "Peak Paged Memory", currentProcess.PeakPagedMemorySize64, "bytes"); // Not very useful one
                 Console.WriteLine("||{0,50}|{1,20:N0}|{2,8}|", "Peak Virtual Memory", currentProcess.PeakVirtualMemorySize64, "bytes"); // Not very useful one
@@ -362,7 +364,7 @@ namespace Microsoft.Build.CommandLine
 
             if (!initializeOnly)
             {
-                Console.WriteLine("\n{0}{1}{0}", new String('=', 41 - category.CategoryName.Length / 2), category.CategoryName);
+                Console.WriteLine("\n{0}{1}{0}", new String('=', 41 - (category.CategoryName.Length / 2)), category.CategoryName);
             }
 
             foreach (PerformanceCounter counter in counters)
@@ -393,12 +395,11 @@ namespace Microsoft.Build.CommandLine
                 if (!initializeOnly)
                 {
                     string friendlyCounterType = GetFriendlyCounterType(counter.CounterType, counter.CounterName);
-                    string valueFormat;
-
+                    
                     // At least some (such as % in GC; maybe all) "%" counters are already multiplied by 100. So we don't do that here.
 
                     // Show decimal places if meaningful
-                    valueFormat = value < 10 ? "{0,20:N2}" : "{0,20:N0}";
+                    string valueFormat = value < 10 ? "{0,20:N2}" : "{0,20:N0}";
 
                     string valueString = String.Format(CultureInfo.CurrentCulture, valueFormat, value);
 
@@ -508,7 +509,11 @@ namespace Microsoft.Build.CommandLine
             }
 
 #if FEATURE_GET_COMMANDLINE
-            ErrorUtilities.VerifyThrowArgumentLength(commandLine, "commandLine");
+            ErrorUtilities.VerifyThrowArgumentLength(commandLine, nameof(commandLine));
+#endif
+
+#if FEATURE_APPDOMAIN_UNHANDLED_EXCEPTION
+            AppDomain.CurrentDomain.UnhandledException += ExceptionHandling.UnhandledExceptionHandler;
 #endif
 
             ExitType exitType = ExitType.Success;
@@ -555,6 +560,7 @@ namespace Microsoft.Build.CommandLine
                 bool enableNodeReuse = false;
 #endif
                 TextWriter preprocessWriter = null;
+                TextWriter targetsWriter = null;
                 bool detailedSummary = false;
                 ISet<string> warningsAsErrors = null;
                 ISet<string> warningsAsMessages = null;
@@ -564,6 +570,7 @@ namespace Microsoft.Build.CommandLine
                 bool interactive = false;
                 bool isolateProjects = false;
                 bool graphBuild = false;
+                bool lowPriority = false;
                 string[] inputResultsCaches = null;
                 string outputResultsCache = null;
 
@@ -588,6 +595,7 @@ namespace Microsoft.Build.CommandLine
                         ref cpuCount,
                         ref enableNodeReuse,
                         ref preprocessWriter,
+                        ref targetsWriter,
                         ref detailedSummary,
                         ref warningsAsErrors,
                         ref warningsAsMessages,
@@ -600,6 +608,7 @@ namespace Microsoft.Build.CommandLine
                         ref graphBuild,
                         ref inputResultsCaches,
                         ref outputResultsCache,
+                        ref lowPriority,
                         recursing: false
                         ))
                 {
@@ -619,6 +628,20 @@ namespace Microsoft.Build.CommandLine
                         // see that in preprocessing/debugging
                         Environment.SetEnvironmentVariable("MSBUILDLOADALLFILESASWRITEABLE", "1");
                     }
+
+                    // Honor the low priority flag, we place our selves below normal priority and let sub processes inherit
+                    // that priority. Idle priority would prevent the build from proceeding as the user does normal actions.
+                    try
+                    {
+                        if (lowPriority && Process.GetCurrentProcess().PriorityClass != ProcessPriorityClass.Idle)
+                        {
+                            Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.BelowNormal;
+                        }
+                    }
+                    // We avoid increasing priority because that causes failures on mac/linux, but there is no good way to
+                    // verify that a particular priority is lower than "BelowNormal." If the error appears, ignore it and
+                    // leave priority where it was.
+                    catch (Win32Exception) { }
 
                     DateTime t1 = DateTime.Now;
 
@@ -651,6 +674,7 @@ namespace Microsoft.Build.CommandLine
                                     cpuCount,
                                     enableNodeReuse,
                                     preprocessWriter,
+                                    targetsWriter,
                                     detailedSummary,
                                     warningsAsErrors,
                                     warningsAsMessages,
@@ -660,6 +684,7 @@ namespace Microsoft.Build.CommandLine
                                     interactive,
                                     isolateProjects,
                                     graphBuild,
+                                    lowPriority,
                                     inputResultsCaches,
                                     outputResultsCache))
                             {
@@ -727,7 +752,7 @@ namespace Microsoft.Build.CommandLine
             catch (LoggerException e)
             {
                 // display the localized message from the outer exception in canonical format
-                if (null != e.ErrorCode)
+                if (e.ErrorCode != null)
                 {
                     // Brief prefix to indicate that it's a logger failure, and provide the "error" indication
                     Console.WriteLine(ResourceUtilities.FormatResourceStringStripCodeAndKeyword("LoggerFailurePrefixNoErrorCode", e.ErrorCode, e.Message));
@@ -739,7 +764,7 @@ namespace Microsoft.Build.CommandLine
                     Console.WriteLine(ResourceUtilities.FormatResourceStringStripCodeAndKeyword("LoggerFailurePrefixWithErrorCode", e.Message));
                 }
 
-                if (null != e.InnerException)
+                if (e.InnerException != null)
                 {
                     // write out exception details -- don't bother triggering Watson, because most of these exceptions will be coming
                     // from buggy loggers written by users
@@ -959,6 +984,7 @@ namespace Microsoft.Build.CommandLine
             int cpuCount,
             bool enableNodeReuse,
             TextWriter preprocessWriter,
+            TextWriter targetsWriter,
             bool detailedSummary,
             ISet<string> warningsAsErrors,
             ISet<string> warningsAsMessages,
@@ -968,6 +994,7 @@ namespace Microsoft.Build.CommandLine
             bool interactive,
             bool isolateProjects,
             bool graphBuild,
+            bool lowPriority,
             string[] inputResultsCaches,
             string outputResultsCache
         )
@@ -1056,6 +1083,7 @@ namespace Microsoft.Build.CommandLine
                 ToolsetDefinitionLocations toolsetDefinitionLocations = ToolsetDefinitionLocations.Default;
 
                 bool preprocessOnly = preprocessWriter != null && !FileUtilities.IsSolutionFilename(projectFile);
+                bool targetsOnly = targetsWriter != null && !FileUtilities.IsSolutionFilename(projectFile);
 
                 projectCollection = new ProjectCollection
                 (
@@ -1078,7 +1106,7 @@ namespace Microsoft.Build.CommandLine
                 if (needToValidateProject && !FileUtilities.IsSolutionFilename(projectFile))
                 {
                     Microsoft.Build.Evaluation.Project project = projectCollection.LoadProject(projectFile, globalProperties, toolsVersion);
-                    Microsoft.Build.Evaluation.Toolset toolset = projectCollection.GetToolset((toolsVersion == null) ? project.ToolsVersion : toolsVersion);
+                    Microsoft.Build.Evaluation.Toolset toolset = projectCollection.GetToolset(toolsVersion ?? project.ToolsVersion);
 
                     if (toolset == null)
                     {
@@ -1102,7 +1130,13 @@ namespace Microsoft.Build.CommandLine
                     projectCollection.UnloadProject(project);
                     success = true;
                 }
-                else
+
+                if (targetsOnly)
+                {
+                    success = PrintTargets(projectFile, toolsVersion, globalProperties, targetsWriter, projectCollection);
+                }
+
+                if (!preprocessOnly && !targetsOnly)
                 {
                     BuildParameters parameters = new BuildParameters(projectCollection);
 
@@ -1114,6 +1148,7 @@ namespace Microsoft.Build.CommandLine
                     }
 
                     parameters.EnableNodeReuse = enableNodeReuse;
+                    parameters.LowPriority = lowPriority;
 #if FEATURE_ASSEMBLY_LOCATION
                     parameters.NodeExeLocation = Assembly.GetExecutingAssembly().Location;
 #else
@@ -1164,7 +1199,13 @@ namespace Microsoft.Build.CommandLine
                     DataCollection.CommentMarkProfile(8800, "Pending Build Request from MSBuild.exe");
 #endif
                     BuildResultCode? result = null;
-                    buildManager.BeginBuild(parameters);
+
+                    var messagesToLogInBuildLoggers = Traits.Instance.EscapeHatches.DoNotSendDeferredMessagesToBuildManager
+                        ? null
+                        : GetMessagesToLogInBuildLoggers();
+
+                    buildManager.BeginBuild(parameters, messagesToLogInBuildLoggers);
+
                     Exception exception = null;
                     try
                     {
@@ -1281,15 +1322,66 @@ namespace Microsoft.Build.CommandLine
             finally
             {
                 FileUtilities.ClearCacheDirectory();
-                if (projectCollection != null)
-                {
-                    projectCollection.Dispose();
-                }
+                projectCollection?.Dispose();
 
                 BuildManager.DefaultBuildManager.Dispose();
             }
 
             return success;
+        }
+
+        private static bool PrintTargets(string projectFile, string toolsVersion, Dictionary<string, string> globalProperties, TextWriter targetsWriter, ProjectCollection projectCollection)
+        {
+            try
+            {
+                Project project = projectCollection.LoadProject(projectFile, globalProperties, toolsVersion);
+
+                foreach (string target in project.Targets.Keys)
+                {
+                    targetsWriter.WriteLine(target);
+                }
+
+                projectCollection.UnloadProject(project);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                var message = ResourceUtilities.FormatResourceStringStripCodeAndKeyword("TargetsCouldNotBePrinted", ex);
+                Console.Error.WriteLine(message);
+                return false;
+            }
+        }
+
+        private static IEnumerable<BuildManager.DeferredBuildMessage> GetMessagesToLogInBuildLoggers()
+        {
+            return new[]
+            {
+                new BuildManager.DeferredBuildMessage(
+                    ResourceUtilities.FormatResourceStringIgnoreCodeAndKeyword(
+                        "Process",
+                        Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty),
+                    MessageImportance.Low),
+                new BuildManager.DeferredBuildMessage(
+                    ResourceUtilities.FormatResourceStringIgnoreCodeAndKeyword(
+                        "MSBExePath",
+                        BuildEnvironmentHelper.Instance.CurrentMSBuildExePath),
+                    MessageImportance.Low),
+                new BuildManager.DeferredBuildMessage(
+                    ResourceUtilities.FormatResourceStringIgnoreCodeAndKeyword(
+                        "CommandLine",
+                        Environment.CommandLine),
+                    MessageImportance.Low),
+                new BuildManager.DeferredBuildMessage(
+                    ResourceUtilities.FormatResourceStringIgnoreCodeAndKeyword(
+                        "CurrentDirectory",
+                        Environment.CurrentDirectory),
+                    MessageImportance.Low),
+                new BuildManager.DeferredBuildMessage(
+                    ResourceUtilities.FormatResourceStringIgnoreCodeAndKeyword(
+                        "MSBVersion",
+                        ProjectCollection.DisplayVersion),
+                    MessageImportance.Low)
+            };
         }
 
         private static (BuildResultCode result, Exception exception) ExecuteBuild(BuildManager buildManager, BuildRequestData request)
@@ -1683,7 +1775,6 @@ namespace Microsoft.Build.CommandLine
             int switchParameterIndicator
         )
         {
-            string switchParameters = null;
 
             // find the parameter indicator again using the quoted arg
             // NOTE: since the parameter indicator cannot be part of a switch name, quoting around it is not relevant, because a
@@ -1700,6 +1791,7 @@ namespace Microsoft.Build.CommandLine
             ErrorUtilities.VerifyThrow(doubleQuotesRemovedFromArg >= doubleQuotesRemovedFromSwitchIndicatorAndName,
                 "The name portion of the switch cannot contain more quoting than the arg itself.");
 
+            string switchParameters;
             // if quoting in the name portion of the switch was terminated
             if ((doubleQuotesRemovedFromSwitchIndicatorAndName % 2) == 0)
             {
@@ -1766,7 +1858,7 @@ namespace Microsoft.Build.CommandLine
 
                     foreach (string includedResponseFile in s_includedResponseFiles)
                     {
-                        if (String.Compare(responseFile, includedResponseFile, StringComparison.OrdinalIgnoreCase) == 0)
+                        if (String.Equals(responseFile, includedResponseFile, StringComparison.OrdinalIgnoreCase))
                         {
                             commandLineSwitches.SetParameterError("RepeatedResponseFileError", unquotedCommandLineArg);
                             isRepeatedResponseFile = true;
@@ -2011,6 +2103,7 @@ namespace Microsoft.Build.CommandLine
             ref int cpuCount,
             ref bool enableNodeReuse,
             ref TextWriter preprocessWriter,
+            ref TextWriter targetsWriter,
             ref bool detailedSummary,
             ref ISet<string> warningsAsErrors,
             ref ISet<string> warningsAsMessages,
@@ -2023,6 +2116,7 @@ namespace Microsoft.Build.CommandLine
             ref bool graphBuild,
             ref string[] inputResultsCaches,
             ref string outputResultsCache,
+            ref bool lowPriority,
             bool recursing
         )
         {
@@ -2099,7 +2193,7 @@ namespace Microsoft.Build.CommandLine
                         if (!String.Equals(projectDirectory, s_exePath, StringComparison.OrdinalIgnoreCase))
                         {
                             // this combines any found, with higher precedence, with the switches from the original auto response file switches
-                            found = found | GatherAutoResponseFileSwitches(projectDirectory, switchesFromAutoResponseFile);
+                            found |= GatherAutoResponseFileSwitches(projectDirectory, switchesFromAutoResponseFile);
                         }
 
                         if (found)
@@ -2126,6 +2220,7 @@ namespace Microsoft.Build.CommandLine
                                                                ref cpuCount,
                                                                ref enableNodeReuse,
                                                                ref preprocessWriter,
+                                                               ref targetsWriter,
                                                                ref detailedSummary,
                                                                ref warningsAsErrors,
                                                                ref warningsAsMessages,
@@ -2138,6 +2233,7 @@ namespace Microsoft.Build.CommandLine
                                                                ref graphBuild,
                                                                ref inputResultsCaches,
                                                                ref outputResultsCache,
+                                                               ref lowPriority,
                                                                recursing: true
                                                              );
                         }
@@ -2169,6 +2265,13 @@ namespace Microsoft.Build.CommandLine
                         preprocessWriter = ProcessPreprocessSwitch(commandLineSwitches[CommandLineSwitches.ParameterizedSwitch.Preprocess]);
                     }
 
+                    // determine what if any writer to print targets to
+                    targetsWriter = null;
+                    if (commandLineSwitches.IsParameterizedSwitchSet(CommandLineSwitches.ParameterizedSwitch.Targets))
+                    {
+                        targetsWriter = ProcessTargetsSwitch(commandLineSwitches[CommandLineSwitches.ParameterizedSwitch.Targets]);
+                    }
+
                     detailedSummary = commandLineSwitches.IsParameterlessSwitchSet(CommandLineSwitches.ParameterlessSwitch.DetailedSummary);
 
                     warningsAsErrors = ProcessWarnAsErrorSwitch(commandLineSwitches);
@@ -2193,6 +2296,11 @@ namespace Microsoft.Build.CommandLine
                     if (commandLineSwitches.IsParameterizedSwitchSet(CommandLineSwitches.ParameterizedSwitch.GraphBuild))
                     {
                         graphBuild = ProcessBooleanSwitch(commandLineSwitches[CommandLineSwitches.ParameterizedSwitch.GraphBuild], defaultValue: true, resourceName: "InvalidGraphBuildValue");
+                    }
+
+                    if (commandLineSwitches.IsParameterizedSwitchSet(CommandLineSwitches.ParameterizedSwitch.LowPriority))
+                    {
+                        lowPriority = ProcessBooleanSwitch(commandLineSwitches[CommandLineSwitches.ParameterizedSwitch.LowPriority], defaultValue: true, resourceName: "InvalidLowPriorityValue");
                     }
 
                     inputResultsCaches = ProcessInputResultsCaches(commandLineSwitches);
@@ -2279,7 +2387,7 @@ namespace Microsoft.Build.CommandLine
             enableNodeReuse = false;
 #endif
 
-            if (Environment.GetEnvironmentVariable("MSBUILDDISABLENODEREUSE") == "1") // For example to disable node reuse in a gated checkin, without using the flag
+            if (Traits.Instance.DisableNodeReuse) // For example to disable node reuse in a gated checkin, without using the flag
             {
                 enableNodeReuse = false;
             }
@@ -2326,6 +2434,25 @@ namespace Microsoft.Build.CommandLine
                 catch (Exception ex) when (ExceptionHandling.IsIoRelatedException(ex))
                 {
                     CommandLineSwitchException.Throw("InvalidPreprocessPath", parameters[parameters.Length - 1], ex.Message);
+                }
+            }
+
+            return writer;
+        }
+
+        internal static TextWriter ProcessTargetsSwitch(string[] parameters)
+        {
+            TextWriter writer = Console.Out;
+
+            if (parameters.Length > 0)
+            {
+                try
+                {
+                    writer = FileUtilities.OpenWrite(parameters[parameters.Length - 1], append: false);
+                }
+                catch (Exception ex) when (ExceptionHandling.IsIoRelatedException(ex))
+                {
+                    CommandLineSwitchException.Throw("TargetsCouldNotBePrinted", parameters[parameters.Length - 1], ex.Message);
                 }
             }
 
@@ -2454,7 +2581,6 @@ namespace Microsoft.Build.CommandLine
                     ex.Message);
             }
 
-
             var logger = new ProfilerLogger(profilerFile);
             loggers.Add(logger);
 
@@ -2504,8 +2630,10 @@ namespace Microsoft.Build.CommandLine
 
                         // If FEATURE_NODE_REUSE is OFF, just validates that the switch is OK, and always returns False
                         bool nodeReuse = ProcessNodeReuseSwitch(commandLineSwitches[CommandLineSwitches.ParameterizedSwitch.NodeReuse]);
+                        string[] lowPriorityInput = commandLineSwitches[CommandLineSwitches.ParameterizedSwitch.LowPriority];
+                        bool lowpriority = lowPriorityInput.Length > 0 ? lowPriorityInput[0].Equals("true") : false;
 
-                        shutdownReason = node.Run(nodeReuse, out nodeException);
+                        shutdownReason = node.Run(nodeReuse, lowpriority, out nodeException);
 
                         FileUtilities.ClearCacheDirectory();
                     }
@@ -2516,9 +2644,8 @@ namespace Microsoft.Build.CommandLine
                     }
                     else
                     {
-                        CommandLineSwitchException.Throw("InvalidNodeNumberValue", input[0]);
+                        CommandLineSwitchException.Throw("InvalidNodeNumberValue", nodeModeNumber.ToString());
                     }
-
 
                     if (shutdownReason == NodeEngineShutdownReason.Error)
                     {
@@ -2650,7 +2777,6 @@ namespace Microsoft.Build.CommandLine
                     }
                 }
 
-
                 if (potentialSolutionFiles != null)
                 {
                     foreach (string s in potentialSolutionFiles)
@@ -2669,13 +2795,13 @@ namespace Microsoft.Build.CommandLine
                 if (extensionsToIgnoreDictionary.Count > 0)
                 {
                     // No point removing extensions if we have no project files
-                    if (potentialProjectFiles != null && potentialProjectFiles.Length > 0)
+                    if (potentialProjectFiles?.Length > 0)
                     {
                         potentialProjectFiles = RemoveFilesWithExtensionsToIgnore(potentialProjectFiles, extensionsToIgnoreDictionary);
                     }
 
                     // No point removing extensions if we have no solutions
-                    if (potentialSolutionFiles != null && potentialSolutionFiles.Length > 0)
+                    if (potentialSolutionFiles?.Length > 0)
                     {
                         potentialSolutionFiles = RemoveFilesWithExtensionsToIgnore(potentialSolutionFiles, extensionsToIgnoreDictionary);
                     }
@@ -2687,7 +2813,7 @@ namespace Microsoft.Build.CommandLine
                     string solutionName = Path.GetFileNameWithoutExtension(potentialSolutionFiles[0]);
                     string projectName = Path.GetFileNameWithoutExtension(potentialProjectFiles[0]);
                     // Compare the names and error if they are not identical
-                    InitializationException.VerifyThrow(String.Compare(solutionName, projectName, StringComparison.OrdinalIgnoreCase) == 0, projectDirectory == null ? "AmbiguousProjectError" : "AmbiguousProjectDirectoryError", null, projectDirectory);
+                    InitializationException.VerifyThrow(String.Equals(solutionName, projectName, StringComparison.OrdinalIgnoreCase), projectDirectory == null ? "AmbiguousProjectError" : "AmbiguousProjectDirectoryError", null, projectDirectory);
                 }
                 // If there is more than one solution file in the current directory we have no idea which one to use
                 else if (potentialSolutionFiles.Length > 1)
@@ -2707,17 +2833,17 @@ namespace Microsoft.Build.CommandLine
                         string secondPotentialProjectExtension = Path.GetExtension(potentialProjectFiles[1]);
 
                         // If the two projects have the same extension we can't decide which one to pick
-                        if (String.Compare(firstPotentialProjectExtension, secondPotentialProjectExtension, StringComparison.OrdinalIgnoreCase) != 0)
+                        if (!String.Equals(firstPotentialProjectExtension, secondPotentialProjectExtension, StringComparison.OrdinalIgnoreCase))
                         {
                             // Check to see if the first project is the proj, if it is use it
-                            if (String.Compare(firstPotentialProjectExtension, ".proj", StringComparison.OrdinalIgnoreCase) == 0)
+                            if (String.Equals(firstPotentialProjectExtension, ".proj", StringComparison.OrdinalIgnoreCase))
                             {
                                 potentialProjectFiles = new string[] { potentialProjectFiles[0] };
                                 // We have made a decision
                                 isAmbiguousProject = false;
                             }
                             // If the first project is not the proj check to see if the second one is the proj, if so use it
-                            else if (String.Compare(secondPotentialProjectExtension, ".proj", StringComparison.OrdinalIgnoreCase) == 0)
+                            else if (String.Equals(secondPotentialProjectExtension, ".proj", StringComparison.OrdinalIgnoreCase))
                             {
                                 potentialProjectFiles = new string[] { potentialProjectFiles[1] };
                                 // We have made a decision
@@ -2756,7 +2882,7 @@ namespace Microsoft.Build.CommandLine
             Dictionary<string, object> extensionsToIgnoreDictionary = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
             // Go through each of the extensions to ignore and add them as a key in the dictionary
-            if (projectsExtensionsToIgnore != null && projectsExtensionsToIgnore.Length > 0)
+            if (projectsExtensionsToIgnore?.Length > 0)
             {
                 string extension = null;
 
@@ -2783,7 +2909,7 @@ namespace Microsoft.Build.CommandLine
 
                     // The parsed extension does not match the passed in extension, this means that there were
                     // some other chars before the last extension
-                    if (string.Compare(extension, extensionToIgnore, StringComparison.OrdinalIgnoreCase) != 0)
+                    if (!string.Equals(extension, extensionToIgnore, StringComparison.OrdinalIgnoreCase))
                     {
                         InitializationException.Throw("InvalidExtensionToIgnore", extensionToIgnore, null, false);
                     }
@@ -2792,7 +2918,7 @@ namespace Microsoft.Build.CommandLine
                     if (extensionToIgnore.IndexOfAny(s_wildcards) > -1)
                     {
                         InitializationException.Throw("InvalidExtensionToIgnore", extensionToIgnore, null, false);
-                    };
+                    }
                     if (!extensionsToIgnoreDictionary.ContainsKey(extensionToIgnore))
                     {
                         extensionsToIgnoreDictionary.Add(extensionToIgnore, null);
@@ -2815,8 +2941,8 @@ namespace Microsoft.Build.CommandLine
                                 )
         {
             // If we got to this method we should have to possible projects or solutions and some extensions to ignore
-            ErrorUtilities.VerifyThrow(((potentialProjectOrSolutionFiles != null) && (potentialProjectOrSolutionFiles.Length > 0)), "There should be some potential project or solution files");
-            ErrorUtilities.VerifyThrow(((extensionsToIgnoreDictionary != null) && (extensionsToIgnoreDictionary.Count > 0)), "There should be some extensions to Ignore");
+            ErrorUtilities.VerifyThrow(potentialProjectOrSolutionFiles?.Length > 0, "There should be some potential project or solution files");
+            ErrorUtilities.VerifyThrow(extensionsToIgnoreDictionary?.Count > 0, "There should be some extensions to Ignore");
 
             List<string> filesToKeep = new List<string>();
             foreach (string projectOrSolutionFile in potentialProjectOrSolutionFiles)
@@ -3072,7 +3198,7 @@ namespace Microsoft.Build.CommandLine
                 ConsoleLogger logger = new ConsoleLogger(verbosity);
                 string consoleParameters = "SHOWPROJECTFILE=TRUE;";
 
-                if ((consoleLoggerParameters != null) && (consoleLoggerParameters.Length > 0))
+                if ((consoleLoggerParameters?.Length > 0))
                 {
                     consoleParameters = AggregateParameters(consoleParameters, consoleLoggerParameters);
                 }
@@ -3139,7 +3265,7 @@ namespace Microsoft.Build.CommandLine
             if (distributedFileLogger)
             {
                 string fileParameters = string.Empty;
-                if ((fileLoggerParameters != null) && (fileLoggerParameters.Length > 0))
+                if ((fileLoggerParameters?.Length > 0))
                 {
                     // Join the file logger parameters into one string seperated by semicolons
                     fileParameters = AggregateParameters(null, fileLoggerParameters);
@@ -3413,7 +3539,7 @@ namespace Microsoft.Build.CommandLine
             // DDB Bug msbuild.exe -Logger:FileLogger,Microsoft.Build.Engine fails due to moved engine file.
             // Only add strong naming if the assembly is a non-strong named 'Microsoft.Build.Engine' (i.e, no additional characteristics)
             // Concat full Strong Assembly to match v4.0
-            if (String.Compare(loggerAssemblySpec, "Microsoft.Build.Engine", StringComparison.OrdinalIgnoreCase) == 0)
+            if (String.Equals(loggerAssemblySpec, "Microsoft.Build.Engine", StringComparison.OrdinalIgnoreCase))
             {
                 loggerAssemblySpec = "Microsoft.Build.Engine,Version=4.0.0.0,Culture=neutral,PublicKeyToken=b03f5f7f11d50a3a";
             }
@@ -3494,7 +3620,6 @@ namespace Microsoft.Build.CommandLine
                     logger.Parameters = loggerDescription.LoggerSwitchParameters;
                 }
             }
-
             catch (LoggerException)
             {
                 // Logger failed politely during parameter/verbosity setting
@@ -3619,7 +3744,7 @@ namespace Microsoft.Build.CommandLine
         private static void DisplayCopyrightMessage()
         {
 #if RUNTIME_TYPE_NETCORE
-            const string frameworkName = ".NET Core";
+            const string frameworkName = ".NET";
 #elif MONO
             const string frameworkName = "Mono";
 #else
@@ -3663,6 +3788,7 @@ namespace Microsoft.Build.CommandLine
             Console.WriteLine(AssemblyResources.GetString("HelpMessage_24_NodeReuse"));
 #endif
             Console.WriteLine(AssemblyResources.GetString("HelpMessage_25_PreprocessSwitch"));
+            Console.WriteLine(AssemblyResources.GetString("HelpMessage_38_TargetsSwitch"));
 
             Console.WriteLine(AssemblyResources.GetString("HelpMessage_26_DetailedSummarySwitch"));
             Console.WriteLine(AssemblyResources.GetString("HelpMessage_31_RestoreSwitch"));
@@ -3673,12 +3799,14 @@ namespace Microsoft.Build.CommandLine
             Console.WriteLine(AssemblyResources.GetString("HelpMessage_InputCachesFiles"));
             Console.WriteLine(AssemblyResources.GetString("HelpMessage_OutputCacheFile"));
             Console.WriteLine(AssemblyResources.GetString("HelpMessage_36_GraphBuildSwitch"));
+            Console.WriteLine(AssemblyResources.GetString("HelpMessage_39_LowPrioritySwitch"));
             Console.WriteLine(AssemblyResources.GetString("HelpMessage_7_ResponseFile"));
             Console.WriteLine(AssemblyResources.GetString("HelpMessage_8_NoAutoResponseSwitch"));
             Console.WriteLine(AssemblyResources.GetString("HelpMessage_5_NoLogoSwitch"));
             Console.WriteLine(AssemblyResources.GetString("HelpMessage_6_VersionSwitch"));
             Console.WriteLine(AssemblyResources.GetString("HelpMessage_4_HelpSwitch"));
             Console.WriteLine(AssemblyResources.GetString("HelpMessage_16_Examples"));
+            Console.WriteLine(AssemblyResources.GetString("HelpMessage_37_DocsLink"));
         }
 
         /// <summary>

@@ -155,7 +155,7 @@ namespace Microsoft.Build.Construction
         {
             XmlAttributeWithLocation attributeWithLocation = GetAttributeWithLocation(name);
 
-            return (attributeWithLocation != null) ? attributeWithLocation.Location : null;
+            return attributeWithLocation?.Location;
         }
     }
 }

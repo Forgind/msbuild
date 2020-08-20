@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
+// Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
@@ -115,7 +115,7 @@ namespace Microsoft.Build.BackEnd
             bool skipStaticGraphIsolationConstraints = false)
         {
             ErrorUtilities.VerifyThrowArgumentNull(escapedTargets, "targets");
-            ErrorUtilities.VerifyThrowArgumentNull(parentBuildEventContext, "parentBuildEventContext");
+            ErrorUtilities.VerifyThrowArgumentNull(parentBuildEventContext, nameof(parentBuildEventContext));
 
             _submissionId = submissionId;
             _configurationId = configurationId;
@@ -269,6 +269,13 @@ namespace Microsoft.Build.BackEnd
         }
 
         /// <summary>
+        /// The <see cref="BuildEventContext" /> of the currently executing task, if any.
+        /// Used to correlate a project's build with the parent task that spawned it
+        /// (usually the MSBuild task).
+        /// </summary>
+        public BuildEventContext CurrentTaskContext { get; set; }
+
+        /// <summary>
         /// The set of flags specified in the BuildRequestData for this request.
         /// </summary>
         public BuildRequestDataFlags BuildRequestDataFlags
@@ -285,7 +292,6 @@ namespace Microsoft.Build.BackEnd
             get => _requestedProjectState;
             set => _requestedProjectState = value;
         }
-
 
         /// <summary>
         /// The route for host-aware tasks back to the host

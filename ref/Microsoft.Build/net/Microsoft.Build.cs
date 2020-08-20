@@ -147,6 +147,10 @@ namespace Microsoft.Build.Construction
         public Microsoft.Build.Construction.ElementLocation KeepDuplicatesLocation { get { throw null; } }
         public string KeepMetadata { get { throw null; } set { } }
         public Microsoft.Build.Construction.ElementLocation KeepMetadataLocation { get { throw null; } }
+        public string MatchOnMetadata { get { throw null; } set { } }
+        public Microsoft.Build.Construction.ElementLocation MatchOnMetadataLocation { get { throw null; } }
+        public string MatchOnMetadataOptions { get { throw null; } set { } }
+        public Microsoft.Build.Construction.ElementLocation MatchOnMetadataOptionsLocation { get { throw null; } }
         public System.Collections.Generic.ICollection<Microsoft.Build.Construction.ProjectMetadataElement> Metadata { get { throw null; } }
         public string Remove { get { throw null; } set { } }
         public Microsoft.Build.Construction.ElementLocation RemoveLocation { get { throw null; } }
@@ -504,6 +508,16 @@ namespace Microsoft.Build.Evaluation
         public Microsoft.Build.Construction.ProjectItemElement ItemElement { get { throw null; } }
         public Microsoft.Build.Globbing.IMSBuildGlob MsBuildGlob { get { throw null; } set { } }
         public System.Collections.Generic.IEnumerable<string> Removes { get { throw null; } set { } }
+    }
+    public static partial class MatchOnMetadataConstants
+    {
+        public const Microsoft.Build.Evaluation.MatchOnMetadataOptions MatchOnMetadataOptionsDefaultValue = Microsoft.Build.Evaluation.MatchOnMetadataOptions.CaseSensitive;
+    }
+    public enum MatchOnMetadataOptions
+    {
+        CaseInsensitive = 1,
+        CaseSensitive = 0,
+        PathLike = 2,
     }
     [System.FlagsAttribute]
     public enum NewProjectFileOptions
@@ -928,6 +942,7 @@ namespace Microsoft.Build.Execution
         public BuildManager(string hostName) { }
         public static Microsoft.Build.Execution.BuildManager DefaultBuildManager { get { throw null; } }
         public void BeginBuild(Microsoft.Build.Execution.BuildParameters parameters) { }
+        public void BeginBuild(Microsoft.Build.Execution.BuildParameters parameters, System.Collections.Generic.IEnumerable<Microsoft.Build.Execution.BuildManager.DeferredBuildMessage> deferredBuildMessages) { }
         public Microsoft.Build.Execution.BuildResult Build(Microsoft.Build.Execution.BuildParameters parameters, Microsoft.Build.Execution.BuildRequestData requestData) { throw null; }
         public Microsoft.Build.Graph.GraphBuildResult Build(Microsoft.Build.Execution.BuildParameters parameters, Microsoft.Build.Graph.GraphBuildRequestData requestData) { throw null; }
         public Microsoft.Build.Execution.BuildResult BuildRequest(Microsoft.Build.Execution.BuildRequestData requestData) { throw null; }
@@ -941,11 +956,19 @@ namespace Microsoft.Build.Execution
         public Microsoft.Build.Graph.GraphBuildSubmission PendBuildRequest(Microsoft.Build.Graph.GraphBuildRequestData requestData) { throw null; }
         public void ResetCaches() { }
         public void ShutdownAllNodes() { }
+        [System.Runtime.InteropServices.StructLayoutAttribute(System.Runtime.InteropServices.LayoutKind.Sequential)]
+        public partial struct DeferredBuildMessage
+        {
+            public DeferredBuildMessage(string text, Microsoft.Build.Framework.MessageImportance importance) { throw null;}
+            public Microsoft.Build.Framework.MessageImportance Importance { get { throw null; } }
+            public string Text { get { throw null; } }
+        }
     }
     public partial class BuildParameters
     {
         public BuildParameters() { }
         public BuildParameters(Microsoft.Build.Evaluation.ProjectCollection projectCollection) { }
+        public bool AllowFailureWithoutError { get { throw null; } set { } }
         public System.Collections.Generic.IDictionary<string, string> BuildProcessEnvironment { get { throw null; } }
         public System.Threading.ThreadPriority BuildThreadPriority { get { throw null; } set { } }
         public System.Globalization.CultureInfo Culture { get { throw null; } set { } }
@@ -965,6 +988,7 @@ namespace Microsoft.Build.Execution
         public System.Collections.Generic.IEnumerable<Microsoft.Build.Framework.ILogger> Loggers { get { throw null; } set { } }
         public bool LogInitialPropertiesAndItems { get { throw null; } set { } }
         public bool LogTaskInputs { get { throw null; } set { } }
+        public bool LowPriority { get { throw null; } set { } }
         public int MaxNodeCount { get { throw null; } set { } }
         public int MemoryUseLimit { get { throw null; } set { } }
         public string NodeExeLocation { get { throw null; } set { } }
@@ -1084,6 +1108,7 @@ namespace Microsoft.Build.Execution
     public partial class OutOfProcNode
     {
         public OutOfProcNode() { }
+        public Microsoft.Build.Execution.NodeEngineShutdownReason Run(bool enableReuse, bool lowPriority, out System.Exception shutdownException) { shutdownException = default(System.Exception); throw null; }
         public Microsoft.Build.Execution.NodeEngineShutdownReason Run(bool enableReuse, out System.Exception shutdownException) { shutdownException = default(System.Exception); throw null; }
         public Microsoft.Build.Execution.NodeEngineShutdownReason Run(out System.Exception shutdownException) { shutdownException = default(System.Exception); throw null; }
     }
@@ -1187,6 +1212,10 @@ namespace Microsoft.Build.Execution
         public string KeepMetadata { get { throw null; } }
         public Microsoft.Build.Construction.ElementLocation KeepMetadataLocation { get { throw null; } }
         public Microsoft.Build.Construction.ElementLocation Location { get { throw null; } }
+        public string MatchOnMetadata { get { throw null; } }
+        public Microsoft.Build.Construction.ElementLocation MatchOnMetadataLocation { get { throw null; } }
+        public string MatchOnMetadataOptions { get { throw null; } }
+        public Microsoft.Build.Construction.ElementLocation MatchOnMetadataOptionsLocation { get { throw null; } }
         public System.Collections.Generic.ICollection<Microsoft.Build.Execution.ProjectItemGroupTaskMetadataInstance> Metadata { get { throw null; } }
         public string Remove { get { throw null; } }
         public Microsoft.Build.Construction.ElementLocation RemoveLocation { get { throw null; } }
@@ -1484,11 +1513,20 @@ namespace Microsoft.Build.Graph
         public ProjectGraph(string entryProjectFile, Microsoft.Build.Evaluation.ProjectCollection projectCollection, Microsoft.Build.Graph.ProjectGraph.ProjectInstanceFactoryFunc projectInstanceFactory) { }
         public ProjectGraph(string entryProjectFile, System.Collections.Generic.IDictionary<string, string> globalProperties) { }
         public ProjectGraph(string entryProjectFile, System.Collections.Generic.IDictionary<string, string> globalProperties, Microsoft.Build.Evaluation.ProjectCollection projectCollection) { }
+        public Microsoft.Build.Graph.ProjectGraph.GraphConstructionMetrics ConstructionMetrics { get { throw null; } }
         public System.Collections.Generic.IReadOnlyCollection<Microsoft.Build.Graph.ProjectGraphNode> EntryPointNodes { get { throw null; } }
         public System.Collections.Generic.IReadOnlyCollection<Microsoft.Build.Graph.ProjectGraphNode> GraphRoots { get { throw null; } }
         public System.Collections.Generic.IReadOnlyCollection<Microsoft.Build.Graph.ProjectGraphNode> ProjectNodes { get { throw null; } }
         public System.Collections.Generic.IReadOnlyCollection<Microsoft.Build.Graph.ProjectGraphNode> ProjectNodesTopologicallySorted { get { throw null; } }
         public System.Collections.Generic.IReadOnlyDictionary<Microsoft.Build.Graph.ProjectGraphNode, System.Collections.Immutable.ImmutableList<string>> GetTargetLists(System.Collections.Generic.ICollection<string> entryProjectTargets) { throw null; }
+        [System.Runtime.InteropServices.StructLayoutAttribute(System.Runtime.InteropServices.LayoutKind.Sequential)]
+        public partial struct GraphConstructionMetrics
+        {
+            public GraphConstructionMetrics(System.TimeSpan constructionTime, int nodeCount, int edgeCount) { throw null;}
+            public System.TimeSpan ConstructionTime { get { throw null; } }
+            public int EdgeCount { get { throw null; } }
+            public int NodeCount { get { throw null; } }
+        }
         public delegate Microsoft.Build.Execution.ProjectInstance ProjectInstanceFactoryFunc(string projectPath, System.Collections.Generic.Dictionary<string, string> globalProperties, Microsoft.Build.Evaluation.ProjectCollection projectCollection);
     }
     [System.Runtime.InteropServices.StructLayoutAttribute(System.Runtime.InteropServices.LayoutKind.Sequential)]

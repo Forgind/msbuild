@@ -41,14 +41,14 @@
     - the reference was called with global properties that do not match the static graph inferred nodes
     - the reference was not explicitly specified as a ProjectReference item in project "{0}"
     </source>
-        <target state="new">MSB4252: Project "{0}" with global properties
+        <target state="translated">MSB4252: 具有全域屬性的專案 "{0}"
     ({1})
-    is building project "{2}" with global properties
+    正在建置具有全域屬性的專案 "{2}"
     ({3})
-    with the ({4}) target(s) but the build result for the built project is not in the engine cache. In isolated builds this could mean one of the following:
-    - the reference was called with a target which is not specified in the ProjectReferenceTargets item in project "{0}"
-    - the reference was called with global properties that do not match the static graph inferred nodes
-    - the reference was not explicitly specified as a ProjectReference item in project "{0}"
+    具有 ({4}) 個目標，但是已建置專案的組建結果不在引擎快取中。在隔離式組建中，這可能代表下列其中一項情況:
+    - 使用在專案 "{0}" 中 ProjectReferenceTargets 項目內未指定的目標呼叫了參考
+    - 使用與靜態圖表推斷節點不相符的全域屬性呼叫了參考
+    - 未明確指定參考作為專案 "{0}" 中的 ProjectReference 項目
     </target>
         <note>
       {StrBegin="MSB4252:"}
@@ -73,6 +73,11 @@
       <trans-unit id="EmptyOutputCacheFile">
         <source>MSB4257: The specified output result cache file is empty.</source>
         <target state="translated">MSB4257: 指定的輸出結果快取檔案是空的。</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="EnvironmentVariableRead">
+        <source>Read environment variable "{0}"</source>
+        <target state="translated">讀取環境變數 "{0}"</target>
         <note />
       </trans-unit>
       <trans-unit id="ErrorReadingCacheFile">
@@ -102,6 +107,11 @@
       LOCALIZATION: {0} is an enum value of LoggerVerbosity.
     </note>
       </trans-unit>
+      <trans-unit id="LogTaskInputs.Truncated">
+        <source>The parameters have been truncated beyond this point. To view all parameters, clear the MSBUILDTRUNCATETASKINPUTLOGGING environment variable.</source>
+        <target state="translated">參數已在此點之後截斷。若要檢視所有參數，請清除 MSBUILDTRUNCATETASKINPUTLOGGING 環境變數。</target>
+        <note />
+      </trans-unit>
       <trans-unit id="MetaprojectGenerated">
         <source>Metaproject "{0}" generated.</source>
         <target state="translated">已產生中繼專案 "{0}"。</target>
@@ -112,6 +122,11 @@
         <target state="translated">無法完成作業，因為尚未呼叫 BeginBuild。</target>
         <note />
       </trans-unit>
+      <trans-unit id="NuGetAssemblyNotFound">
+        <source>A required NuGet assembly was not found. Expected Path: {0}</source>
+        <target state="translated">找不到必要的 NuGet 元件。預期的路徑: {0}</target>
+        <note />
+      </trans-unit>
       <trans-unit id="NullReferenceFromProjectInstanceFactory">
         <source>MSB4253: A null reference was returned from a user-provided ProjectInstanceFactoryFunc callback. This is not allowed.</source>
         <target state="translated">MSB4253: 使用者提供的 ProjectInstanceFactoryFunc 回呼傳回了 null 參考。這是不允許的情況。</target>
@@ -119,6 +134,26 @@
       {StrBegin="MSB4253: "}
       LOCALIZATION:  Do not localize the following words: ProjectInstanceFactoryFunc.
     </note>
+      </trans-unit>
+      <trans-unit id="OM_MatchOnMetadataIsRestrictedToOnlyOneReferencedItem">
+        <source>Only one item type may be referenced when removing with MatchOnMetadata.</source>
+        <target state="translated">使用 MatchOnMetadata 移除時，只能參考一個項目類型。</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="OM_MatchOnMetadataOnlyApplicableToRemoveItems">
+        <source>MatchOnMetadata only applies to Remove operations on items.</source>
+        <target state="translated">MatchOnMetadata 只可對項目執行移除作業。</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="OM_MatchOnMetadataOptionsOnlyApplicableToItemsWithMatchOnMetadata">
+        <source>MatchOnMetadataOptions is valid only when removing items using MatchOnMetadata.</source>
+        <target state="translated">僅當使用 MatchOnMetadata 移除項目時，MatchOnMetadataOptions 才有效。</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="OM_NoMatchOnMetadataOutsideTargets">
+        <source>MatchOnMetadata cannot be used outside of a &lt;Target&gt;.</source>
+        <target state="translated">MatchOnMetadata 無法在 &lt;目標&gt; 之外使用。</target>
+        <note />
       </trans-unit>
       <trans-unit id="OM_TargetNameNullOrEmpty">
         <source>Method {0} cannot be called with a collection containing null or empty target names.</source>
@@ -133,6 +168,11 @@
       LOCALIZATION:  Do not localize the following words: ProjectGraph, ProjectReference, ToolsVersion.
     </note>
       </trans-unit>
+      <trans-unit id="PropertyAssignment">
+        <source>Property initial value: $({0})="{1}" Source: {2}</source>
+        <target state="translated">屬性初始值: $({0})="{1}" 來源: {2}</target>
+        <note />
+      </trans-unit>
       <trans-unit id="SkippedConstraintsOnRequest">
         <source>MSB4260: Project "{0}" skipped graph isolation constraints on referenced project "{1}"</source>
         <target state="translated">MSB4260: 專案 "{0}" 已跳過參考專案 "{1}" 上的圖形隔離條件約束</target>
@@ -141,11 +181,16 @@
     </note>
       </trans-unit>
       <trans-unit id="StaticGraphAcceptsSingleSolutionEntryPoint">
-        <source>MSB4261: Static graph only accepts a solution as the only entry point. Multiple entry points detected: {0}</source>
-        <target state="translated">MSB4261: 靜態圖表只接受解決方案作為唯一的進入點。偵測到多個進入點: {0}</target>
+        <source>MSB4261: Multiple entry points with solutions detected: {0}. If static graph is loaded from a solution, that that solution must be the only entry point.</source>
+        <target state="translated">MSB4261: 偵測到解決方案有多個進入點: {0}。若是從解決方案載入靜態圖表，則該解決方案只可有一個進入點。</target>
         <note>
       LOCALIZATION: {0} is a semicolon delimited list of files
     </note>
+      </trans-unit>
+      <trans-unit id="StaticGraphConstructionMetrics">
+        <source>"Static graph loaded in {0} seconds: {1} nodes, {2} edges"</source>
+        <target state="translated">"在 {0} 秒內載入的靜態圖形: {1} 個節點、{2} 個邊緣"</target>
+        <note />
       </trans-unit>
       <trans-unit id="StaticGraphDoesNotSupportSlnReferences">
         <source>MSB4263: Project "{0}" has a reference to solution file "{1}". Referencing solutions is not supported in static graph.
@@ -169,6 +214,11 @@
       LOCALIZATION: {0} is a file, {1} and {2} are semicolon delimited lists of messages
     </note>
       </trans-unit>
+      <trans-unit id="TaskReturnedFalseButDidNotLogError">
+        <source>MSB4181: The "{0}" task returned false but did not log an error.</source>
+        <target state="translated">MSB4181: "{0}" 工作傳回了 False，但未記錄錯誤。</target>
+        <note>{StrBegin="MSB4181: "}</note>
+      </trans-unit>
       <trans-unit id="UndeclaredMSBuildTasksNotAllowedInIsolatedGraphBuilds">
         <source>MSB4254: The MSBuild task is building project(s) "{0}" which are not specified in the ProjectReference item. In isolated builds this probably means that the references are not explicitly specified as a ProjectReference item in "{1}"</source>
         <target state="translated">MSB4254: MSBuild 工作正在建置未在 ProjectReference 項目中指定的專案 "{0}"。在隔離式組建中，這可能代表未在 "{1}" 中將該參考明確指定為 ProjectReference 項目</target>
@@ -176,6 +226,11 @@
       {StrBegin="MSB4254:"}
       LOCALIZATION: Do not localize the following words: ProjectReference, MSBuild, task.
     </note>
+      </trans-unit>
+      <trans-unit id="UninitializedPropertyRead">
+        <source>Read uninitialized property "{0}"</source>
+        <target state="translated">讀取未初始化的屬性 "{0}"</target>
+        <note />
       </trans-unit>
       <trans-unit id="UsingInputCaches">
         <source>Using input build results caches: {0}</source>

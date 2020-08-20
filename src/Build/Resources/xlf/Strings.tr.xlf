@@ -41,14 +41,14 @@
     - the reference was called with global properties that do not match the static graph inferred nodes
     - the reference was not explicitly specified as a ProjectReference item in project "{0}"
     </source>
-        <target state="new">MSB4252: Project "{0}" with global properties
+        <target state="translated">MSB4252: Genel özelliklerle sahip "{0}" projesi
     ({1})
-    is building project "{2}" with global properties
+    ({4}) hedefle 
     ({3})
-    with the ({4}) target(s) but the build result for the built project is not in the engine cache. In isolated builds this could mean one of the following:
-    - the reference was called with a target which is not specified in the ProjectReferenceTargets item in project "{0}"
-    - the reference was called with global properties that do not match the static graph inferred nodes
-    - the reference was not explicitly specified as a ProjectReference item in project "{0}"
+    genel özelliklere sahip "{2}" projesini oluşturuyor ancak oluşturulan projeye yönelik derleme sonucu, altyapı önbelleğinde değil. Bu, yalıtılmış derlemelerde aşağıdakilerden biri anlamına gelebilir:
+    - Başvuru, "{0}" projesindeki ProjectReferenceTargets öğesinde belirtilmeyen bir hedefle çağrıldı
+    - Başvuru, çıkartılan statik grafik düğümü ile eşleşmeyen genel özelliklerle çağrıldı
+    - Başvuru, "{0}" projesinde ProjectReference öğesi olarak açıkça belirtilmedi
     </target>
         <note>
       {StrBegin="MSB4252:"}
@@ -73,6 +73,11 @@
       <trans-unit id="EmptyOutputCacheFile">
         <source>MSB4257: The specified output result cache file is empty.</source>
         <target state="translated">MSB4257: Belirtilen çıkış sonucu önbellek dosyası boş.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="EnvironmentVariableRead">
+        <source>Read environment variable "{0}"</source>
+        <target state="translated">"{0}" ortam değişkenini oku</target>
         <note />
       </trans-unit>
       <trans-unit id="ErrorReadingCacheFile">
@@ -102,6 +107,11 @@
       LOCALIZATION: {0} is an enum value of LoggerVerbosity.
     </note>
       </trans-unit>
+      <trans-unit id="LogTaskInputs.Truncated">
+        <source>The parameters have been truncated beyond this point. To view all parameters, clear the MSBUILDTRUNCATETASKINPUTLOGGING environment variable.</source>
+        <target state="translated">Parametreler bu noktanın ötesinde kısaltıldı. Tüm parametreleri görüntülemek için MSBUILDTRUNCATETASKINPUTLOGGING ortam değişkenini temizleyin.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="MetaprojectGenerated">
         <source>Metaproject "{0}" generated.</source>
         <target state="translated">"{0}" meta projesi oluşturuldu.</target>
@@ -112,6 +122,11 @@
         <target state="translated">BeginBuild henüz çağrılmadığı için işlem tamamlanamıyor.</target>
         <note />
       </trans-unit>
+      <trans-unit id="NuGetAssemblyNotFound">
+        <source>A required NuGet assembly was not found. Expected Path: {0}</source>
+        <target state="translated">Gereken NuGet derlemesi bulunamadı. Beklenen Yol: {0}</target>
+        <note />
+      </trans-unit>
       <trans-unit id="NullReferenceFromProjectInstanceFactory">
         <source>MSB4253: A null reference was returned from a user-provided ProjectInstanceFactoryFunc callback. This is not allowed.</source>
         <target state="translated">MSB4253: Kullanıcı tarafından sağlanan bir ProjectInstanceFactoryFunc geri aramasında null başvuru var. Buna izin verilmez.</target>
@@ -119,6 +134,26 @@
       {StrBegin="MSB4253: "}
       LOCALIZATION:  Do not localize the following words: ProjectInstanceFactoryFunc.
     </note>
+      </trans-unit>
+      <trans-unit id="OM_MatchOnMetadataIsRestrictedToOnlyOneReferencedItem">
+        <source>Only one item type may be referenced when removing with MatchOnMetadata.</source>
+        <target state="translated">MatchOnMetadata ile kaldırırken yalnızca bir öğe türüne başvurulabilir.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="OM_MatchOnMetadataOnlyApplicableToRemoveItems">
+        <source>MatchOnMetadata only applies to Remove operations on items.</source>
+        <target state="translated">MatchOnMetadata yalnızca öğelerdeki Kaldırma işlemleri için geçerlidir.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="OM_MatchOnMetadataOptionsOnlyApplicableToItemsWithMatchOnMetadata">
+        <source>MatchOnMetadataOptions is valid only when removing items using MatchOnMetadata.</source>
+        <target state="translated">MatchOnMetadataOptions yalnızca MatchOnMetadata kullanılarak öğeler kaldırılırken geçerlidir.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="OM_NoMatchOnMetadataOutsideTargets">
+        <source>MatchOnMetadata cannot be used outside of a &lt;Target&gt;.</source>
+        <target state="translated">MatchOnMetadata bir &lt;Target&gt; dışında kullanılamaz.</target>
+        <note />
       </trans-unit>
       <trans-unit id="OM_TargetNameNullOrEmpty">
         <source>Method {0} cannot be called with a collection containing null or empty target names.</source>
@@ -133,6 +168,11 @@
       LOCALIZATION:  Do not localize the following words: ProjectGraph, ProjectReference, ToolsVersion.
     </note>
       </trans-unit>
+      <trans-unit id="PropertyAssignment">
+        <source>Property initial value: $({0})="{1}" Source: {2}</source>
+        <target state="translated">Özellik başlangıç değeri: $({0})="{1}" Kaynak: {2}</target>
+        <note />
+      </trans-unit>
       <trans-unit id="SkippedConstraintsOnRequest">
         <source>MSB4260: Project "{0}" skipped graph isolation constraints on referenced project "{1}"</source>
         <target state="translated">MSB4260: "{0}" projesi, başvurulan "{1}" projesindeki graf yalıtımı kısıtlamalarını atladı</target>
@@ -141,11 +181,16 @@
     </note>
       </trans-unit>
       <trans-unit id="StaticGraphAcceptsSingleSolutionEntryPoint">
-        <source>MSB4261: Static graph only accepts a solution as the only entry point. Multiple entry points detected: {0}</source>
-        <target state="translated">MSB4261: Statik graf tek giriş noktası olarak yalnızca bir çözümü kabul eder. Birden çok giriş noktası algılandı: {0}</target>
+        <source>MSB4261: Multiple entry points with solutions detected: {0}. If static graph is loaded from a solution, that that solution must be the only entry point.</source>
+        <target state="translated">MSB4261: Çözümlerde birden fazla giriş noktası algılandı: {0}. Statik graf bir çözümden yükleniyorsa bu çözüm tek giriş noktası olmalıdır.</target>
         <note>
       LOCALIZATION: {0} is a semicolon delimited list of files
     </note>
+      </trans-unit>
+      <trans-unit id="StaticGraphConstructionMetrics">
+        <source>"Static graph loaded in {0} seconds: {1} nodes, {2} edges"</source>
+        <target state="translated">"Statik graf {0} saniye içinde yüklendi: {1} düğüm, {2} uç"</target>
+        <note />
       </trans-unit>
       <trans-unit id="StaticGraphDoesNotSupportSlnReferences">
         <source>MSB4263: Project "{0}" has a reference to solution file "{1}". Referencing solutions is not supported in static graph.
@@ -169,6 +214,11 @@
       LOCALIZATION: {0} is a file, {1} and {2} are semicolon delimited lists of messages
     </note>
       </trans-unit>
+      <trans-unit id="TaskReturnedFalseButDidNotLogError">
+        <source>MSB4181: The "{0}" task returned false but did not log an error.</source>
+        <target state="translated">MSB4181: "{0}" görevi false değerini döndürdü ancak günlüğe hata kaydetmedi.</target>
+        <note>{StrBegin="MSB4181: "}</note>
+      </trans-unit>
       <trans-unit id="UndeclaredMSBuildTasksNotAllowedInIsolatedGraphBuilds">
         <source>MSB4254: The MSBuild task is building project(s) "{0}" which are not specified in the ProjectReference item. In isolated builds this probably means that the references are not explicitly specified as a ProjectReference item in "{1}"</source>
         <target state="translated">MSB4254: MSBuild task, ProjectReference öğesinde belirtilmeyen "{0}" projelerini derliyor. Yalıtılmış derlemelerde bu, genellikle başvuruların "{1}" içinde açıkça ProjectReference öğesi olarak belirtilmediği anlamına gelir</target>
@@ -176,6 +226,11 @@
       {StrBegin="MSB4254:"}
       LOCALIZATION: Do not localize the following words: ProjectReference, MSBuild, task.
     </note>
+      </trans-unit>
+      <trans-unit id="UninitializedPropertyRead">
+        <source>Read uninitialized property "{0}"</source>
+        <target state="translated">"{0}" başlatılmamış özelliğini oku</target>
+        <note />
       </trans-unit>
       <trans-unit id="UsingInputCaches">
         <source>Using input build results caches: {0}</source>

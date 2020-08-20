@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -13,7 +14,6 @@ using Microsoft.Build.CommandLine;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Shared;
 using Microsoft.Build.UnitTests.Shared;
-using Microsoft.Build.UnitTests;
 using Xunit;
 using Xunit.Abstractions;
 using Shouldly;
@@ -659,7 +659,6 @@ namespace Microsoft.Build.UnitTests
             // if there's not, we will catch when we try to read the toolsets. Either is fine; we just want to not crash.
             (output.Contains("MSB1043") || output.Contains("MSB4136")).ShouldBeTrue("Output should contain 'MSB1043' or 'MSB4136'");
 
-
         }
 #endif
 
@@ -735,10 +734,11 @@ namespace Microsoft.Build.UnitTests
             string projectString =
                    "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
                     "<Project ToolsVersion=\"4.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">" +
-                    "<Target Name=\"t\"><Message Text=\"Hello\"/></Target>" +
+                    "<Target Name=\"t\"><Message Text=\"[Hello]\"/></Target>" +
                     "</Project>";
             string tempdir = Path.GetTempPath();
             string projectFileName = Path.Combine(tempdir, "msbLoggertest.proj");
+            string logFile = Path.Combine(tempdir, "logFile");
             string quotedProjectFileName = "\"" + projectFileName + "\"";
 
             try
@@ -749,7 +749,7 @@ namespace Microsoft.Build.UnitTests
                 }
 #if FEATURE_GET_COMMANDLINE
                 //Should pass
-                MSBuildApp.Execute(@"c:\bin\msbuild.exe /logger:FileLogger,""Microsoft.Build, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"" " + quotedProjectFileName).ShouldBe(MSBuildApp.ExitType.Success);
+                MSBuildApp.Execute(@$"c:\bin\msbuild.exe /logger:FileLogger,""Microsoft.Build, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"";""LogFile={logFile}"" /verbosity:detailed " + quotedProjectFileName).ShouldBe(MSBuildApp.ExitType.Success);
 
 #else
                 //Should pass
@@ -757,14 +757,26 @@ namespace Microsoft.Build.UnitTests
                     new[]
                         {
                             NativeMethodsShared.IsWindows ? @"c:\bin\msbuild.exe" : "/msbuild.exe",
-                            @"/logger:FileLogger,""Microsoft.Build, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a""",
+                            @$"/logger:FileLogger,""Microsoft.Build, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"";""LogFile={logFile}""",
+                            "/verbosity:detailed",
                             quotedProjectFileName
                         }).ShouldBe(MSBuildApp.ExitType.Success);
 #endif
+                File.Exists(logFile).ShouldBeTrue();
+
+                var logFileContents = File.ReadAllText(logFile);
+
+                logFileContents.ShouldContain("Process = ");
+                logFileContents.ShouldContain("MSBuild executable path = ");
+                logFileContents.ShouldContain("Command line arguments = ");
+                logFileContents.ShouldContain("Current directory = ");
+                logFileContents.ShouldContain("MSBuild version = ");
+                logFileContents.ShouldContain("[Hello]");
             }
             finally
             {
                 File.Delete(projectFileName);
+                File.Delete(logFile);
             }
         }
 
@@ -1199,6 +1211,54 @@ namespace Microsoft.Build.UnitTests
             }
         }
 
+        /// <summary>
+        /// Test that low priority builds actually execute with low priority.
+        /// </summary>
+        [Fact(Skip = "https://github.com/microsoft/msbuild/issues/5229")]
+        public void LowPriorityBuild()
+        {
+            RunPriorityBuildTest(expectedPrority: ProcessPriorityClass.BelowNormal, arguments: "/low");
+        }
+
+        /// <summary>
+        /// Test that normal builds execute with normal priority.
+        /// </summary>
+        [Fact(Skip = "https://github.com/microsoft/msbuild/issues/5229")]
+        public void NormalPriorityBuild()
+        {
+            // In case we are already running at a  different priority, validate
+            // the build runs as the current priority, and not some hard coded priority.
+            ProcessPriorityClass currentPriority = Process.GetCurrentProcess().PriorityClass;
+            RunPriorityBuildTest(expectedPrority: currentPriority);
+        }
+
+        private void RunPriorityBuildTest(ProcessPriorityClass expectedPrority, params string[] arguments)
+        {
+            string[] aggregateArguments = arguments.Union(new string[] { " /nr:false /v:diag "}).ToArray();
+
+            string contents = ObjectModelHelpers.CleanupFileContents(@"
+<Project DefaultTargets=""Build"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
+ <Target Name=""Build"">
+    <Message Text=""Task priority is '$([System.Diagnostics.Process]::GetCurrentProcess().PriorityClass)'""/>
+ </Target>
+</Project>
+");
+            // Set our test environment variables:
+            //  - Disable in proc build to make sure priority is inherited by subprocesses.
+            //  - Enable property functions so we can easily read our priority class.
+            IDictionary<string, string> environmentVars = new Dictionary<string, string>
+            {
+                { "MSBUILDNOINPROCNODE", "1"},
+                { "DISABLECONSOLECOLOR", "1"},
+                { "MSBUILDENABLEALLPROPERTYFUNCTIONS", "1" },
+            };
+
+            string logContents = ExecuteMSBuildExeExpectSuccess(contents, envsToCreate: environmentVars, arguments: aggregateArguments);
+
+            string expected = string.Format(@"Task priority is '{0}'", expectedPrority);
+            logContents.ShouldContain(expected, () => logContents);
+        }
+
 #region IgnoreProjectExtensionTests
 
         /// <summary>
@@ -1363,13 +1423,11 @@ namespace Microsoft.Build.UnitTests
             projectHelper = new IgnoreProjectExtensionsHelper(projects);
             MSBuildApp.ProcessProjectSwitch(new string[0] { }, extensionsToIgnore, projectHelper.GetFiles).ShouldBe("test.sln", StringCompareShould.IgnoreCase); // "Expected test.sln to be only solution found"
 
-
             projects = new string[] { "test.sln~", "test.sln" };
             extensionsToIgnore = new string[] { };
             projectHelper = new IgnoreProjectExtensionsHelper(projects);
             MSBuildApp.ProcessProjectSwitch(new string[0] { }, extensionsToIgnore, projectHelper.GetFiles).ShouldBe("test.sln", StringCompareShould.IgnoreCase); // "Expected test.sln to be only solution found"
         }
-
 
         /// <summary>
         /// Ignore .sln and .vcproj files to replicate Building_DF_LKG functionality
@@ -1382,7 +1440,6 @@ namespace Microsoft.Build.UnitTests
             IgnoreProjectExtensionsHelper projectHelper = new IgnoreProjectExtensionsHelper(projects);
             MSBuildApp.ProcessProjectSwitch(new string[0] { }, extensionsToIgnore, projectHelper.GetFiles).ShouldBe("test.proj"); // "Expected test.proj to be only project found"
         }
-
 
         /// <summary>
         /// Test the case where we remove all of the project extensions that exist in the directory
@@ -1523,14 +1580,14 @@ namespace Microsoft.Build.UnitTests
                 List<string> fileNamesToReturn = new List<string>();
                 foreach (string file in _directoryFileNameList)
                 {
-                    if (String.Compare(searchPattern, "*.sln", StringComparison.OrdinalIgnoreCase) == 0)
+                    if (String.Equals(searchPattern, "*.sln", StringComparison.OrdinalIgnoreCase))
                     {
-                        if (String.Compare(Path.GetExtension(file), ".sln", StringComparison.OrdinalIgnoreCase) == 0)
+                        if (String.Equals(Path.GetExtension(file), ".sln", StringComparison.OrdinalIgnoreCase))
                         {
                             fileNamesToReturn.Add(file);
                         }
                     }
-                    else if (String.Compare(searchPattern, "*.*proj", StringComparison.OrdinalIgnoreCase) == 0)
+                    else if (String.Equals(searchPattern, "*.*proj", StringComparison.OrdinalIgnoreCase))
                     {
                         if (Path.GetExtension(file).Contains("proj"))
                         {
@@ -1842,7 +1899,7 @@ namespace Microsoft.Build.UnitTests
         {
             ArrayList loggers = new ArrayList();
             LoggerVerbosity verbosity = LoggerVerbosity.Normal;
-            List<DistributedLoggerRecord> distributedLoggerRecords = new List<DistributedLoggerRecord>(); ;
+            List<DistributedLoggerRecord> distributedLoggerRecords = new List<DistributedLoggerRecord>(); 
             string[] consoleLoggerParameters = new string[6] { "Parameter1", ";Parameter;", "", ";", ";Parameter", "Parameter;" };
 
             MSBuildApp.ProcessConsoleLoggerSwitch
@@ -1960,7 +2017,7 @@ namespace Microsoft.Build.UnitTests
                 }
             };
 
-            string logContents = ExecuteMSBuildExeExpectSuccess(projectContents, preExistingProps, "/restore");
+            string logContents = ExecuteMSBuildExeExpectSuccess(projectContents, filesToCreate: preExistingProps, arguments: "/restore");
 
             logContents.ShouldContain(guid1);
             logContents.ShouldContain(guid2);
@@ -2007,7 +2064,7 @@ namespace Microsoft.Build.UnitTests
                 }
             };
 
-            string logContents = ExecuteMSBuildExeExpectSuccess(projectContents, preExistingProps, "/restore");
+            string logContents = ExecuteMSBuildExeExpectSuccess(projectContents, filesToCreate: preExistingProps, arguments: "/restore");
 
             logContents.ShouldContain(guid1);
             logContents.ShouldContain(guid2);
@@ -2147,7 +2204,6 @@ namespace Microsoft.Build.UnitTests
 
 #endif
 
-
         private string CopyMSBuild()
         {
             string dest = null;
@@ -2194,7 +2250,7 @@ namespace Microsoft.Build.UnitTests
             }
         }
 
-        private string ExecuteMSBuildExeExpectSuccess(string projectContents, IDictionary<string, string> filesToCreate = null, params string[] arguments)
+        private string ExecuteMSBuildExeExpectSuccess(string projectContents, IDictionary<string, string> filesToCreate = null,  IDictionary<string, string> envsToCreate = null, params string[] arguments)
         {
             using (TestEnvironment testEnvironment = UnitTests.TestEnvironment.Create())
             {
@@ -2205,6 +2261,14 @@ namespace Microsoft.Build.UnitTests
                     foreach (var item in filesToCreate)
                     {
                         File.WriteAllText(Path.Combine(testProject.TestRoot, item.Key), item.Value);
+                    }
+                }
+
+                if (envsToCreate != null)
+                {
+                    foreach (var env in envsToCreate)
+                    {
+                        testEnvironment.SetEnvironmentVariable(env.Key, env.Value);
                     }
                 }
 

@@ -86,8 +86,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetPlatformIdentifier Condition="'$(TargetPlatformIdentifier)' == ''">Windows</TargetPlatformIdentifier>
-    <TargetPlatformVersion Condition="'$(TargetPlatformVersion)' == ''">7.0</TargetPlatformVersion>
+    <TargetPlatformIdentifier Condition="'$(TargetPlatformIdentifier)' == '' and '$(_EnableDefaultWindowsPlatform)' != 'false'">Windows</TargetPlatformIdentifier>
+    <TargetPlatformVersion Condition="'$(TargetPlatformVersion)' == '' and '$(_EnableDefaultWindowsPlatform)' != 'false'">7.0</TargetPlatformVersion>
     <TargetPlatformSdkPath Condition="'$(TargetPlatformSdkPath)' == '' and '$(TargetPlatformSdkRootOverride)' != ''">$(TargetPlatformSdkRootOverride)\</TargetPlatformSdkPath>
     <TargetPlatformSdkPath Condition="'$(TargetPlatformSdkPath)' == '' and '$(TargetPlatformIdentifier)' == 'Windows' and '$(OS)' == 'Windows_NT' and '$(MSBuildRuntimeType)' != 'Core'">$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\Software\Microsoft\Microsoft SDKs\Windows\v$(TargetPlatformVersion)', InstallationFolder, null, RegistryView.Registry32, RegistryView.Default))</TargetPlatformSdkPath>
     <TargetPlatformSdkPath Condition="'$(TargetPlatformSdkPath)' == ''">$([Microsoft.Build.Utilities.ToolLocationHelper]::GetPlatformSDKLocation($(TargetPlatformIdentifier), $(TargetPlatformVersion)))</TargetPlatformSdkPath>
@@ -96,7 +96,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <TargetPlatformWinMDLocation Condition="'$(TargetPlatformWinMDLocation)' == '' and Exists('$(TargetPlatformSdkMetadataLocation)')">$(TargetPlatformSdkMetadataLocation)</TargetPlatformWinMDLocation>
     <UseOSWinMdReferences Condition="'$(UseOSWinMdReferences)' == '' and ('$(TargetPlatformWinMDLocation)' == '' and '$(TargetPlatformIdentifier)' == 'Windows' and '$(TargetPlatformVersion)' &gt; '7.0')">true</UseOSWinMdReferences>
     <TargetPlatformWinMDLocation Condition="'$(UseOsWinMdReferences)' == 'true'">$(WinDir)\System32\WinMetadata</TargetPlatformWinMDLocation>
-    <TargetPlatformMoniker Condition="'$(TargetPlatformMoniker)' == ''">$(TargetPlatformIdentifier),Version=$(TargetPlatformVersion)</TargetPlatformMoniker>
+    <TargetPlatformMoniker Condition="'$(TargetPlatformMoniker)' == '' and '$(TargetPlatformIdentifier)' != '' and '$(TargetPlatformVersion)' != ''">$(TargetPlatformIdentifier),Version=$(TargetPlatformVersion)</TargetPlatformMoniker>
     <TargetPlatformDisplayName Condition="'$(TargetPlatformDisplayName)' == ''">$([Microsoft.Build.Utilities.ToolLocationHelper]::GetPlatformSDKDisplayName($(TargetPlatformIdentifier), $(TargetPlatformVersion)))</TargetPlatformDisplayName>
   </PropertyGroup>
 
@@ -123,6 +123,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     -->
 
   <PropertyGroup>
+    <GenerateFullPaths Condition="'$(GenerateFullPaths)' == ''">true</GenerateFullPaths>
     <!-- Ensure any OutputPath has a trailing slash, so it can be concatenated -->
     <OutputPath Condition="'$(OutputPath)' != '' and !HasTrailingSlash('$(OutputPath)')">$(OutputPath)\</OutputPath>
     <AssemblyName Condition=" '$(AssemblyName)'=='' ">$(MSBuildProjectName)</AssemblyName>
@@ -2056,6 +2057,9 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       <ResolveAssemblyReferencesSilent Condition="'$(ResolveAssemblyReferencesSilent)' == '' and '$(TraceDesignTime)' != 'true' and '$(BuildingProject)' == 'false'">true</ResolveAssemblyReferencesSilent>
       <ResolveAssemblyReferencesSilent Condition="'$(ResolveAssemblyReferencesSilent)' == ''">false</ResolveAssemblyReferencesSilent>
       <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch Condition="'$(ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch)' == ''">Warning</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+      <ResolveAssemblyReferencesFindRelatedSatellites Condition="'$(ResolveAssemblyReferencesFindRelatedSatellites)' == ''">$(BuildingProject)</ResolveAssemblyReferencesFindRelatedSatellites>
+      <ResolveAssemblyReferencesFindSerializationAssemblies Condition="'$(ResolveAssemblyReferencesFindSerializationAssemblies)' == ''">$(BuildingProject)</ResolveAssemblyReferencesFindSerializationAssemblies>
+      <ResolveAssemblyReferencesFindRelatedFiles Condition="'$(ResolveAssemblyReferencesFindRelatedFiles)' == ''">$(BuildingProject)</ResolveAssemblyReferencesFindRelatedFiles>
     </PropertyGroup>
 
     <ItemGroup>
@@ -2095,9 +2099,9 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         SupportsBindingRedirectGeneration="$(GenerateBindingRedirectsOutputType)"
         IgnoreVersionForFrameworkReferences="$(IgnoreVersionForFrameworkReferences)"
         FindDependencies="$(_FindDependencies)"
-        FindSatellites="$(BuildingProject)"
-        FindSerializationAssemblies="$(BuildingProject)"
-        FindRelatedFiles="$(BuildingProject)"
+        FindSatellites="$(ResolveAssemblyReferencesFindRelatedSatellites)"
+        FindSerializationAssemblies="$(ResolveAssemblyReferencesFindSerializationAssemblies)"
+        FindRelatedFiles="$(ResolveAssemblyReferencesFindRelatedFiles)"
         Silent="$(ResolveAssemblyReferencesSilent)"
         TargetFrameworkVersion="$(TargetFrameworkVersion)"
         TargetFrameworkMoniker="$(TargetFrameworkMoniker)"
@@ -2663,7 +2667,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
         [IN]
         @(COMReference) - The list of COM references
-        $(BaseIntermediateOutputPath) - The output directory in which to generate wrapper assemblies
+        $(InteropOutputPath) - The output directory in which to generate wrapper assemblies
+                               When $(InteropOutputPath) is not set, then it defaults to $(IntermediateOutputPath).
 
         [OUT]
         @(ReferencePath) - Paths to referenced wrappers.
@@ -3286,7 +3291,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <PropertyGroup Condition="'$(TargetFrameworkMoniker)' != ''">
     <!-- Do not clean if we are going to default the path to the temp directory -->
     <TargetFrameworkMonikerAssemblyAttributesFileClean Condition="'$(TargetFrameworkMonikerAssemblyAttributesFileClean)' == '' and '$(TargetFrameworkMonikerAssemblyAttributesPath)' != ''">true</TargetFrameworkMonikerAssemblyAttributesFileClean>
-    <TargetFrameworkMonikerAssemblyAttributesPath Condition="'$(TargetFrameworkMonikerAssemblyAttributesPath)' == ''">$([System.IO.Path]::Combine('$([System.IO.Path]::GetTempPath())','$(TargetFrameworkMoniker).AssemblyAttributes$(DefaultLanguageSourceExtension)'))</TargetFrameworkMonikerAssemblyAttributesPath>
+    <TargetFrameworkMonikerAssemblyAttributesPath Condition="'$(TargetFrameworkMonikerAssemblyAttributesPath)' == ''">$([System.IO.Path]::Combine('$(IntermediateOutputPath)','$(TargetFrameworkMoniker).AssemblyAttributes$(DefaultLanguageSourceExtension)'))</TargetFrameworkMonikerAssemblyAttributesPath>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -4569,6 +4574,10 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       <Output TaskParameter="TargetOutputs" ItemName="_ThisProjectItemsToCopyToOutputDirectory" />
     </CallTarget>
 
+    <ItemGroup Condition="'$(CopyConflictingTransitiveContent)' == 'false'">
+      <_TransitiveItemsToCopyToOutputDirectory Remove="@(_ThisProjectItemsToCopyToOutputDirectory)" MatchOnMetadata="TargetPath" MatchOnMetadataOptions="PathLike" />
+    </ItemGroup>
+
     <ItemGroup>
       <_TransitiveItemsToCopyToOutputDirectoryAlways               KeepDuplicates=" '$(_GCTODIKeepDuplicates)' != 'false' " KeepMetadata="$(_GCTODIKeepMetadata)" Include="@(_TransitiveItemsToCopyToOutputDirectory->'%(FullPath)')" Condition="'%(_TransitiveItemsToCopyToOutputDirectory.CopyToOutputDirectory)'=='Always'"/>
       <_TransitiveItemsToCopyToOutputDirectoryPreserveNewest       KeepDuplicates=" '$(_GCTODIKeepDuplicates)' != 'false' " KeepMetadata="$(_GCTODIKeepMetadata)" Include="@(_TransitiveItemsToCopyToOutputDirectory->'%(FullPath)')" Condition="'%(_TransitiveItemsToCopyToOutputDirectory.CopyToOutputDirectory)'=='PreserveNewest'"/>
@@ -4914,7 +4923,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     -->
   <Target
        Name="IncrementalClean"
-       DependsOnTargets="_CleanGetCurrentAndPriorFileWrites">
+       DependsOnTargets="$(IncrementalCleanDependsOn);_CleanGetCurrentAndPriorFileWrites">
 
     <!-- Subtract list of files produced in prior builds from list of files produced in this build. -->
     <ItemGroup>
@@ -6170,11 +6179,12 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
   <!-- Import NuGet.targets (required for GetReferenceNearestTargetFrameworkTask and used for Restore functionality) -->
   <PropertyGroup>
-    <NuGetRestoreTargets Condition="'$(NuGetRestoreTargets)'=='' and '$([MSBuild]::IsRunningFromVisualStudio())'=='true'">$(MSBuildToolsPath32)\..\..\..\Common7\IDE\CommonExtensions\Microsoft\NuGet\NuGet.targets</NuGetRestoreTargets>
+    <MSBuildUseVisualStudioDirectoryLayout Condition="'$(MSBuildUseVisualStudioDirectoryLayout)'==''">$([MSBuild]::IsRunningFromVisualStudio())</MSBuildUseVisualStudioDirectoryLayout>
+    <NuGetRestoreTargets Condition="'$(NuGetRestoreTargets)'=='' and '$(MSBuildUseVisualStudioDirectoryLayout)'=='true'">$(MSBuildToolsPath32)\..\..\..\Common7\IDE\CommonExtensions\Microsoft\NuGet\NuGet.targets</NuGetRestoreTargets>
     <NuGetRestoreTargets Condition="'$(NuGetRestoreTargets)'==''">$(MSBuildToolsPath)\NuGet.targets</NuGetRestoreTargets>
   </PropertyGroup>
 
-  <Import Condition="Exists('$(NuGetRestoreTargets)')" Project="$(NuGetRestoreTargets)" />
+  <Import Condition="'$(IsRestoreTargetsFileLoaded)' != 'true' and Exists('$(NuGetRestoreTargets)')" Project="$(NuGetRestoreTargets)" />
 
   <Import Project="$(CustomAfterMicrosoftCommonTargets)" Condition="'$(CustomAfterMicrosoftCommonTargets)' != '' and Exists('$(CustomAfterMicrosoftCommonTargets)')"/>
 

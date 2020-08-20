@@ -26,7 +26,6 @@ using Microsoft.Build.Graph;
 using Microsoft.Build.Internal;
 using Microsoft.Build.Logging;
 using Microsoft.Build.Shared;
-using Microsoft.Build.Shared.FileSystem;
 using ForwardingLoggerRecord = Microsoft.Build.Logging.ForwardingLoggerRecord;
 using LoggerDescription = Microsoft.Build.Logging.LoggerDescription;
 
@@ -233,6 +232,8 @@ namespace Microsoft.Build.Execution
         /// </summary>
         private DateTime _instantiationTimeUtc;
 
+        private IEnumerable<DeferredBuildMessage> _deferredBuildMessages;
+
 #if DEBUG
         /// <summary>
         /// <code>true</code> to wait for a debugger to be attached, otherwise <code>false</code>.
@@ -293,12 +294,12 @@ namespace Microsoft.Build.Execution
         private enum BuildManagerState
         {
             /// <summary>
-            /// This is the default state.  <see cref="BuildManager.BeginBuild"/> may be called in this state.  All other methods raise InvalidOperationException
+            /// This is the default state.  <see cref="BeginBuild(BuildParameters)"/> may be called in this state.  All other methods raise InvalidOperationException
             /// </summary>
             Idle,
 
             /// <summary>
-            /// This is the state the BuildManager is in after <see cref="BuildManager.BeginBuild"/> has been called but before <see cref="BuildManager.EndBuild"/> has been called.
+            /// This is the state the BuildManager is in after <see cref="BeginBuild(BuildParameters)"/> has been called but before <see cref="EndBuild"/> has been called.
             /// <see cref="BuildManager.PendBuildRequest(Microsoft.Build.Execution.BuildRequestData)"/>, <see cref="BuildManager.BuildRequest(Microsoft.Build.Execution.BuildRequestData)"/>, <see cref="BuildManager.PendBuildRequest(GraphBuildRequestData)"/>, <see cref="BuildManager.BuildRequest(GraphBuildRequestData)"/>, and <see cref="BuildManager.EndBuild"/> may be called in this state.
             /// </summary>
             Building,
@@ -359,6 +360,36 @@ namespace Microsoft.Build.Execution
         LegacyThreadingData IBuildComponentHost.LegacyThreadingData => _legacyThreadingData;
 
         /// <summary>
+        /// <see cref="BuildManager.BeginBuild(BuildParameters,IEnumerable{DeferredBuildMessage})"/>
+        /// </summary>
+        public readonly struct DeferredBuildMessage
+        {
+            public MessageImportance Importance { get; }
+
+            public string Text { get; }
+
+            public DeferredBuildMessage(string text, MessageImportance importance)
+            {
+                Importance = importance;
+                Text = text;
+            }
+        }
+
+        /// <summary>
+        /// Prepares the BuildManager to receive build requests.
+        /// </summary>
+        /// <param name="parameters">The build parameters.  May be null.</param>
+        /// <param name="deferredBuildMessages"> Build messages to be logged before the build begins. </param>
+        /// <exception cref="InvalidOperationException">Thrown if a build is already in progress.</exception>
+        public void BeginBuild(BuildParameters parameters, IEnumerable<DeferredBuildMessage> deferredBuildMessages)
+        {
+            // deferredBuildMessages cannot be an optional parameter on a single BeginBuild method because it would break binary compatibility.
+            _deferredBuildMessages = deferredBuildMessages;
+            BeginBuild(parameters);
+            _deferredBuildMessages = null;
+        }
+
+        /// <summary>
         /// Prepares the BuildManager to receive build requests.
         /// </summary>
         /// <param name="parameters">The build parameters.  May be null.</param>
@@ -374,7 +405,7 @@ namespace Microsoft.Build.Execution
 
                 if (BuildParameters.DumpOpportunisticInternStats)
                 {
-                    OpportunisticIntern.EnableStatisticsGathering();
+                    OpportunisticIntern.Instance.EnableStatisticsGathering();
                 }
 
                 _overallBuildSuccess = true;
@@ -399,6 +430,8 @@ namespace Microsoft.Build.Execution
                 _nodeManager = ((IBuildComponentHost)this).GetComponent(BuildComponentType.NodeManager) as INodeManager;
 
                 var loggingService = InitializeLoggingService();
+
+                LogDeferredMessages(loggingService, _deferredBuildMessages);
 
                 InitializeCaches();
 
@@ -783,14 +816,11 @@ namespace Microsoft.Build.Execution
                     Reset();
                     _buildManagerState = BuildManagerState.Idle;
 
-                    if (_threadException != null)
-                    {
-                        _threadException.Throw();
-                    }
+                    _threadException?.Throw();
 
                     if (BuildParameters.DumpOpportunisticInternStats)
                     {
-                        OpportunisticIntern.ReportStatistics();
+                        OpportunisticIntern.Instance.ReportStatistics();
                     }
                 }
             }
@@ -861,7 +891,7 @@ namespace Microsoft.Build.Execution
         /// </summary>
         public void ShutdownAllNodes()
         {
-            if (null == _nodeManager)
+            if (_nodeManager == null)
             {
                 _nodeManager = ((IBuildComponentHost)this).GetComponent(BuildComponentType.NodeManager) as INodeManager;
             }
@@ -1261,7 +1291,7 @@ namespace Microsoft.Build.Execution
         {
             if (ex is InvalidProjectFileException projectException)
             {
-                if (projectException.HasBeenLogged != true)
+                if (!projectException.HasBeenLogged)
                 {
                     BuildEventContext buildEventContext = new BuildEventContext(submission.SubmissionId, 1, BuildEventContext.InvalidProjectInstanceId, BuildEventContext.InvalidProjectContextId, BuildEventContext.InvalidTargetId, BuildEventContext.InvalidTaskId);
                     ((IBuildComponentHost)this).LoggingService.LogInvalidProjectFileError(buildEventContext, projectException);
@@ -1288,7 +1318,7 @@ namespace Microsoft.Build.Execution
         {
             if (ex is InvalidProjectFileException projectException)
             {
-                if (projectException.HasBeenLogged != true)
+                if (!projectException.HasBeenLogged)
                 {
                     BuildEventContext buildEventContext = new BuildEventContext(submission.SubmissionId, 1, BuildEventContext.InvalidProjectInstanceId, BuildEventContext.InvalidProjectContextId, BuildEventContext.InvalidTargetId, BuildEventContext.InvalidTaskId);
                     ((IBuildComponentHost)this).LoggingService.LogInvalidProjectFileError(buildEventContext, projectException);
@@ -1340,7 +1370,7 @@ namespace Microsoft.Build.Execution
                 InvalidProjectFileException projectException = ex as InvalidProjectFileException;
                 if (projectException != null)
                 {
-                    if (projectException.HasBeenLogged != true)
+                    if (!projectException.HasBeenLogged)
                     {
                         BuildEventContext projectBuildEventContext = new BuildEventContext(submission.SubmissionId, 1, BuildEventContext.InvalidProjectInstanceId, BuildEventContext.InvalidProjectContextId, BuildEventContext.InvalidTargetId, BuildEventContext.InvalidTaskId);
                         ((IBuildComponentHost)this).LoggingService.LogInvalidProjectFileError(projectBuildEventContext, projectException);
@@ -1411,6 +1441,13 @@ namespace Microsoft.Build.Execution
                                 projectLoadSettings);
                         });
                 }
+
+                LogMessage(
+                    ResourceUtilities.FormatResourceStringIgnoreCodeAndKeyword(
+                        "StaticGraphConstructionMetrics",
+                        Math.Round(projectGraph.ConstructionMetrics.ConstructionTime.TotalSeconds, 3),
+                        projectGraph.ConstructionMetrics.NodeCount,
+                        projectGraph.ConstructionMetrics.EdgeCount));
 
                 IReadOnlyDictionary<ProjectGraphNode, ImmutableList<string>> targetLists = projectGraph.GetTargetLists(submission.BuildRequestData.TargetNames);
 
@@ -1489,7 +1526,7 @@ namespace Microsoft.Build.Execution
                     foreach (var innerException in aggregateException.InnerExceptions)
                     {
                         var projectException = (InvalidProjectFileException) innerException;
-                        if (projectException.HasBeenLogged != true)
+                        if (!projectException.HasBeenLogged)
                         {
                             BuildEventContext projectBuildEventContext = new BuildEventContext(submission.SubmissionId, 1, BuildEventContext.InvalidProjectInstanceId, BuildEventContext.InvalidProjectContextId, BuildEventContext.InvalidTargetId, BuildEventContext.InvalidTaskId);
                             ((IBuildComponentHost)this).LoggingService.LogInvalidProjectFileError(projectBuildEventContext, projectException);
@@ -1934,7 +1971,7 @@ namespace Microsoft.Build.Execution
                         {
                             NodeInfo createdNode = _nodeManager.CreateNode(GetNodeConfiguration(), response.RequiredNodeType);
 
-                            if (null != createdNode)
+                            if (createdNode != null)
                             {
                                 _noNodesActiveEvent.Reset();
                                 _activeNodes.Add(createdNode.NodeId);
@@ -2105,7 +2142,7 @@ namespace Microsoft.Build.Execution
         /// </summary>
         private NodeConfiguration GetNodeConfiguration()
         {
-            if (null == _nodeConfiguration)
+            if (_nodeConfiguration == null)
             {
                 // Get the remote loggers
                 ILoggingService loggingService = ((IBuildComponentHost)this).GetComponent(BuildComponentType.LoggingService) as ILoggingService;
@@ -2232,19 +2269,9 @@ namespace Microsoft.Build.Execution
         {
             int cpuCount = _buildParameters.MaxNodeCount;
 
-            // Mono has issues with TPL Dataflow implementation,
-            // so use synchronous version
-            LoggerMode loggerMode;
-            if (NativeMethodsShared.IsMono)
-            {
-                loggerMode = LoggerMode.Synchronous;
-            }
-            else
-            {
-                loggerMode = cpuCount == 1 && _buildParameters.UseSynchronousLogging
-                    ? LoggerMode.Synchronous
-                    : LoggerMode.Asynchronous;
-            }
+            LoggerMode loggerMode = cpuCount == 1 && _buildParameters.UseSynchronousLogging
+                                        ? LoggerMode.Synchronous
+                                        : LoggerMode.Asynchronous;
 
             ILoggingService loggingService = LoggingService.CreateLoggingService(loggerMode,
                 1 /*This logging service is used for the build manager and the inproc node, therefore it should have the first nodeId*/);
@@ -2301,6 +2328,19 @@ namespace Microsoft.Build.Execution
             return loggingService;
         }
 
+        private static void LogDeferredMessages(ILoggingService loggingService, IEnumerable<DeferredBuildMessage> deferredBuildMessages)
+        {
+            if (deferredBuildMessages == null)
+            {
+                return;
+            }
+
+            foreach (var message in deferredBuildMessages)
+            {
+                loggingService.LogCommentFromText(BuildEventContext.Invalid, message.Importance, message.Text);
+            }
+        }
+
         /// <summary>
         /// Ensures that the packet type matches the expected type
         /// </summary>
@@ -2324,7 +2364,7 @@ namespace Microsoft.Build.Execution
         /// </summary>
         private void SetOverallResultIfWarningsAsErrors(BuildResult result)
         {
-            if (result != null && result.OverallResult == BuildResultCode.Success)
+            if (result?.OverallResult == BuildResultCode.Success)
             {
                 ILoggingService loggingService = ((IBuildComponentHost)this).LoggingService;
 
@@ -2460,6 +2500,13 @@ namespace Microsoft.Build.Execution
                 CancelAndMarkAsFailure();
                 throw;
             }
+        }
+
+        private void LogMessage(string message)
+        {
+            var loggingService = ((IBuildComponentHost)this).LoggingService;
+
+            loggingService?.LogCommentFromText(BuildEventContext.Invalid, MessageImportance.High, message);
         }
 
         private void LogErrorAndShutdown(string message)

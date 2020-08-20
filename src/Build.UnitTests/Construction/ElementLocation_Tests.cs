@@ -18,6 +18,7 @@ using System.IO;
 using System.Reflection;
 using Xunit;
 using System.Text;
+using Microsoft.Build.BackEnd;
 
 namespace Microsoft.Build.UnitTests.Construction
 {
@@ -492,9 +493,7 @@ namespace Microsoft.Build.UnitTests.Construction
                     }
                 }
 
-                locations = locations.Replace(file, "c:\\foo\\bar.csproj");
-
-                return locations;
+                return locations.Replace(file, "c:\\foo\\bar.csproj");
             }
             finally
             {

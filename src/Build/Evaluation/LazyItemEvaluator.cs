@@ -304,7 +304,6 @@ namespace Microsoft.Build.Evaluation
 
                     return ComputeItems(this, globsToIgnore);
                 }
-
             }
 
             private static ImmutableList<ItemData>.Builder ComputeItems(LazyItemList lazyItemList, ImmutableHashSet<string> globsToIgnore)
@@ -516,9 +515,34 @@ namespace Microsoft.Build.Evaluation
 
         private RemoveOperation BuildRemoveOperation(string rootDirectory, ProjectItemElement itemElement, bool conditionResult)
         {
-            OperationBuilder operationBuilder = new OperationBuilder(itemElement, conditionResult);
+            RemoveOperationBuilder operationBuilder = new RemoveOperationBuilder(itemElement, conditionResult);
 
             ProcessItemSpec(rootDirectory, itemElement.Remove, itemElement.RemoveLocation, operationBuilder);
+
+            // Process MatchOnMetadata
+            if (itemElement.MatchOnMetadata.Length > 0)
+            {
+                string evaluatedmatchOnMetadata = _expander.ExpandIntoStringLeaveEscaped(itemElement.MatchOnMetadata, ExpanderOptions.ExpandProperties, itemElement.MatchOnMetadataLocation);
+
+                if (evaluatedmatchOnMetadata.Length > 0)
+                {
+                    var matchOnMetadataSplits = ExpressionShredder.SplitSemiColonSeparatedList(evaluatedmatchOnMetadata);
+
+                    foreach (var matchOnMetadataSplit in matchOnMetadataSplits)
+                    {
+                        AddItemReferences(matchOnMetadataSplit, operationBuilder, itemElement.MatchOnMetadataLocation);
+                        string metadataExpanded = _expander.ExpandIntoStringLeaveEscaped(matchOnMetadataSplit, ExpanderOptions.ExpandPropertiesAndItems, itemElement.MatchOnMetadataLocation);
+                        var metadataSplits = ExpressionShredder.SplitSemiColonSeparatedList(metadataExpanded);
+                        operationBuilder.MatchOnMetadata.AddRange(metadataSplits);
+                    }
+                }
+            }
+
+            operationBuilder.MatchOnMetadataOptions = MatchOnMetadataOptions.CaseSensitive;
+            if (Enum.TryParse(itemElement.MatchOnMetadataOptions, out MatchOnMetadataOptions options))
+            {
+                operationBuilder.MatchOnMetadataOptions = options;
+            }
 
             return new RemoveOperation(operationBuilder, this);
         }
@@ -527,10 +551,9 @@ namespace Microsoft.Build.Evaluation
         {
             builder.ItemSpec = new ItemSpec<P, I>(itemSpec, _outerExpander, itemSpecLocation, rootDirectory);
 
-            foreach (ItemFragment fragment in builder.ItemSpec.Fragments)
+            foreach (ItemSpecFragment fragment in builder.ItemSpec.Fragments)
             {
-                ItemExpressionFragment<P, I> itemExpression = fragment as ItemExpressionFragment<P, I>;
-                if (itemExpression != null)
+                if (fragment is ItemSpec<P, I>.ItemExpressionFragment itemExpression)
                 {
                     AddReferencedItemLists(builder, itemExpression.Capture);
                 }
@@ -579,7 +602,7 @@ namespace Microsoft.Build.Evaluation
             }
         }
 
-        private void AddItemReferences(string expression, IncludeOperationBuilder operationBuilder, IElementLocation elementLocation)
+        private void AddItemReferences(string expression, OperationBuilder operationBuilder, IElementLocation elementLocation)
         {
             if (expression.Length == 0)
             {

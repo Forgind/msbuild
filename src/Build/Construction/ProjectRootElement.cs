@@ -142,7 +142,6 @@ namespace Microsoft.Build.Construction
         /// </summary>
         private string _dirtyParameter = String.Empty;
 
-
         internal ProjectRootElementLink RootLink => (ProjectRootElementLink)Link;
 
         /// <summary>
@@ -766,7 +765,6 @@ namespace Microsoft.Build.Construction
             return Create(projectCollection.ProjectRootElementCache, projectFileOptions);
         }
 
-
         /// <summary>
         /// Initialize an in-memory, empty ProjectRootElement instance that can be saved later.
         /// Uses the global project collection.
@@ -1001,8 +999,8 @@ namespace Microsoft.Build.Construction
         /// </remarks>
         public ProjectItemElement AddItem(string itemType, string include, IEnumerable<KeyValuePair<string, string>> metadata)
         {
-            ErrorUtilities.VerifyThrowArgumentLength(itemType, "itemType");
-            ErrorUtilities.VerifyThrowArgumentLength(include, "include");
+            ErrorUtilities.VerifyThrowArgumentLength(itemType, nameof(itemType));
+            ErrorUtilities.VerifyThrowArgumentLength(include, nameof(include));
 
             ProjectItemGroupElement itemGroupToAddTo = null;
 
@@ -1023,7 +1021,7 @@ namespace Microsoft.Build.Construction
                     itemGroupToAddTo = itemGroup;
                 }
 
-                if (itemGroupToAddTo != null && itemGroupToAddTo.Count > 0)
+                if (itemGroupToAddTo?.Count > 0)
                 {
                     break;
                 }
@@ -2054,6 +2052,7 @@ namespace Microsoft.Build.Construction
         /// </summary>
         /// <param name="fullPath">The full path to the document to load.</param>
         /// <param name="preserveFormatting"><code>true</code> to preserve the formatting of the document, otherwise <code>false</code>.</param>
+        /// <param name="loadAsReadOnly">Whether to load the file in read-only mode.</param>
         private XmlDocumentWithLocation LoadDocument(string fullPath, bool preserveFormatting, bool loadAsReadOnly)
         {
             ErrorUtilities.VerifyThrowInternalRooted(fullPath);

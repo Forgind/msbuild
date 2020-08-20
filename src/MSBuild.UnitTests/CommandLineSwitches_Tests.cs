@@ -423,6 +423,47 @@ namespace Microsoft.Build.UnitTests
         }
 
         [Theory]
+        [InlineData("targets")]
+        [InlineData("tArGeTs")]
+        [InlineData("ts")]
+        public void TargetsSwitchIdentificationTests(string @switch)
+        {
+            CommandLineSwitches.IsParameterizedSwitch(
+                @switch,
+                out var parameterizedSwitch,
+                out var duplicateSwitchErrorMessage,
+                out var multipleParametersAllowed,
+                out var missingParametersErrorMessage,
+                out var unquoteParameters,
+                out var emptyParametersAllowed).ShouldBeTrue();
+            parameterizedSwitch.ShouldBe(CommandLineSwitches.ParameterizedSwitch.Targets);
+            duplicateSwitchErrorMessage.ShouldBeNull();
+            multipleParametersAllowed.ShouldBeFalse();
+            missingParametersErrorMessage.ShouldBeNull();
+            unquoteParameters.ShouldBeTrue();
+            emptyParametersAllowed.ShouldBeFalse();
+        }
+
+        [Fact]
+        public void TargetsSwitchParameter()
+        {
+            CommandLineSwitches switches = new CommandLineSwitches();
+            MSBuildApp.GatherCommandLineSwitches(new ArrayList() { "/targets:targets.txt" }, switches);
+
+            switches.HaveErrors().ShouldBeFalse();
+            switches[CommandLineSwitches.ParameterizedSwitch.Targets].ShouldBe(new[] { "targets.txt" });
+        }
+
+        [Fact]
+        public void TargetsSwitchDoesNotSupportMultipleOccurrences()
+        {
+            CommandLineSwitches switches = new CommandLineSwitches();
+            MSBuildApp.GatherCommandLineSwitches(new ArrayList() { "/targets /targets" }, switches);
+
+            switches.HaveErrors().ShouldBeTrue();
+        }
+
+        [Theory]
         [InlineData("isolate")]
         [InlineData("ISOLATE")]
         [InlineData("isolateprojects")]
@@ -467,6 +508,29 @@ namespace Microsoft.Build.UnitTests
             unquoteParameters.ShouldBeTrue();
             emptyParametersAllowed.ShouldBeFalse();
         }
+
+        [Theory]
+        [InlineData("low")]
+        [InlineData("LOW")]
+        [InlineData("lowpriority")]
+        [InlineData("lowPriority")]
+        public void LowPrioritySwitchIdentificationTests(string lowpriority)
+        {
+            CommandLineSwitches.IsParameterizedSwitch(lowpriority,
+                out CommandLineSwitches.ParameterizedSwitch parameterizedSwitch,
+                out string duplicateSwitchErrorMessage,
+                out bool multipleParametersAllowed,
+                out string missingParametersErrorMessage,
+                out bool unquoteParameters,
+                out bool emptyParametersAllowed).ShouldBeTrue();
+            parameterizedSwitch.ShouldBe(CommandLineSwitches.ParameterizedSwitch.LowPriority);
+            duplicateSwitchErrorMessage.ShouldBeNull();
+            multipleParametersAllowed.ShouldBeFalse();
+            missingParametersErrorMessage.ShouldBeNull();
+            unquoteParameters.ShouldBeTrue();
+            emptyParametersAllowed.ShouldBeFalse();
+        }
+
 
         [Fact]
         public void InputResultsCachesSupportsMultipleOccurrence()
@@ -894,6 +958,7 @@ namespace Microsoft.Build.UnitTests
                                         1,
                                         true,
                                         new StringWriter(),
+                                        new StringWriter(),
                                         false,
                                         warningsAsErrors: null,
                                         warningsAsMessages: null,
@@ -903,6 +968,7 @@ namespace Microsoft.Build.UnitTests
                                         interactive: false,
                                         isolateProjects: false,
                                         graphBuild: false,
+                                        lowPriority: false,
                                         inputResultsCaches: null,
                                         outputResultsCache: null
                         );
@@ -1199,7 +1265,6 @@ namespace Microsoft.Build.UnitTests
                         // Ignore empty lines
                         if (!String.IsNullOrWhiteSpace(helpMessageLines[i]))
                         {
-
                             if (item.Key.Contains("Examples"))
                             {
                                 // Examples require a certain number of leading spaces

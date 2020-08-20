@@ -280,13 +280,8 @@ namespace Microsoft.Build.BackEnd
             {
                 _workQueue.Completion.Wait();
             }
-            catch (Exception e)
+            catch (Exception e) when (!ExceptionHandling.IsCriticalException(e))
             {
-                if (ExceptionHandling.IsCriticalException(e))
-                {
-                    throw;
-                }
-
                 // If we caught an exception during cleanup, we need to log that
                 ErrorUtilities.ThrowInternalError("Failure during engine shutdown.  Exception: {0}", e.ToString());
             }
@@ -516,7 +511,6 @@ namespace Microsoft.Build.BackEnd
                                         request: request,
                                         configInitialTargets: config.ProjectInitialTargets,
                                         configDefaultTargets: config.ProjectDefaultTargets,
-                                        additionalTargetsToCheckForOverallResult: config.GetAfterTargetsForDefaultTargets(request),
                                         skippedResultsDoNotCauseCacheMiss: _componentHost.BuildParameters.SkippedResultsDoNotCauseCacheMiss());
 
                                     if (cacheResponse.Type == ResultsCacheResponseType.Satisfied)
@@ -621,7 +615,7 @@ namespace Microsoft.Build.BackEnd
         private void RaiseRequestComplete(BuildRequest request, BuildResult result)
         {
             RequestCompleteDelegate requestComplete = OnRequestComplete;
-            if (null != requestComplete)
+            if (requestComplete != null)
             {
                 TraceEngine("RRC: Reporting result for request {0}({1}) (nr {2}).", request.GlobalRequestId, request.ConfigurationId, request.NodeRequestId);
                 requestComplete(request, result);
@@ -724,7 +718,7 @@ namespace Microsoft.Build.BackEnd
 
                     // This request is ready to be built
                     case BuildRequestEntryState.Ready:
-                        if (null == firstReadyEntry)
+                        if (firstReadyEntry == null)
                         {
                             firstReadyEntry = currentEntry;
                         }
@@ -753,9 +747,9 @@ namespace Microsoft.Build.BackEnd
             }
 
             // Update current engine status and start the next request, if applicable.
-            if (null == activeEntry)
+            if (activeEntry == null)
             {
-                if (null != firstReadyEntry)
+                if (firstReadyEntry != null)
                 {
                     // We are now active because we have an entry which is building.
                     ChangeStatus(BuildRequestEngineStatus.Active);
@@ -1137,7 +1131,7 @@ namespace Microsoft.Build.BackEnd
                             configurationId: request.Config.ConfigurationId,
                             escapedTargets: request.Targets,
                             hostServices: issuingEntry.Request.HostServices,
-                            parentBuildEventContext: issuingEntry.Request.BuildEventContext,
+                            parentBuildEventContext: issuingEntry.Request.CurrentTaskContext ?? issuingEntry.Request.BuildEventContext,
                             parentRequest: issuingEntry.Request,
                             buildRequestDataFlags: buildRequestDataFlags,
                             requestedProjectState: null,
@@ -1178,7 +1172,6 @@ namespace Microsoft.Build.BackEnd
                             request: newRequest,
                             configInitialTargets: matchingConfig.ProjectInitialTargets,
                             configDefaultTargets: matchingConfig.ProjectDefaultTargets,
-                            additionalTargetsToCheckForOverallResult: matchingConfig.GetAfterTargetsForDefaultTargets(newRequest),
                             skippedResultsDoNotCauseCacheMiss: _componentHost.BuildParameters.SkippedResultsDoNotCauseCacheMiss());
 
                         if (response.Type == ResultsCacheResponseType.Satisfied)

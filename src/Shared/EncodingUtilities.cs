@@ -206,7 +206,7 @@ namespace Microsoft.Build.Shared
                 return EncodingUtilities.Utf8WithoutBom;
             }
 
-            var defaultEncoding = EncodingUtilities.CurrentSystemOemEncoding;
+            var defaultEncoding = Encoding.GetEncoding((int)NativeMethodsShared.GetConsoleCP());
 
             // When Windows is configured to use UTF-8 by default, the above returns
             // a UTF-8-with-BOM encoding, which cmd.exe can't interpret. Force the no-BOM

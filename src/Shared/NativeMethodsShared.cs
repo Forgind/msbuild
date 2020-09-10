@@ -1374,6 +1374,11 @@ namespace Microsoft.Build.Shared
         internal static extern bool FreeLibrary([In] IntPtr module);
 
         [SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass", Justification = "Class name is NativeMethodsShared for increased clarity")]
+        [DllImport(kernel32Dll, PreserveSig = true, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.SysUInt)]
+        internal static extern uint GetConsoleCP();
+
+        [SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass", Justification = "Class name is NativeMethodsShared for increased clarity")]
         [DllImport("kernel32.dll", PreserveSig = true, BestFitMapping = false, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi, SetLastError = true)]
         internal static extern IntPtr GetProcAddress(IntPtr module, string procName);
 

@@ -1375,8 +1375,11 @@ namespace Microsoft.Build.Shared
 
         [SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass", Justification = "Class name is NativeMethodsShared for increased clarity")]
         [DllImport(kernel32Dll, PreserveSig = true, SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.SysUInt)]
         internal static extern uint GetConsoleCP();
+
+        [SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass", Justification = "Class name is NativeMethodsShared for increased clarity")]
+        [DllImport(kernel32Dll, PreserveSig = true, SetLastError = true)]
+        internal static extern uint SetConsoleCP(int cp);
 
         [SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass", Justification = "Class name is NativeMethodsShared for increased clarity")]
         [DllImport("kernel32.dll", PreserveSig = true, BestFitMapping = false, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi, SetLastError = true)]

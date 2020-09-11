@@ -660,6 +660,8 @@ namespace Microsoft.Build.Execution
                 NativeMethodsShared.SetCurrentDirectory(BuildEnvironmentHelper.Instance.CurrentMSBuildToolsDirectory);
             }
 
+            NativeMethodsShared.SetConsoleCP(configuration.CodePage);
+
             // Replicate the environment.  First, unset any environment variables set by the previous configuration.
             if (_currentConfiguration != null)
             {

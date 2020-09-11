@@ -6,6 +6,8 @@ using System.Diagnostics;
 
 using Microsoft.Build.Execution;
 using Microsoft.Build.Logging;
+using Microsoft.Build.Shared;
+
 namespace Microsoft.Build.BackEnd
 {
     /// <summary>
@@ -63,6 +65,8 @@ namespace Microsoft.Build.BackEnd
             _forwardingLoggers = forwardingLoggers;
             _appDomainSetup = appDomainSetup;
             _loggingNodeConfiguration = loggingNodeConfiguration;
+
+            CodePage = (int)NativeMethodsShared.GetConsoleCP();
         }
 #else
         /// <summary>
@@ -117,6 +121,11 @@ namespace Microsoft.Build.BackEnd
             get
             { return _buildParameters; }
         }
+
+        /// <summary>
+        /// Accesses the entry point process's console code page.
+        /// </summary>
+        public int CodePage { get; }
 
         /// <summary>
         /// Retrieves the logger descriptions.

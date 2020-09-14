@@ -463,6 +463,8 @@ namespace Microsoft.Build.BackEnd
             _componentHost.BuildParameters.NodeId = configuration.NodeId;
             _shutdownException = null;
 
+            NativeMethodsShared.SetConsoleCP(configuration.CodePage);
+
 #if FEATURE_APPDOMAIN
             // And the AppDomainSetup
             _componentHost.BuildParameters.AppDomainSetup = configuration.AppDomainSetup;

@@ -42,6 +42,11 @@ namespace Microsoft.Build.BackEnd
         /// </summary>
         private LoggingNodeConfiguration _loggingNodeConfiguration;
 
+        /// <summary>
+        /// Console code page for entry point node. Should be passed to children.
+        /// </summary>
+        private int _codePage;
+
 #if FEATURE_APPDOMAIN
         /// <summary>
         /// Constructor
@@ -125,7 +130,13 @@ namespace Microsoft.Build.BackEnd
         /// <summary>
         /// Accesses the entry point process's console code page.
         /// </summary>
-        public int CodePage { get; }
+        public int CodePage
+        {
+            get
+            { return _codePage; }
+            set
+            { _codePage = value; }
+        }
 
         /// <summary>
         /// Retrieves the logger descriptions.
@@ -188,6 +199,7 @@ namespace Microsoft.Build.BackEnd
             translator.TranslateDotNet(ref _appDomainSetup);
 #endif
             translator.Translate(ref _loggingNodeConfiguration);
+            translator.Translate(ref _codePage);
         }
 
         /// <summary>

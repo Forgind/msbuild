@@ -62,6 +62,7 @@ namespace Microsoft.Build.BackEnd
             _buildParameters = buildParameters;
             _forwardingLoggers = forwardingLoggers;
             _appDomainSetup = appDomainSetup;
+            //Dummy change
             _loggingNodeConfiguration = loggingNodeConfiguration;
         }
 #else

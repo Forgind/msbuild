@@ -121,14 +121,7 @@ namespace Microsoft.Build.Internal
                     // them, so just check COMPLUS_InstallRoot.
                     string complusInstallRoot = Environment.GetEnvironmentVariable("COMPLUS_INSTALLROOT");
 
-                    // This is easier in .NET 4+:
-                    //  var fileIdentity = typeof(CommunicationsUtilities).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
-                    // but we need to be 3.5 compatible here to work in MSBuildTaskHost
-                    string fileIdentity = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
-
-                    ErrorUtilities.VerifyThrow(fileIdentity != null, "Did not successfully retrieve InformationalVersion.");
-
-                    s_fileVersionHash = GetHandshakeHashCode(complusInstallRoot ?? fileIdentity);
+                    s_fileVersionHash = GetHandshakeHashCode(complusInstallRoot ?? "16.7.1.52801");
                     s_fileVersionChecked = true;
                 }
 

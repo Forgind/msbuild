@@ -127,7 +127,12 @@ namespace Microsoft.Build.Internal
                     string fileIdentity = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
 
                     ErrorUtilities.VerifyThrow(fileIdentity != null, "Did not successfully retrieve InformationalVersion.");
-
+                    Trace(String.Format("av1: {0}, av2: {1}, fv: {2}, pv: {3}, ts: {4}",
+                        Assembly.GetExecutingAssembly().GetName().Version.ToString(),
+                        Assembly.LoadFile(Assembly.GetExecutingAssembly().Location).GetName().Version.ToString(),
+                        FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion,
+                        FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion,
+                        new FileInfo(FileUtilities.ExecutingAssemblyPath).LastWriteTime.Ticks));
                     s_fileVersionHash = GetHandshakeHashCode(complusInstallRoot ?? fileIdentity);
                     s_fileVersionChecked = true;
                 }

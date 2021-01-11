@@ -223,6 +223,29 @@ namespace Microsoft.Build.Utilities
         /// </remarks>
         protected virtual Encoding StandardOutputEncoding => EncodingUtilities.CurrentSystemOemEncoding;
 
+        public string AlwaysUseUtf8 {
+            get
+            {
+                return
+                    requiredEncoding == Encoding.UTF8 ? "UTF8" :
+                    requiredEncoding == Encoding.ASCII ? "ASCII" :
+                    requiredEncoding == Encoding.Unicode ? "UNICODE" :
+                    "DEFAULT";
+            }
+            set
+            {
+                requiredEncoding = value switch
+                {
+                    "UTF8" => Encoding.UTF8,
+                    "ASCII" => Encoding.ASCII,
+                    "UNICODE" => Encoding.Unicode,
+                    _ => Encoding.Default
+                };
+            }
+        }
+
+        private Encoding requiredEncoding = null;
+
         /// <summary>
         /// Overridable property specifying the encoding of the captured task standard error stream
         /// </summary>
@@ -1375,7 +1398,7 @@ namespace Microsoft.Build.Utilities
                         }
                         else
                         {
-                            encoding = EncodingUtilities.BatchFileEncoding(commandLineCommands + _temporaryBatchFile, EncodingUtilities.UseUtf8Detect);
+                            encoding = string.IsNullOrEmpty(AlwaysUseUtf8) ? EncodingUtilities.BatchFileEncoding(commandLineCommands + _temporaryBatchFile, EncodingUtilities.UseUtf8Detect) : EncodingUtilities.Utf8WithoutBom;
 
                             if (encoding.CodePage != EncodingUtilities.CurrentSystemOemEncoding.CodePage)
                             {

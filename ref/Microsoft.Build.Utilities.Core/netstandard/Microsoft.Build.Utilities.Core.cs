@@ -371,6 +371,7 @@ namespace Microsoft.Build.Utilities
         protected ToolTask() { }
         protected ToolTask(System.Resources.ResourceManager taskResources) { }
         protected ToolTask(System.Resources.ResourceManager taskResources, string helpKeywordPrefix) { }
+        public string AlwaysUseUtf8 { get { throw null; } set { } }
         public bool EchoOff { get { throw null; } set { } }
         [System.ObsoleteAttribute("Use EnvironmentVariables property")]
         protected virtual System.Collections.Generic.Dictionary<string, string> EnvironmentOverride { get { throw null; } }

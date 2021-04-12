@@ -2,11 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Runtime.Serialization;
-#if FEATURE_SECURITY_PERMISSIONS
-using System.Security.Permissions;
-#endif
-
 using Microsoft.Build.Shared;
 
 namespace Microsoft.Build.Exceptions
@@ -15,10 +10,6 @@ namespace Microsoft.Build.Exceptions
     /// This exception is thrown whenever there is a problem with the user's XML project file. The problem might be semantic or
     /// syntactical. The latter would be of a type typically caught by XSD validation (if it was performed by the project writer).
     /// </summary>
-    // WARNING: marking a type [Serializable] without implementing ISerializable imposes a serialization contract -- it is a
-    // promise to never change the type's fields i.e. the type is immutable; adding new fields in the next version of the type
-    // without following certain special FX guidelines, can break both forward and backward compatibility
-    [Serializable]
     public sealed class InvalidProjectFileException : Exception
     {
         #region Basic constructors
@@ -70,54 +61,6 @@ namespace Microsoft.Build.Exceptions
         internal InvalidProjectFileException(string message, InvalidProjectFileException innerException)
             : this(innerException.ProjectFile, innerException.LineNumber, innerException.ColumnNumber, innerException.EndLineNumber, innerException.EndColumnNumber, message, innerException.ErrorSubcategory, innerException.ErrorCode, innerException.HelpKeyword)
         {
-        }
-
-        #endregion
-
-        #region Serialization (update when adding new class members)
-
-        /// <summary>
-        /// Protected constructor used for (de)serialization. 
-        /// If we ever add new members to this class, we'll need to update this.
-        /// </summary>
-        /// <param name="info"></param>
-        /// <param name="context"></param>
-        private InvalidProjectFileException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-            file = info.GetString("projectFile");
-            lineNumber = info.GetInt32("lineNumber");
-            columnNumber = info.GetInt32("columnNumber");
-            endLineNumber = info.GetInt32("endLineNumber");
-            endColumnNumber = info.GetInt32("endColumnNumber");
-            errorSubcategory = info.GetString("errorSubcategory");
-            errorCode = info.GetString("errorCode");
-            helpKeyword = info.GetString("helpKeyword");
-            hasBeenLogged = info.GetBoolean("hasBeenLogged");
-        }
-
-        /// <summary>
-        /// ISerializable method which we must override since Exception implements this interface
-        /// If we ever add new members to this class, we'll need to update this.
-        /// </summary>
-        /// <param name="info"></param>
-        /// <param name="context"></param>
-#if FEATURE_SECURITY_PERMISSIONS
-        [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-#endif
-        override public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("projectFile", file);
-            info.AddValue("lineNumber", lineNumber);
-            info.AddValue("columnNumber", columnNumber);
-            info.AddValue("endLineNumber", endLineNumber);
-            info.AddValue("endColumnNumber", endColumnNumber);
-            info.AddValue("errorSubcategory", errorSubcategory);
-            info.AddValue("errorCode", errorCode);
-            info.AddValue("helpKeyword", helpKeyword);
-            info.AddValue("hasBeenLogged", hasBeenLogged);
         }
 
         #endregion
@@ -354,22 +297,22 @@ namespace Microsoft.Build.Exceptions
         #endregion
 
         // the project file that caused this exception
-        private string file;
+        internal string file;
         // the invalid line number in the project
-        private int lineNumber;
+        internal int lineNumber;
         // the invalid column number in the project
-        private int columnNumber;
+        internal int columnNumber;
         // the end of a range of invalid lines in the project
-        private int endLineNumber;
+        internal int endLineNumber;
         // the end of a range of invalid columns in the project
-        private int endColumnNumber;
+        internal int endColumnNumber;
         // the error sub-category that describes the type of this error
-        private string errorSubcategory;
+        internal string errorSubcategory;
         // the error code for the exception message
-        private string errorCode;
+        internal string errorCode;
         // the F1-help keyword for the host IDE
-        private string helpKeyword;
+        internal string helpKeyword;
         // Has this errors been sent to the loggers?
-        private bool hasBeenLogged = false;
+        internal bool hasBeenLogged = false;
     }
 }

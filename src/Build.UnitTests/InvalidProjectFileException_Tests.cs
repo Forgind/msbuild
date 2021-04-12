@@ -3,7 +3,7 @@
 
 using System;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+using Microsoft.Build.BackEnd;
 using Microsoft.Build.Exceptions;
 
 using Xunit;
@@ -36,12 +36,12 @@ namespace Microsoft.Build.UnitTests
 
             using (MemoryStream memstr = new MemoryStream())
             {
-                BinaryFormatter frm = new BinaryFormatter();
-
-                frm.Serialize(memstr, e);
+                var translator = BinaryTranslator.GetWriteTranslator(memstr);
+                Errors.TranslatorHelpers.Translate(translator, ref e);
                 memstr.Position = 0;
-
-                InvalidProjectFileException e2 = (InvalidProjectFileException)frm.Deserialize(memstr);
+                var translator2 = BinaryTranslator.GetReadTranslator(memstr, buffer: null);
+                InvalidProjectFileException e2 = null;
+                Errors.TranslatorHelpers.Translate(translator2, ref e2);
 
                 Assert.Equal(e.ColumnNumber, e2.ColumnNumber);
                 Assert.Equal(e.EndColumnNumber, e2.EndColumnNumber);

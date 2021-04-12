@@ -225,79 +225,31 @@ namespace Microsoft.Build.Framework
             this.endColumnNumber = endColumnNumber;
         }
 
-        private MessageImportance importance;
+        internal MessageImportance importance;
 
         [OptionalField(VersionAdded = 2)]
-        private string subcategory;
+        internal string subcategory;
 
         [OptionalField(VersionAdded = 2)]
-        private string code;
+        internal string code;
 
         [OptionalField(VersionAdded = 2)]
-        private string file;
+        internal string file;
 
         [OptionalField(VersionAdded = 2)]
-        private string projectFile;
+        internal string projectFile;
 
         [OptionalField(VersionAdded = 2)]
-        private int lineNumber;
+        internal int lineNumber;
 
         [OptionalField(VersionAdded = 2)]
-        private int columnNumber;
+        internal int columnNumber;
 
         [OptionalField(VersionAdded = 2)]
-        private int endLineNumber;
+        internal int endLineNumber;
 
         [OptionalField(VersionAdded = 2)]
-        private int endColumnNumber;
-
-        #region CustomSerializationToStream
-        /// <summary>
-        /// Serializes to a stream through a binary writer
-        /// </summary>
-        /// <param name="writer">Binary writer which is attached to the stream the event will be serialized into</param>
-        internal override void WriteToStream(BinaryWriter writer)
-        {
-            base.WriteToStream(writer);
-
-            writer.Write((Int32)importance);
-
-            writer.WriteOptionalString(subcategory);
-            writer.WriteOptionalString(code);
-            writer.WriteOptionalString(file);
-            writer.WriteOptionalString(projectFile);
-
-            writer.Write((Int32)lineNumber);
-            writer.Write((Int32)columnNumber);
-            writer.Write((Int32)endLineNumber);
-            writer.Write((Int32)endColumnNumber);
-        }
-
-        /// <summary>
-        /// Deserializes from a stream through a binary reader
-        /// </summary>
-        /// <param name="reader">Binary reader which is attached to the stream the event will be deserialized from</param>
-        /// <param name="version">The version of the runtime the message packet was created from</param>
-        internal override void CreateFromStream(BinaryReader reader, int version)
-        {
-            base.CreateFromStream(reader, version);
-            importance = (MessageImportance)reader.ReadInt32();
-
-            //The data in the stream beyond this point are new to 4.0
-            if (version > 20)
-            {
-                subcategory = reader.ReadByte() == 0 ? null : reader.ReadString();
-                code = reader.ReadByte() == 0 ? null : reader.ReadString();
-                file = reader.ReadByte() == 0 ? null : reader.ReadString();
-                projectFile = reader.ReadByte() == 0 ? null : reader.ReadString();
-
-                lineNumber = reader.ReadInt32();
-                columnNumber = reader.ReadInt32();
-                endLineNumber = reader.ReadInt32();
-                endColumnNumber = reader.ReadInt32();
-            }
-        }
-        #endregion
+        internal int endColumnNumber;
 
         /// <summary>
         /// Importance of the message

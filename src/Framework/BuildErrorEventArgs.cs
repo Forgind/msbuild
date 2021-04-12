@@ -22,47 +22,47 @@ namespace Microsoft.Build.Framework
         /// <summary>
         /// Subcategory of the error
         /// </summary>
-        private string subcategory;
+        internal string subcategory;
 
         /// <summary>
         /// Error code
         /// </summary>
-        private string code;
+        internal string code;
 
         /// <summary>
         /// File name
         /// </summary>
-        private string file;
+        internal string file;
 
         /// <summary>
         /// The project which issued the event
         /// </summary>
-        private string projectFile;
+        internal string projectFile;
 
         /// <summary>
         /// Line number
         /// </summary>
-        private int lineNumber;
+        internal int lineNumber;
 
         /// <summary>
         /// Column number
         /// </summary>
-        private int columnNumber;
+        internal int columnNumber;
 
         /// <summary>
         /// End line number
         /// </summary>
-        private int endLineNumber;
+        internal int endLineNumber;
 
         /// <summary>
         /// End column number
         /// </summary>
-        private int endColumnNumber;
+        internal int endColumnNumber;
 
         /// <summary>
         /// A link pointing to more information about the error
         /// </summary>
-        private string helpLink;
+        internal string helpLink;
 
         /// <summary>
         /// This constructor allows all event data to be initialized
@@ -264,65 +264,5 @@ namespace Microsoft.Build.Framework
         /// A link pointing to more information about the error.
         /// </summary>
         public string HelpLink => helpLink;
-
-        #region CustomSerializationToStream
-        /// <summary>
-        /// Serializes to a stream through a binary writer
-        /// </summary>
-        /// <param name="writer">Binary writer which is attached to the stream the event will be serialized into</param>
-        internal override void WriteToStream(BinaryWriter writer)
-        {
-            base.WriteToStream(writer);
-
-            writer.WriteOptionalString(subcategory);
-            writer.WriteOptionalString(code);
-            writer.WriteOptionalString(file);
-            writer.WriteOptionalString(projectFile);
-
-            writer.Write((Int32)lineNumber);
-            writer.Write((Int32)columnNumber);
-            writer.Write((Int32)endLineNumber);
-            writer.Write((Int32)endColumnNumber);
-
-            writer.WriteOptionalString(helpLink);
-        }
-
-        /// <summary>
-        /// Deserializes to a stream through a binary writer
-        /// </summary>
-        /// <param name="reader">Binary reader which the object will be deserialized from</param>
-        /// <param name="version">The version of the runtime the message packet was created from</param>
-        internal override void CreateFromStream(BinaryReader reader, int version)
-        {
-            base.CreateFromStream(reader, version);
-
-            subcategory = reader.ReadByte() == 0 ? null : reader.ReadString();
-            code = reader.ReadByte() == 0 ? null : reader.ReadString();
-            file = reader.ReadByte() == 0 ? null : reader.ReadString();
-
-            if (version > 20)
-            {
-                projectFile = reader.ReadByte() == 0 ? null : reader.ReadString();
-            }
-            else
-            {
-                projectFile = null;
-            }
-
-            lineNumber = reader.ReadInt32();
-            columnNumber = reader.ReadInt32();
-            endLineNumber = reader.ReadInt32();
-            endColumnNumber = reader.ReadInt32();
-
-            if (version >= 40)
-            {
-                helpLink = reader.ReadByte() == 0 ? null : reader.ReadString();
-            }
-            else
-            {
-                helpLink = null;
-            }
-        }
-        #endregion
     }
 }

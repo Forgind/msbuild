@@ -169,71 +169,15 @@ namespace Microsoft.Build.Framework
             this.helpLink = helpLink;
         }
 
-        private string subcategory;
-        private string code;
-        private string file;
-        private string projectFile;
-        private int lineNumber;
-        private int columnNumber;
-        private int endLineNumber;
-        private int endColumnNumber;
-        private string helpLink;
-
-        #region CustomSerializationToStream
-        /// <summary>
-        /// Serializes the Errorevent to a stream through a binary writer
-        /// </summary>
-        /// <param name="writer">Binary writer which is attached to the stream the event will be serialized into</param>
-        internal override void WriteToStream(BinaryWriter writer)
-        {
-            base.WriteToStream(writer);
-
-            writer.WriteOptionalString(subcategory);
-            writer.WriteOptionalString(code);
-            writer.WriteOptionalString(file);
-            writer.WriteOptionalString(projectFile);
-
-            writer.Write((Int32)lineNumber);
-            writer.Write((Int32)columnNumber);
-            writer.Write((Int32)endLineNumber);
-            writer.Write((Int32)endColumnNumber);
-
-            writer.WriteOptionalString(helpLink);
-        }
-
-        /// <summary>
-        /// Deserializes from a stream through a binary reader
-        /// </summary>
-        /// <param name="reader">Binary reader which is attached to the stream the event will be deserialized from</param>
-        /// <param name="version">The version of the runtime the message packet was created from</param>
-        internal override void CreateFromStream(BinaryReader reader, int version)
-        {
-            base.CreateFromStream(reader, version);
-
-            subcategory = reader.ReadByte() == 0 ? null : reader.ReadString();
-            code = reader.ReadByte() == 0 ? null : reader.ReadString();
-            file = reader.ReadByte() == 0 ? null : reader.ReadString();
-
-            if (version > 20)
-            {
-                projectFile = reader.ReadByte() == 0 ? null : reader.ReadString();
-            }
-
-            lineNumber = reader.ReadInt32();
-            columnNumber = reader.ReadInt32();
-            endLineNumber = reader.ReadInt32();
-            endColumnNumber = reader.ReadInt32();
-
-            if (version >= 40)
-            {
-                helpLink = reader.ReadByte() == 0 ? null : reader.ReadString();
-            }
-            else
-            {
-                helpLink = null;
-            }
-        }
-        #endregion
+        internal string subcategory;
+        internal string code;
+        internal string file;
+        internal string projectFile;
+        internal int lineNumber;
+        internal int columnNumber;
+        internal int endLineNumber;
+        internal int endColumnNumber;
+        internal string helpLink;
 
         /// <summary>
         /// The custom sub-type of the event.

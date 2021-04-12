@@ -7,6 +7,7 @@ using Microsoft.Build.Framework;
 using Microsoft.Build.Exceptions;
 using Xunit;
 using System.Runtime.Serialization.Formatters.Binary;
+using Microsoft.Build.BackEnd;
 
 namespace Microsoft.Build.UnitTests
 {
@@ -28,12 +29,10 @@ namespace Microsoft.Build.UnitTests
 
             using (MemoryStream memstr = new MemoryStream())
             {
-                BinaryFormatter frm = new BinaryFormatter();
-
-                frm.Serialize(memstr, e);
+                Errors.TranslatorHelpers.Translate(BinaryTranslator.GetWriteTranslator(memstr), ref e);
                 memstr.Position = 0;
-
-                InternalLoggerException e2 = (InternalLoggerException)frm.Deserialize(memstr);
+                InternalLoggerException e2 = null;
+                Errors.TranslatorHelpers.Translate(BinaryTranslator.GetReadTranslator(memstr, buffer: null), ref e2);
 
                 Assert.Equal(e.BuildEventArgs.Message, e2.BuildEventArgs.Message);
                 Assert.Equal(e.BuildEventArgs.HelpKeyword, e2.BuildEventArgs.HelpKeyword);

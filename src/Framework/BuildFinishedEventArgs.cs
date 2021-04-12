@@ -21,7 +21,7 @@ namespace Microsoft.Build.Framework
         /// <summary>
         /// Whether the build succeeded
         /// </summary>
-        private bool succeeded;
+        internal bool succeeded;
 
         /// <summary>
         /// Default constructor
@@ -88,30 +88,6 @@ namespace Microsoft.Build.Framework
         {
             this.succeeded = succeeded;
         }
-
-
-        #region CustomSerializationToStream
-        /// <summary>
-        /// Serializes to a stream through a binary writer
-        /// </summary>
-        /// <param name="writer">Binary writer which is attached to the stream the event will be serialized into</param>
-        internal override void WriteToStream(BinaryWriter writer)
-        {
-            base.WriteToStream(writer);
-            writer.Write(succeeded);
-        }
-
-        /// <summary>
-        /// Deserializes from a stream through a binary reader
-        /// </summary>
-        /// <param name="reader">Binary reader which is attached to the stream the event will be deserialized from</param>
-        /// <param name="version">The version of the runtime the message packet was created from</param>
-        internal override void CreateFromStream(BinaryReader reader, int version)
-        {
-            base.CreateFromStream(reader, version);
-            succeeded = reader.ReadBoolean();
-        }
-        #endregion
 
         /// <summary>
         /// Succeeded is true if the build succeeded; false otherwise.

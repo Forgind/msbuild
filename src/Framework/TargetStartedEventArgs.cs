@@ -108,11 +108,11 @@ namespace Microsoft.Build.Framework
             this.buildReason = buildReason;
         }
 
-        private string targetName;
-        private string projectFile;
-        private string targetFile;
-        private string parentTarget;
-        private TargetBuiltReason buildReason;
+        internal string targetName;
+        internal string projectFile;
+        internal string targetFile;
+        internal string parentTarget;
+        internal TargetBuiltReason buildReason;
 
         #region CustomSerializationToStream
         /// <summary>

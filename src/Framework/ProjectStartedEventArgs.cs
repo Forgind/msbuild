@@ -201,7 +201,7 @@ namespace Microsoft.Build.Framework
         }
 
         [OptionalField(VersionAdded = 2)]
-        private BuildEventContext parentProjectBuildEventContext;
+        internal BuildEventContext parentProjectBuildEventContext;
 
         /// <summary>
         /// Event context information, where the event was fired from in terms of the build location
@@ -217,7 +217,7 @@ namespace Microsoft.Build.Framework
         /// <summary>
         /// The name of the project file
         /// </summary>
-        private string projectFile;
+        internal string projectFile;
 
         /// <summary>
         /// Project name

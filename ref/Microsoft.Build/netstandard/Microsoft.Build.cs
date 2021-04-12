@@ -923,7 +923,6 @@ namespace Microsoft.Build.Exceptions
         public int LineNumber { get { throw null; } }
         public override string Message { get { throw null; } }
         public string ProjectFile { get { throw null; } }
-        public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) { }
     }
     public partial class InvalidToolsetDefinitionException : System.Exception
     {

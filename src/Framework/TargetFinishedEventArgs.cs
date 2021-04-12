@@ -109,44 +109,11 @@ namespace Microsoft.Build.Framework
             this.targetOutputs = targetOutputs;
         }
 
-        private string projectFile;
-        private string targetFile;
-        private string targetName;
-        private bool succeeded;
+        internal string projectFile;
+        internal string targetFile;
+        internal string targetName;
+        internal bool succeeded;
         private IEnumerable targetOutputs;
-
-        #region CustomSerializationToStream
-        /// <summary>
-        /// Serializes to a stream through a binary writer
-        /// </summary>
-        /// <param name="writer">Binary writer which is attached to the stream the event will be serialized into</param>
-        internal override void WriteToStream(BinaryWriter writer)
-        {
-            base.WriteToStream(writer);
-
-            writer.WriteOptionalString(projectFile);
-            writer.WriteOptionalString(targetFile);
-            writer.WriteOptionalString(targetName);
-
-            writer.Write(succeeded);
-        }
-
-        /// <summary>
-        /// Deserializes from a stream through a binary reader
-        /// </summary>
-        /// <param name="reader">Binary reader which is attached to the stream the event will be deserialized from</param>
-        /// <param name="version">The version of the runtime the message packet was created from</param>
-        internal override void CreateFromStream(BinaryReader reader, int version)
-        {
-            base.CreateFromStream(reader, version);
-
-            projectFile = reader.ReadByte() == 0 ? null : reader.ReadString();
-            targetFile = reader.ReadByte() == 0 ? null : reader.ReadString();
-            targetName = reader.ReadByte() == 0 ? null : reader.ReadString();
-
-            succeeded = reader.ReadBoolean();
-        }
-        #endregion
 
         /// <summary>
         /// Target name

@@ -12,48 +12,41 @@ namespace Microsoft.Build.Framework
     /// This class encapsulates the default data associated with build events. 
     /// It is intended to be extended/sub-classed.
     /// </summary>
-    // WARNING: marking a type [Serializable] without implementing
-    // ISerializable imposes a serialization contract -- it is a
-    // promise to never change the type's fields i.e. the type is
-    // immutable; adding new fields in the next version of the type
-    // without following certain special FX guidelines, can break both
-    // forward and backward compatibility
-    [Serializable]
     public abstract class BuildEventArgs : EventArgs
     {
         /// <summary>
         /// Message
         /// </summary>
-        private string message;
+        internal string message;
 
         /// <summary>
         /// Help keyword
         /// </summary>
-        private string helpKeyword;
+        internal string helpKeyword;
 
         /// <summary>
         /// Sender name
         /// </summary>
-        private string senderName;
+        internal string senderName;
 
         /// <summary>
         /// Timestamp
         /// </summary>
-        private DateTime timestamp;
+        internal DateTime timestamp;
 
         [NonSerialized]
-        private DateTime? _localTimestamp;
+        internal DateTime? _localTimestamp;
 
         /// <summary>
         /// Thread id
         /// </summary>
-        private int threadId;
+        internal int threadId;
 
         /// <summary>
         /// Build event context
         /// </summary>
         [OptionalField(VersionAdded = 2)]
-        private BuildEventContext buildEventContext;
+        internal BuildEventContext buildEventContext;
 
         /// <summary>
         /// Default constructor
@@ -155,71 +148,7 @@ namespace Microsoft.Build.Framework
             set => buildEventContext = value;
         }
 
-#region CustomSerializationToStream
-        /// <summary>
-        /// Serializes to a stream through a binary writer
-        /// </summary>
-        /// <param name="writer">Binary writer which is attached to the stream the event will be serialized into</param>
-        internal virtual void WriteToStream(BinaryWriter writer)
-        {
-            writer.WriteOptionalString(message);
-            writer.WriteOptionalString(helpKeyword);
-            writer.WriteOptionalString(senderName);
-            writer.WriteTimestamp(timestamp);
-            writer.Write(threadId);
-            writer.WriteOptionalBuildEventContext(buildEventContext);
-        }
 
-        /// <summary>
-        /// Deserializes from a stream through a binary reader
-        /// </summary>
-        /// <param name="reader">Binary reader which is attached to the stream the event will be deserialized from</param>
-        /// <param name="version">The version of the runtime the message packet was created from</param>
-        internal virtual void CreateFromStream(BinaryReader reader, int version)
-        {
-            message = reader.ReadOptionalString();
-            helpKeyword = reader.ReadOptionalString();
-            senderName = reader.ReadOptionalString();
-
-            long timestampTicks = reader.ReadInt64();
-
-            if (version > 20)
-            {
-                DateTimeKind kind = (DateTimeKind)reader.ReadInt32();
-                timestamp = new DateTime(timestampTicks, kind);
-            }
-            else
-            {
-                timestamp = new DateTime(timestampTicks);
-            }
-
-            threadId = reader.ReadInt32();
-
-            if (reader.ReadByte() == 0)
-            {
-                buildEventContext = null;
-            }
-            else
-            {
-                int nodeId = reader.ReadInt32();
-                int projectContextId = reader.ReadInt32();
-                int targetId = reader.ReadInt32();
-                int taskId = reader.ReadInt32();
-
-                if (version > 20)
-                {
-                    int submissionId = reader.ReadInt32();
-                    int projectInstanceId = reader.ReadInt32();
-                    int evaluationId = reader.ReadInt32();
-                    buildEventContext = new BuildEventContext(submissionId, nodeId, evaluationId, projectInstanceId, projectContextId, targetId, taskId);
-                }
-                else
-                {
-                    buildEventContext = new BuildEventContext(nodeId, targetId, projectContextId, taskId);
-                }
-            }
-        }
-#endregion
 
 #region SetSerializationDefaults
         /// <summary>

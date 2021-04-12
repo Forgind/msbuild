@@ -17,12 +17,12 @@ namespace Microsoft.Build.Framework
         /// <summary>
         /// Stores the message arguments.
         /// </summary>
-        private object[] arguments;
+        internal object[] arguments;
 
         /// <summary>
         /// Stores the original culture for String.Format.
         /// </summary>
-        private string originalCultureName;
+        internal string originalCultureName;
 
         /// <summary>
         /// Non-serializable CultureInfo object
@@ -107,75 +107,6 @@ namespace Microsoft.Build.Framework
                 }
 
                 return base.Message;
-            }
-        }
-
-        /// <summary>
-        /// Serializes to a stream through a binary writer.
-        /// </summary>
-        /// <param name="writer">Binary writer which is attached to the stream the event will be serialized into.</param>
-        internal override void WriteToStream(BinaryWriter writer)
-        {
-            // Locking is needed here as this is invoked on the serialization thread,
-            // whereas a local logger (a distributed logger) may concurrently invoke this.Message
-            // which will trigger formatting and thus the exception below
-            lock (locker)
-            {
-                bool hasArguments = arguments != null;
-                base.WriteToStream(writer);
-
-                if (hasArguments && arguments == null)
-                {
-                    throw new InvalidOperationException("BuildEventArgs has formatted message while serializing!");
-                }
-
-                if (arguments != null)
-                {
-                    writer.Write(arguments.Length);
-
-                    foreach (object argument in arguments)
-                    {
-                        // Arguments may be ints, etc, so explicitly convert
-                        // Convert.ToString returns String.Empty when it cannot convert, rather than throwing
-                        writer.Write(Convert.ToString(argument, CultureInfo.CurrentCulture));
-                    }
-                }
-                else
-                {
-                    writer.Write(-1);
-                }
-
-                writer.Write(originalCultureName);
-            }
-        }
-
-        /// <summary>
-        /// Deserializes from a stream through a binary reader.
-        /// </summary>
-        /// <param name="reader">Binary reader which is attached to the stream the event will be deserialized from.</param>
-        /// <param name="version">The version of the runtime the message packet was created from</param>
-        internal override void CreateFromStream(BinaryReader reader, Int32 version)
-        {
-            base.CreateFromStream(reader, version);
-
-            if (version > 20)
-            {
-                string[] messageArgs = null;
-                int numArguments = reader.ReadInt32();
-
-                if (numArguments >= 0)
-                {
-                    messageArgs = new string[numArguments];
-
-                    for (int numRead = 0; numRead < numArguments; numRead++)
-                    {
-                        messageArgs[numRead] = reader.ReadString();
-                    }
-                }
-
-                arguments = messageArgs;
-
-                originalCultureName = reader.ReadString();
             }
         }
 

@@ -160,7 +160,7 @@ namespace Microsoft.Build.Utilities
         Version160,
 
         /// <summary>
-        /// Visual Studio "Dev17"
+        /// Visual Studio (Dev17)
         /// </summary>
         Version170,
 
@@ -168,7 +168,7 @@ namespace Microsoft.Build.Utilities
         /// <summary>
         /// The latest version available at the time of release
         /// </summary>
-        VersionLatest = Version150
+        VersionLatest = Version170
     }
 
     /// <summary>

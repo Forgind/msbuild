@@ -1135,50 +1135,42 @@ namespace Microsoft.Build.Construction
                 }
 
                 // Update the appropriate field within the parameters struct.
-                if (aspNetPropertyName == "AspNetCompiler.VirtualPath")
+                switch (aspNetPropertyName)
                 {
-                    aspNetCompilerParameters.aspNetVirtualPath = propertyValue;
-                }
-                else if (aspNetPropertyName == "AspNetCompiler.PhysicalPath")
-                {
-                    aspNetCompilerParameters.aspNetPhysicalPath = propertyValue;
-                }
-                else if (aspNetPropertyName == "AspNetCompiler.TargetPath")
-                {
-                    aspNetCompilerParameters.aspNetTargetPath = propertyValue;
-                }
-                else if (aspNetPropertyName == "AspNetCompiler.ForceOverwrite")
-                {
-                    aspNetCompilerParameters.aspNetForce = propertyValue;
-                }
-                else if (aspNetPropertyName == "AspNetCompiler.Updateable")
-                {
-                    aspNetCompilerParameters.aspNetUpdateable = propertyValue;
-                }
-                else if (aspNetPropertyName == "AspNetCompiler.Debug")
-                {
-                    aspNetCompilerParameters.aspNetDebug = propertyValue;
-                }
-                else if (aspNetPropertyName == "AspNetCompiler.KeyFile")
-                {
-                    aspNetCompilerParameters.aspNetKeyFile = propertyValue;
-                }
-                else if (aspNetPropertyName == "AspNetCompiler.KeyContainer")
-                {
-                    aspNetCompilerParameters.aspNetKeyContainer = propertyValue;
-                }
-                else if (aspNetPropertyName == "AspNetCompiler.DelaySign")
-                {
-                    aspNetCompilerParameters.aspNetDelaySign = propertyValue;
-                }
-                else if (aspNetPropertyName == "AspNetCompiler.AllowPartiallyTrustedCallers")
-                {
-                    aspNetCompilerParameters.aspNetAPTCA = propertyValue;
-                }
-                else if (aspNetPropertyName == "AspNetCompiler.FixedNames")
-                {
-                    aspNetCompilerParameters.aspNetFixedNames = propertyValue;
-                }
+                    case "AspNetCompiler.VirtualPath":
+                        aspNetCompilerParameters.aspNetVirtualPath = propertyValue;
+                        break;
+                    case "AspNetCompiler.PhysicalPath":
+                        aspNetCompilerParameters.aspNetPhysicalPath = propertyValue;
+                        break;
+                    case "AspNetCompiler.TargetPath":
+                        aspNetCompilerParameters.aspNetTargetPath = propertyValue;
+                        break;
+                    case "AspNetCompiler.ForceOverwrite":
+                        aspNetCompilerParameters.aspNetForce = propertyValue;
+                        break;
+                    case "AspNetCompiler.Updateable":
+                        aspNetCompilerParameters.aspNetUpdateable = propertyValue;
+                        break;
+                    case "AspNetCompiler.Debug":
+                        aspNetCompilerParameters.aspNetDebug = propertyValue;
+                        break;
+                    case "AspNetCompiler.KeyFile":
+                        aspNetCompilerParameters.aspNetKeyFile = propertyValue;
+                        break;
+                    case "AspNetCompiler.KeyContainer":
+                        aspNetCompilerParameters.aspNetKeyContainer = propertyValue;
+                        break;
+                    case "AspNetCompiler.DelaySign":
+                        aspNetCompilerParameters.aspNetDelaySign = propertyValue;
+                        break;
+                    case "AspNetCompiler.AllowPartiallyTrustedCallers":
+                        aspNetCompilerParameters.aspNetAPTCA = propertyValue;
+                        break;
+                    case "AspNetCompiler.FixedNames":
+                        aspNetCompilerParameters.aspNetFixedNames = propertyValue;
+                        break;
+            }
 
                 // Store the updated parameters struct back into the hashtable by configuration name.
                 proj.AspNetConfigurations[configurationName] = aspNetCompilerParameters;

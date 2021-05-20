@@ -288,25 +288,13 @@ namespace Microsoft.Build.BackEnd
         /// </summary>
         internal static string GetFullBuildReason(DependencyAnalysisLogDetail logDetail)
         {
-            string reason = null;
-
-            if (logDetail.Reason == OutofdateReason.NewerInput)
+            return logDetail.Reason switch
             {
-                // One of the inputs was newer than all of the outputs
-                reason = ResourceUtilities.FormatResourceStringIgnoreCodeAndKeyword("BuildTargetCompletelyInputNewer", logDetail.Input, logDetail.Output);
-            }
-            else if (logDetail.Reason == OutofdateReason.MissingOutput)
-            {
-                // One of the outputs was missing
-                reason = ResourceUtilities.FormatResourceStringIgnoreCodeAndKeyword("BuildTargetCompletelyOutputDoesntExist", logDetail.Output);
-            }
-            else if (logDetail.Reason == OutofdateReason.MissingInput)
-            {
-                // One of the inputs was missing
-                reason = ResourceUtilities.FormatResourceStringIgnoreCodeAndKeyword("BuildTargetCompletelyInputDoesntExist", logDetail.Input);
-            }
-
-            return reason;
+                OutofdateReason.NewerInput => ResourceUtilities.FormatResourceStringIgnoreCodeAndKeyword("BuildTargetCompletelyInputNewer", logDetail.Input, logDetail.Output),
+                OutofdateReason.MissingOutput => ResourceUtilities.FormatResourceStringIgnoreCodeAndKeyword("BuildTargetCompletelyOutputDoesntExist", logDetail.Output),
+                OutofdateReason.MissingInput => ResourceUtilities.FormatResourceStringIgnoreCodeAndKeyword("BuildTargetCompletelyInputDoesntExist", logDetail.Input),
+                _ => null
+            };
         }
 
         /// <summary>

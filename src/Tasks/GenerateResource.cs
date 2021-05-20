@@ -2933,30 +2933,23 @@ namespace Microsoft.Build.Tasks
                 return Format.Error;
             }
 
-            if (String.Equals(extension, ".txt", StringComparison.OrdinalIgnoreCase) ||
-                String.Equals(extension, ".restext", StringComparison.OrdinalIgnoreCase))
+            switch (extension.ToLowerInvariant())
             {
-                return Format.Text;
-            }
-            else if (String.Equals(extension, ".resx", StringComparison.OrdinalIgnoreCase) ||
-                     String.Equals(extension, ".resw", StringComparison.OrdinalIgnoreCase))
-            {
-                return Format.XML;
-            }
-            else if (String.Equals(extension, ".resources.dll", StringComparison.OrdinalIgnoreCase) ||
-                     String.Equals(extension, ".dll", StringComparison.OrdinalIgnoreCase) ||
-                     String.Equals(extension, ".exe", StringComparison.OrdinalIgnoreCase))
-            {
-                return Format.Assembly;
-            }
-            else if (String.Equals(extension, ".resources", StringComparison.OrdinalIgnoreCase))
-            {
-                return Format.Binary;
-            }
-            else
-            {
-                _logger.LogErrorWithCodeFromResources("GenerateResource.UnknownFileExtension", Path.GetExtension(filename), filename);
-                return Format.Error;
+                case ".txt":
+                case ".restext":
+                    return Format.Text;
+                case ".resx":
+                case ".resw":
+                    return Format.XML;
+                case ".resources.dll":
+                case ".dll":
+                case ".exe":
+                    return Format.Assembly;
+                case ".resources":
+                    return Format.Binary;
+                default:
+                    _logger.LogErrorWithCodeFromResources("GenerateResource.UnknownFileExtension", Path.GetExtension(filename), filename);
+                    return Format.Error;
             }
         }
 

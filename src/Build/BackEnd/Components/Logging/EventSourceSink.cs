@@ -217,70 +217,55 @@ namespace Microsoft.Build.BackEnd.Logging
         /// </summary>
         public void Consume(BuildEventArgs buildEvent)
         {
-            // FXCop may complain that there are unecessary casts here, and there are, but
-            // using "as" and allocating another variable for each event is extremely costly
-            // and is much slower then this approach even with the additional casts
-            if (buildEvent is BuildMessageEventArgs)
+            switch (buildEvent)
             {
-                this.RaiseMessageEvent(null, (BuildMessageEventArgs)buildEvent);
-            }
-            else if (buildEvent is TaskStartedEventArgs)
-            {
-                this.RaiseTaskStartedEvent(null, (TaskStartedEventArgs)buildEvent);
-            }
-            else if (buildEvent is TaskFinishedEventArgs)
-            {
-                this.RaiseTaskFinishedEvent(null, (TaskFinishedEventArgs)buildEvent);
-            }
-            else if (buildEvent is TargetStartedEventArgs)
-            {
-                this.RaiseTargetStartedEvent(null, (TargetStartedEventArgs)buildEvent);
-            }
-            else if (buildEvent is TargetFinishedEventArgs)
-            {
-                this.RaiseTargetFinishedEvent(null, (TargetFinishedEventArgs)buildEvent);
-            }
-            else if (buildEvent is ProjectStartedEventArgs)
-            {
-                this.RaiseProjectStartedEvent(null, (ProjectStartedEventArgs)buildEvent);
-            }
-            else if (buildEvent is ProjectFinishedEventArgs)
-            {
-                this.RaiseProjectFinishedEvent(null, (ProjectFinishedEventArgs)buildEvent);
-            }
-            else if (buildEvent is BuildStartedEventArgs)
-            {
-                HaveLoggedBuildStartedEvent = true;
-                this.RaiseBuildStartedEvent(null, (BuildStartedEventArgs)buildEvent);
-            }
-            else if (buildEvent is BuildFinishedEventArgs)
-            {
-                HaveLoggedBuildFinishedEvent = true;
-                this.RaiseBuildFinishedEvent(null, (BuildFinishedEventArgs)buildEvent);
-            }
-            else if (buildEvent is CustomBuildEventArgs)
-            {
-                this.RaiseCustomEvent(null, (CustomBuildEventArgs)buildEvent);
-            }
-            else if (buildEvent is BuildStatusEventArgs)
-            {
-                this.RaiseStatusEvent(null, (BuildStatusEventArgs)buildEvent);
-            }
-            else if (buildEvent is BuildWarningEventArgs)
-            {
-                this.RaiseWarningEvent(null, (BuildWarningEventArgs)buildEvent);
-            }
-            else if (buildEvent is BuildErrorEventArgs)
-            {
-                this.RaiseErrorEvent(null, (BuildErrorEventArgs)buildEvent);
-            }
-            else if (buildEvent is TelemetryEventArgs)
-            {
-                this.RaiseTelemetryEvent(null, (TelemetryEventArgs) buildEvent);
-            }
-            else
-            {
-                ErrorUtilities.VerifyThrow(false, "Unknown event args type.");
+                case BuildMessageEventArgs bEvent:
+                    this.RaiseMessageEvent(null, bEvent);
+                    break;
+                case TaskStartedEventArgs bEvent:
+                    this.RaiseTaskStartedEvent(null, bEvent);
+                        break;
+                case TaskFinishedEventArgs bEvent:
+                    this.RaiseTaskFinishedEvent(null, bEvent);
+                        break;
+                case TargetStartedEventArgs bEvent:
+                    this.RaiseTargetStartedEvent(null, bEvent);
+                        break;
+                case TargetFinishedEventArgs bEvent:
+                    this.RaiseTargetFinishedEvent(null, bEvent);
+                        break;
+                case ProjectStartedEventArgs bEvent:
+                    this.RaiseProjectStartedEvent(null, bEvent);
+                        break;
+                case ProjectFinishedEventArgs bEvent:
+                    this.RaiseProjectFinishedEvent(null, bEvent);
+                        break;
+                case BuildStartedEventArgs bEvent:
+                    HaveLoggedBuildStartedEvent = true;
+                    this.RaiseBuildStartedEvent(null, bEvent);
+                        break;
+                case BuildFinishedEventArgs bEvent:
+                    HaveLoggedBuildFinishedEvent = true;
+                    this.RaiseBuildFinishedEvent(null, bEvent);
+                        break;
+                case CustomBuildEventArgs bEvent:
+                    this.RaiseCustomEvent(null, bEvent);
+                        break;
+                case BuildStatusEventArgs bEvent:
+                    this.RaiseStatusEvent(null, bEvent);
+                        break;
+                case BuildWarningEventArgs bEvent:
+                    this.RaiseWarningEvent(null, bEvent);
+                        break;
+                case BuildErrorEventArgs bEvent:
+                    this.RaiseErrorEvent(null, bEvent);
+                        break;
+                case TelemetryEventArgs bEvent:
+                    this.RaiseTelemetryEvent(null, bEvent);
+                    break;
+                default:
+                    ErrorUtilities.VerifyThrow(false, "Unknown event args type.");
+                    break;
             }
         }
 

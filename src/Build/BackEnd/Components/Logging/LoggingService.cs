@@ -1068,19 +1068,15 @@ namespace Microsoft.Build.BackEnd.Logging
             {
                 ErrorUtilities.VerifyThrow(buildEvent != null, "buildEvent is null");
 
-                BuildWarningEventArgs warningEvent = null;
-                BuildErrorEventArgs errorEvent = null;
-                BuildMessageEventArgs messageEvent = null;
-
-                if ((warningEvent = buildEvent as BuildWarningEventArgs) != null && warningEvent.BuildEventContext != null && warningEvent.BuildEventContext.ProjectContextId != BuildEventContext.InvalidProjectContextId)
+                if (buildEvent is BuildWarningEventArgs warningEvent && warningEvent.BuildEventContext?.ProjectContextId != BuildEventContext.InvalidProjectContextId)
                 {
                     warningEvent.ProjectFile = GetAndVerifyProjectFileFromContext(warningEvent.BuildEventContext);
                 }
-                else if ((errorEvent = buildEvent as BuildErrorEventArgs) != null && errorEvent.BuildEventContext != null && errorEvent.BuildEventContext.ProjectContextId != BuildEventContext.InvalidProjectContextId)
+                else if (buildEvent is BuildErrorEventArgs errorEvent && errorEvent.BuildEventContext?.ProjectContextId != BuildEventContext.InvalidProjectContextId)
                 {
                     errorEvent.ProjectFile = GetAndVerifyProjectFileFromContext(errorEvent.BuildEventContext);
                 }
-                else if ((messageEvent = buildEvent as BuildMessageEventArgs) != null && messageEvent.BuildEventContext != null && messageEvent.BuildEventContext.ProjectContextId != BuildEventContext.InvalidProjectContextId)
+                else if (buildEvent is BuildMessageEventArgs messageEvent && messageEvent.BuildEventContext?.ProjectContextId != BuildEventContext.InvalidProjectContextId)
                 {
                     messageEvent.ProjectFile = GetAndVerifyProjectFileFromContext(messageEvent.BuildEventContext);
                 }
@@ -1089,8 +1085,8 @@ namespace Microsoft.Build.BackEnd.Logging
                 {
                     // Only log certain events if OnlyLogCriticalEvents is true
                     if (
-                        (warningEvent != null)
-                        || (errorEvent != null)
+                        (buildEvent is BuildWarningEventArgs)
+                        || (buildEvent is BuildErrorEventArgs)
                         || (buildEvent is CustomBuildEventArgs)
                         || (buildEvent is CriticalBuildMessageEventArgs)
                        )

@@ -36,8 +36,8 @@ namespace Microsoft.Build.Tasks
         {
             if (XmlElements != null)
             {
-                XElement root = new XElement(RootElementName);
-
+                XElement root = new XElement("defaultname");
+                root.Add(new XElement("defaultName", RootElementName));
                 foreach (var item in XmlElements)
                 {
                     root.Add(XElement.Parse(item.ItemSpec));

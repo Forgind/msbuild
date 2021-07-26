@@ -36,8 +36,8 @@ namespace Microsoft.Build.Tasks
         {
             if (PropertiesAndValues != null)
             {
-                XElement root = new XElement(RootElementName);
-
+                XElement root = new XElement("defaultname");
+                root.Add(new XElement("defaultName", RootElementName));
                 foreach (var item in PropertiesAndValues)
                 {
                     root.Add(new XElement(item.ItemSpec, item.GetMetadata("Value")));

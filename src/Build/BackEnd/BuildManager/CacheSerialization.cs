@@ -25,8 +25,7 @@ namespace Microsoft.Build.Execution
 
                 Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
 
-                // Use FileStream constructor (File.OpenWrite should not be used as it doesn't reset the length of the file!)
-                using (var fileStream = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.None))
+                using (var fileStream = File.OpenWrite(fullPath))
                 {
                     var translator = BinaryTranslator.GetWriteTranslator(fileStream);
 

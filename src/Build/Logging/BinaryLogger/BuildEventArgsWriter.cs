@@ -251,13 +251,13 @@ Build
         {
             Write(BinaryLogRecordKind.BuildStarted);
             WriteBuildEventArgsFields(e);
-            Write(e.BuildEnvironment);
         }
 
         private void Write(BuildFinishedEventArgs e)
         {
             Write(BinaryLogRecordKind.BuildFinished);
             WriteBuildEventArgsFields(e);
+            Write(EnvironmentUtilities.EnvironmentVariablesUsed);
             Write(e.Succeeded);
         }
 

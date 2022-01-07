@@ -26,7 +26,7 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact]
         public void SetDefaultToolsVersion()
         {
-            string oldValue = Environment.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION");
+            string oldValue = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION");
 
             try
             {
@@ -69,7 +69,7 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact]
         public void ReloadProjectWithInvalidToolsVersionInFile()
         {
-            string oldValue = Environment.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION");
+            string oldValue = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION");
 
             try
             {
@@ -114,7 +114,7 @@ namespace Microsoft.Build.UnitTests.Definition
                 return;
             }
 
-            string oldValue = Environment.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION");
+            string oldValue = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION");
 
             try
             {
@@ -165,7 +165,7 @@ namespace Microsoft.Build.UnitTests.Definition
                 return;
             }
 
-            string oldValue = Environment.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION");
+            string oldValue = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION");
 
             try
             {

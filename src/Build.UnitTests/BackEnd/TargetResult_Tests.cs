@@ -9,6 +9,7 @@ using Microsoft.Build.Execution;
 using TaskItem = Microsoft.Build.Execution.ProjectItemInstance.TaskItem;
 using Xunit;
 using Microsoft.Build.Engine.UnitTests.TestComparers;
+using Microsoft.Build.Shared;
 
 #nullable disable
 
@@ -132,7 +133,7 @@ namespace Microsoft.Build.UnitTests.BackEnd
         [Fact]
         public void TestGetCacheDirectory()
         {
-            string oldTmp = Environment.GetEnvironmentVariable("TMP");
+            string oldTmp = EnvironmentUtilities.GetEnvironmentVariable("TMP");
 
             try
             {

@@ -22,7 +22,7 @@ namespace Microsoft.Build.Shared.Debugging
 
         static DebugUtils()
         {
-            string environmentDebugPath = Environment.GetEnvironmentVariable("MSBUILDDEBUGPATH");
+            string environmentDebugPath = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDEBUGPATH");
             var debugDirectory = environmentDebugPath;
 
             if (Traits.Instance.DebugEngine)
@@ -72,7 +72,7 @@ namespace Microsoft.Build.Shared.Debugging
 
         private static bool CurrentProcessMatchesDebugName()
         {
-            var processNameToBreakInto = Environment.GetEnvironmentVariable("MSBuildDebugProcessName");
+            var processNameToBreakInto = EnvironmentUtilities.GetEnvironmentVariable("MSBuildDebugProcessName");
             var thisProcessMatchesName = string.IsNullOrWhiteSpace(processNameToBreakInto) ||
                                          Process.GetCurrentProcess().ProcessName.Contains(processNameToBreakInto);
 

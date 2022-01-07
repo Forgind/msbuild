@@ -533,7 +533,7 @@ namespace Microsoft.Build.Execution
                 resultsCache.ClearResults();
             }
 
-            if (Environment.GetEnvironmentVariable("MSBUILDCLEARXMLCACHEONCHILDNODES") == "1")
+            if (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDCLEARXMLCACHEONCHILDNODES") == "1")
             {
                 // Optionally clear out the cache. This has the advantage of releasing memory,
                 // but the disadvantage of causing the next build to repeat the load and parse.
@@ -772,7 +772,7 @@ namespace Microsoft.Build.Execution
 
             _loggingService.OnLoggingThreadException += OnLoggingThreadException;
 
-            string forwardPropertiesFromChild = Environment.GetEnvironmentVariable("MSBUILDFORWARDPROPERTIESFROMCHILD");
+            string forwardPropertiesFromChild = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDFORWARDPROPERTIESFROMCHILD");
             string[] propertyListToSerialize = null;
 
             // Get a list of properties which should be serialized
@@ -784,7 +784,7 @@ namespace Microsoft.Build.Execution
             _loggingService.PropertiesToSerialize = propertyListToSerialize;
             _loggingService.RunningOnRemoteNode = true;
 
-            string forwardAllProperties = Environment.GetEnvironmentVariable("MSBUILDFORWARDALLPROPERTIESFROMCHILD");
+            string forwardAllProperties = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDFORWARDALLPROPERTIESFROMCHILD");
             if (String.Equals(forwardAllProperties, "1", StringComparison.OrdinalIgnoreCase) || _buildParameters.LogInitialPropertiesAndItems)
             {
                 _loggingService.SerializeAllProperties = true;

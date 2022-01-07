@@ -3,6 +3,7 @@
 
 using System;
 using Microsoft.Build.Framework;
+using Microsoft.Build.Shared;
 
 #nullable disable
 
@@ -30,43 +31,43 @@ namespace Microsoft.Build.Framework
         {
             EscapeHatches = new EscapeHatches();
 
-            DebugScheduler = DebugEngine || !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("MSBUILDDEBUGSCHEDULER"));
-            DebugNodeCommunication = DebugEngine || !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("MSBUILDDEBUGCOMM"));
+            DebugScheduler = DebugEngine || !string.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDEBUGSCHEDULER"));
+            DebugNodeCommunication = DebugEngine || !string.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDEBUGCOMM"));
         }
 
         public EscapeHatches EscapeHatches { get; }
 
-        internal readonly string MSBuildDisableFeaturesFromVersion = Environment.GetEnvironmentVariable("MSBUILDDISABLEFEATURESFROMVERSION");
+        internal readonly string MSBuildDisableFeaturesFromVersion = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDISABLEFEATURESFROMVERSION");
 
         /// <summary>
         /// Do not expand wildcards that match a certain pattern
         /// </summary>
-        public readonly bool UseLazyWildCardEvaluation = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("MsBuildSkipEagerWildCardEvaluationRegexes"));
-        public readonly bool LogExpandedWildcards = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("MSBUILDLOGEXPANDEDWILDCARDS"));
+        public readonly bool UseLazyWildCardEvaluation = !string.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("MsBuildSkipEagerWildCardEvaluationRegexes"));
+        public readonly bool LogExpandedWildcards = !string.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLOGEXPANDEDWILDCARDS"));
 
         /// <summary>
         /// Cache file existence for the entire process
         /// </summary>
-        public readonly bool CacheFileExistence = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("MsBuildCacheFileExistence"));
+        public readonly bool CacheFileExistence = !string.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("MsBuildCacheFileExistence"));
 
-        public readonly bool UseSimpleProjectRootElementCacheConcurrency = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("MsBuildUseSimpleProjectRootElementCacheConcurrency"));
+        public readonly bool UseSimpleProjectRootElementCacheConcurrency = !string.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("MsBuildUseSimpleProjectRootElementCacheConcurrency"));
 
         /// <summary>
         /// Cache wildcard expansions for the entire process
         /// </summary>
-        public readonly bool MSBuildCacheFileEnumerations = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("MsBuildCacheFileEnumerations"));
+        public readonly bool MSBuildCacheFileEnumerations = !string.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("MsBuildCacheFileEnumerations"));
 
-        public readonly bool EnableAllPropertyFunctions = Environment.GetEnvironmentVariable("MSBUILDENABLEALLPROPERTYFUNCTIONS") == "1";
+        public readonly bool EnableAllPropertyFunctions = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDENABLEALLPROPERTYFUNCTIONS") == "1";
 
         /// <summary>
         /// Enable restore first functionality in MSBuild.exe
         /// </summary>
-        public readonly bool EnableRestoreFirst = Environment.GetEnvironmentVariable("MSBUILDENABLERESTOREFIRST") == "1";
+        public readonly bool EnableRestoreFirst = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDENABLERESTOREFIRST") == "1";
 
         /// <summary>
         /// Allow the user to specify that two processes should not be communicating via an environment variable.
         /// </summary>
-        public static readonly string MSBuildNodeHandshakeSalt = Environment.GetEnvironmentVariable("MSBUILDNODEHANDSHAKESALT");
+        public static readonly string MSBuildNodeHandshakeSalt = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDNODEHANDSHAKESALT");
 
         /// <summary>
         /// Setting the associated environment variable to 1 restores the pre-15.8 single
@@ -79,12 +80,12 @@ namespace Microsoft.Build.Framework
         /// <summary>
         /// Instruct MSBuild to write out the generated "metaproj" file to disk when building a solution file.
         /// </summary>
-        public readonly bool EmitSolutionMetaproj = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("MSBuildEmitSolution"));
+        public readonly bool EmitSolutionMetaproj = !string.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("MSBuildEmitSolution"));
 
         /// <summary>
         /// Log statistics about property functions which require reflection
         /// </summary>
-        public readonly bool LogPropertyFunctionsRequiringReflection = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("MSBuildLogPropertyFunctionsRequiringReflection"));
+        public readonly bool LogPropertyFunctionsRequiringReflection = !string.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("MSBuildLogPropertyFunctionsRequiringReflection"));
 
         /// <summary>
         /// Log property tracking information.
@@ -96,13 +97,13 @@ namespace Microsoft.Build.Framework
         /// </summary>
         public readonly int DictionaryBasedItemRemoveThreshold = ParseIntFromEnvironmentVariableOrDefault("MSBUILDDICTIONARYBASEDITEMREMOVETHRESHOLD", 100);
 
-        public readonly bool DebugEngine = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("MSBuildDebugEngine"));
+        public readonly bool DebugEngine = !string.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("MSBuildDebugEngine"));
         public readonly bool DebugScheduler;
         public readonly bool DebugNodeCommunication;
 
         private static int ParseIntFromEnvironmentVariableOrDefault(string environmentVariable, int defaultValue)
         {
-            return int.TryParse(Environment.GetEnvironmentVariable(environmentVariable), out int result)
+            return int.TryParse(EnvironmentUtilities.GetEnvironmentVariable(environmentVariable), out int result)
                 ? result
                 : defaultValue;
         }
@@ -113,13 +114,13 @@ namespace Microsoft.Build.Framework
         /// <summary>
         /// Do not log command line information to build loggers. Useful to unbreak people who parse the msbuild log and who are unwilling to change their code.
         /// </summary>
-        public readonly bool DoNotSendDeferredMessagesToBuildManager = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("MsBuildDoNotSendDeferredMessagesToBuildManager"));
+        public readonly bool DoNotSendDeferredMessagesToBuildManager = !string.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("MsBuildDoNotSendDeferredMessagesToBuildManager"));
 
         /// <summary>
         /// https://github.com/dotnet/msbuild/pull/4975 started expanding qualified metadata in Update operations. Before they'd expand to empty strings.
         /// This escape hatch turns back the old empty string behavior.
         /// </summary>
-        public readonly bool DoNotExpandQualifiedMetadataInUpdateOperation = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("MSBuildDoNotExpandQualifiedMetadataInUpdateOperation"));
+        public readonly bool DoNotExpandQualifiedMetadataInUpdateOperation = !string.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("MSBuildDoNotExpandQualifiedMetadataInUpdateOperation"));
 
         /// <summary>
         /// Force whether Project based evaluations should evaluate elements with false conditions.
@@ -129,28 +130,28 @@ namespace Microsoft.Build.Framework
         /// <summary>
         /// Always use the accurate-but-slow CreateFile approach to timestamp extraction.
         /// </summary>
-        public readonly bool AlwaysUseContentTimestamp = Environment.GetEnvironmentVariable("MSBUILDALWAYSCHECKCONTENTTIMESTAMP") == "1";
+        public readonly bool AlwaysUseContentTimestamp = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDALWAYSCHECKCONTENTTIMESTAMP") == "1";
 
         /// <summary>
         /// Truncate task inputs when logging them. This can reduce memory pressure
         /// at the expense of log usefulness.
         /// </summary>
-        public readonly bool TruncateTaskInputs = Environment.GetEnvironmentVariable("MSBUILDTRUNCATETASKINPUTS") == "1";
+        public readonly bool TruncateTaskInputs = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTRUNCATETASKINPUTS") == "1";
 
         /// <summary>
         /// Disables truncation of Condition messages in Tasks/Targets via ExpanderOptions.Truncate.
         /// </summary>
-        public readonly bool DoNotTruncateConditions = Environment.GetEnvironmentVariable("MSBuildDoNotTruncateConditions") == "1";
+        public readonly bool DoNotTruncateConditions = EnvironmentUtilities.GetEnvironmentVariable("MSBuildDoNotTruncateConditions") == "1";
 
         /// <summary>
         /// Disables skipping full drive/filesystem globs that are behind a false condition.
         /// </summary>
-        public readonly bool AlwaysEvaluateDangerousGlobs = Environment.GetEnvironmentVariable("MSBuildAlwaysEvaluateDangerousGlobs") == "1";
+        public readonly bool AlwaysEvaluateDangerousGlobs = EnvironmentUtilities.GetEnvironmentVariable("MSBuildAlwaysEvaluateDangerousGlobs") == "1";
 
         /// <summary>
         /// Disables skipping full up to date check for immutable files. See FileClassifier class.
         /// </summary>
-        public readonly bool AlwaysDoImmutableFilesUpToDateCheck = Environment.GetEnvironmentVariable("MSBUILDDONOTCACHEMODIFICATIONTIME") == "1";
+        public readonly bool AlwaysDoImmutableFilesUpToDateCheck = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDONOTCACHEMODIFICATIONTIME") == "1";
 
         /// <summary>
         /// Emit events for project imports.
@@ -167,7 +168,7 @@ namespace Microsoft.Build.Framework
                 // Cache the first time
                 if (_logProjectImports == null)
                 {
-                    _logProjectImports = !String.IsNullOrEmpty(Environment.GetEnvironmentVariable("MSBUILDLOGIMPORTS"));
+                    _logProjectImports = !String.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLOGIMPORTS"));
                 }
                 return _logProjectImports.Value;
             }
@@ -184,7 +185,7 @@ namespace Microsoft.Build.Framework
             {
                 if (_logTaskInputs == null)
                 {
-                    _logTaskInputs = Environment.GetEnvironmentVariable("MSBUILDLOGTASKINPUTS") == "1";
+                    _logTaskInputs = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLOGTASKINPUTS") == "1";
                 }
                 return _logTaskInputs.Value;
             }
@@ -203,7 +204,7 @@ namespace Microsoft.Build.Framework
                 if (!_logPropertiesAndItemsAfterEvaluationInitialized)
                 {
                     _logPropertiesAndItemsAfterEvaluationInitialized = true;
-                    var variable = Environment.GetEnvironmentVariable("MSBUILDLOGPROPERTIESANDITEMSAFTEREVALUATION");
+                    var variable = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLOGPROPERTIESANDITEMSAFTEREVALUATION");
                     if (!string.IsNullOrEmpty(variable))
                     {
                         _logPropertiesAndItemsAfterEvaluation = variable == "1" || string.Equals(variable, "true", StringComparison.OrdinalIgnoreCase);
@@ -223,39 +224,39 @@ namespace Microsoft.Build.Framework
         /// <summary>
         /// Read information only once per file per ResolveAssemblyReference invocation.
         /// </summary>
-        public readonly bool CacheAssemblyInformation = Environment.GetEnvironmentVariable("MSBUILDDONOTCACHERARASSEMBLYINFORMATION") != "1";
+        public readonly bool CacheAssemblyInformation = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDONOTCACHERARASSEMBLYINFORMATION") != "1";
 
         public readonly ProjectInstanceTranslationMode? ProjectInstanceTranslation = ComputeProjectInstanceTranslation();
 
         /// <summary>
         /// Never use the slow (but more accurate) CreateFile approach to timestamp extraction.
         /// </summary>
-        public readonly bool UseSymlinkTimeInsteadOfTargetTime = Environment.GetEnvironmentVariable("MSBUILDUSESYMLINKTIMESTAMP") == "1";
+        public readonly bool UseSymlinkTimeInsteadOfTargetTime = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDUSESYMLINKTIMESTAMP") == "1";
 
         /// <summary>
         /// Allow node reuse of TaskHost nodes. This results in task assemblies locked past the build lifetime, preventing them from being rebuilt if custom tasks change, but may improve performance.
         /// </summary>
-        public readonly bool ReuseTaskHostNodes = Environment.GetEnvironmentVariable("MSBUILDREUSETASKHOSTNODES") == "1";
+        public readonly bool ReuseTaskHostNodes = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDREUSETASKHOSTNODES") == "1";
 
         /// <summary>
         /// Whether or not to ignore imports that are considered empty.  See ProjectRootElement.IsEmptyXmlFile() for more info.
         /// </summary>
-        public readonly bool IgnoreEmptyImports = Environment.GetEnvironmentVariable("MSBUILDIGNOREEMPTYIMPORTS") == "1";
+        public readonly bool IgnoreEmptyImports = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDIGNOREEMPTYIMPORTS") == "1";
 
         /// <summary>
         /// Whether to respect the TreatAsLocalProperty parameter on the Project tag.
         /// </summary>
-        public readonly bool IgnoreTreatAsLocalProperty = Environment.GetEnvironmentVariable("MSBUILDIGNORETREATASLOCALPROPERTY") != null;
+        public readonly bool IgnoreTreatAsLocalProperty = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDIGNORETREATASLOCALPROPERTY") != null;
 
         /// <summary>
         /// Whether to write information about why we evaluate to debug output.
         /// </summary>
-        public readonly bool DebugEvaluation = Environment.GetEnvironmentVariable("MSBUILDDEBUGEVALUATION") != null;
+        public readonly bool DebugEvaluation = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDEBUGEVALUATION") != null;
 
         /// <summary>
         /// Whether to warn when we set a property for the first time, after it was previously used.
         /// </summary>
-        public readonly bool WarnOnUninitializedProperty = !String.IsNullOrEmpty(Environment.GetEnvironmentVariable("MSBUILDWARNONUNINITIALIZEDPROPERTY"));
+        public readonly bool WarnOnUninitializedProperty = !String.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("MSBUILDWARNONUNINITIALIZEDPROPERTY"));
 
         /// <summary>
         /// MSBUILDUSECASESENSITIVEITEMNAMES is an escape hatch for the fix
@@ -263,47 +264,47 @@ namespace Microsoft.Build.Framework
         /// be removed (permanently set to false) after establishing that
         /// it's unneeded (at least by the 16.0 timeframe).
         /// </summary>
-        public readonly bool UseCaseSensitiveItemNames = Environment.GetEnvironmentVariable("MSBUILDUSECASESENSITIVEITEMNAMES") == "1";
+        public readonly bool UseCaseSensitiveItemNames = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDUSECASESENSITIVEITEMNAMES") == "1";
 
         /// <summary>
         /// Disable the use of paths longer than Windows MAX_PATH limits (260 characters) when running on a long path enabled OS.
         /// </summary>
-        public readonly bool DisableLongPaths = Environment.GetEnvironmentVariable("MSBUILDDISABLELONGPATHS") == "1";
+        public readonly bool DisableLongPaths = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDISABLELONGPATHS") == "1";
 
         /// <summary>
         /// Disable the use of any caching when resolving SDKs.
         /// </summary>
-        public readonly bool DisableSdkResolutionCache = Environment.GetEnvironmentVariable("MSBUILDDISABLESDKCACHE") == "1";
+        public readonly bool DisableSdkResolutionCache = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDISABLESDKCACHE") == "1";
 
         /// <summary>
         /// Disable the NuGet-based SDK resolver.
         /// </summary>
-        public readonly bool DisableNuGetSdkResolver = Environment.GetEnvironmentVariable("MSBUILDDISABLENUGETSDKRESOLVER") == "1";
+        public readonly bool DisableNuGetSdkResolver = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDISABLENUGETSDKRESOLVER") == "1";
 
         /// <summary>
         /// Don't delete TargetPath metadata from associated files found by RAR.
         /// </summary>
-        public readonly bool TargetPathForRelatedFiles = Environment.GetEnvironmentVariable("MSBUILDTARGETPATHFORRELATEDFILES") == "1";
+        public readonly bool TargetPathForRelatedFiles = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTARGETPATHFORRELATEDFILES") == "1";
 
         /// <summary>
         /// Disable AssemblyLoadContext isolation for plugins.
         /// </summary>
-        public readonly bool UseSingleLoadContext = Environment.GetEnvironmentVariable("MSBUILDSINGLELOADCONTEXT") == "1";
+        public readonly bool UseSingleLoadContext = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDSINGLELOADCONTEXT") == "1";
 
         /// <summary>
         /// Enables the user of autorun functionality in CMD.exe on Windows which is disabled by default in MSBuild.
         /// </summary>
-        public readonly bool UseAutoRunWhenLaunchingProcessUnderCmd = Environment.GetEnvironmentVariable("MSBUILDUSERAUTORUNINCMD") == "1";
+        public readonly bool UseAutoRunWhenLaunchingProcessUnderCmd = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDUSERAUTORUNINCMD") == "1";
 
         /// <summary>
         /// Disables switching codepage to UTF-8 after detection of characters that can't be represented in the current codepage.
         /// </summary>
-        public readonly bool AvoidUnicodeWhenWritingToolTaskBatch = Environment.GetEnvironmentVariable("MSBUILDAVOIDUNICODE") == "1";
+        public readonly bool AvoidUnicodeWhenWritingToolTaskBatch = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDAVOIDUNICODE") == "1";
 
         /// <summary>
         /// Workaround for https://github.com/Microsoft/vstest/issues/1503.
         /// </summary>
-        public readonly bool EnsureStdOutForChildNodesIsPrimaryStdout = Environment.GetEnvironmentVariable("MSBUILDENSURESTDOUTFORTASKPROCESSES") == "1";
+        public readonly bool EnsureStdOutForChildNodesIsPrimaryStdout = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDENSURESTDOUTFORTASKPROCESSES") == "1";
 
         /// <summary>
         /// Use the original, string-only resx parsing in .NET Core scenarios.
@@ -311,7 +312,7 @@ namespace Microsoft.Build.Framework
         /// <remarks>
         /// Escape hatch for problems arising from https://github.com/dotnet/msbuild/pull/4420.
         /// </remarks>
-        public readonly bool UseMinimalResxParsingInCoreScenarios = Environment.GetEnvironmentVariable("MSBUILDUSEMINIMALRESX") == "1";
+        public readonly bool UseMinimalResxParsingInCoreScenarios = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDUSEMINIMALRESX") == "1";
 
         private bool _sdkReferencePropertyExpansionInitialized;
         private SdkReferencePropertyExpansionMode? _sdkReferencePropertyExpansionValue;
@@ -338,7 +339,7 @@ namespace Microsoft.Build.Framework
 
         private static bool? ParseNullableBoolFromEnvironmentVariable(string environmentVariable)
         {
-            var value = Environment.GetEnvironmentVariable(environmentVariable);
+            var value = EnvironmentUtilities.GetEnvironmentVariable(environmentVariable);
 
             if (string.IsNullOrEmpty(value))
             {
@@ -357,7 +358,7 @@ namespace Microsoft.Build.Framework
 
         private static ProjectInstanceTranslationMode? ComputeProjectInstanceTranslation()
         {
-            var mode = Environment.GetEnvironmentVariable("MSBUILD_PROJECTINSTANCE_TRANSLATION_MODE");
+            var mode = EnvironmentUtilities.GetEnvironmentVariable("MSBUILD_PROJECTINSTANCE_TRANSLATION_MODE");
 
             if (mode == null)
             {
@@ -381,7 +382,7 @@ namespace Microsoft.Build.Framework
 
         private static SdkReferencePropertyExpansionMode? ComputeSdkReferencePropertyExpansion()
         {
-            var mode = Environment.GetEnvironmentVariable("MSBUILD_SDKREFERENCE_PROPERTY_EXPANSION_MODE");
+            var mode = EnvironmentUtilities.GetEnvironmentVariable("MSBUILD_SDKREFERENCE_PROPERTY_EXPANSION_MODE");
 
             if (mode == null)
             {
@@ -442,7 +443,7 @@ namespace Microsoft.Build.Framework
         /// Clone from ErrorUtilities which isn't (yet?) available in Framework.
         /// </remarks>
 
-        private static readonly bool s_throwExceptions = String.IsNullOrEmpty(Environment.GetEnvironmentVariable("MSBUILDDONOTTHROWINTERNAL"));
+        private static readonly bool s_throwExceptions = String.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDONOTTHROWINTERNAL"));
 
         /// <summary>
         /// Throws InternalErrorException.

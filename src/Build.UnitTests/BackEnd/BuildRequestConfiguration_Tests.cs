@@ -366,7 +366,7 @@ namespace Microsoft.Build.UnitTests.BackEnd
             BuildRequestConfiguration configuration = new BuildRequestConfiguration(new BuildRequestData(instance, new string[] { }, null), "2.0");
             configuration.ConfigurationId = 1;
 
-            string originalValue = Environment.GetEnvironmentVariable("MSBUILDCACHE");
+            string originalValue = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDCACHE");
             try
             {
                 Environment.SetEnvironmentVariable("MSBUILDCACHE", "1");
@@ -466,8 +466,8 @@ namespace Microsoft.Build.UnitTests.BackEnd
             ProjectInstance instance = project.CreateProjectInstance();
             BuildRequestConfiguration configuration = new BuildRequestConfiguration(new BuildRequestData(instance, new string[] { }, null), "2.0");
 
-            string originalTmp = Environment.GetEnvironmentVariable("TMP");
-            string originalTemp = Environment.GetEnvironmentVariable("TEMP");
+            string originalTmp = EnvironmentUtilities.GetEnvironmentVariable("TMP");
+            string originalTemp = EnvironmentUtilities.GetEnvironmentVariable("TEMP");
 
             try
             {

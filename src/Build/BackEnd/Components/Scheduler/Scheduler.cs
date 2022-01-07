@@ -183,8 +183,8 @@ namespace Microsoft.Build.BackEnd
             _debugDumpState = Traits.Instance.DebugScheduler;
             _debugDumpPath = ChangeWaves.AreFeaturesEnabled(ChangeWaves.Wave17_0)
                 ? DebugUtils.DebugPath
-                : Environment.GetEnvironmentVariable("MSBUILDDEBUGPATH");
-            _schedulingUnlimitedVariable = Environment.GetEnvironmentVariable("MSBUILDSCHEDULINGUNLIMITED");
+                : EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDEBUGPATH");
+            _schedulingUnlimitedVariable = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDSCHEDULINGUNLIMITED");
             _nodeLimitOffset = 0;
 
             if (!String.IsNullOrEmpty(_schedulingUnlimitedVariable))
@@ -195,7 +195,7 @@ namespace Microsoft.Build.BackEnd
             {
                 _schedulingUnlimited = false;
 
-                string strNodeLimitOffset = Environment.GetEnvironmentVariable("MSBUILDNODELIMITOFFSET");
+                string strNodeLimitOffset = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDNODELIMITOFFSET");
                 if (!String.IsNullOrEmpty(strNodeLimitOffset))
                 {
                     _nodeLimitOffset = Int16.Parse(strNodeLimitOffset, CultureInfo.InvariantCulture);
@@ -210,14 +210,14 @@ namespace Microsoft.Build.BackEnd
             // Resource management tuning knobs:
             // 1) MSBUILDCORELIMIT is the maximum number of cores we hand out via IBuildEngine9.RequestCores.
             //    Note that it is independent of build parallelism as given by /m on the command line.
-            if (!int.TryParse(Environment.GetEnvironmentVariable("MSBUILDCORELIMIT"), out _coreLimit) || _coreLimit <= 0)
+            if (!int.TryParse(EnvironmentUtilities.GetEnvironmentVariable("MSBUILDCORELIMIT"), out _coreLimit) || _coreLimit <= 0)
             {
                 _coreLimit = NativeMethodsShared.GetLogicalCoreCount();
             }
             // 1) MSBUILDNODECOREALLOCATIONWEIGHT is the weight with which executing nodes reduce the number of available cores.
             //    Example: If the weight is 50, _coreLimit is 8, and there are 4 nodes that are busy executing build requests,
             //    then the number of cores available via IBuildEngine9.RequestCores is 8 - (0.5 * 4) = 6.
-            if (!int.TryParse(Environment.GetEnvironmentVariable("MSBUILDNODECOREALLOCATIONWEIGHT"), out _nodeCoreAllocationWeight)
+            if (!int.TryParse(EnvironmentUtilities.GetEnvironmentVariable("MSBUILDNODECOREALLOCATIONWEIGHT"), out _nodeCoreAllocationWeight)
                 || _nodeCoreAllocationWeight <= 0
                 || _nodeCoreAllocationWeight > 100)
             {
@@ -621,7 +621,7 @@ namespace Microsoft.Build.BackEnd
             _resultsCache = (IResultsCache)_componentHost.GetComponent(BuildComponentType.ResultsCache);
             _configCache = (IConfigCache)_componentHost.GetComponent(BuildComponentType.ConfigCache);
             _inprocNodeContext =  new NodeLoggingContext(_componentHost.LoggingService, InProcNodeId, true);
-            var inprocNodeDisabledViaEnvironmentVariable = Environment.GetEnvironmentVariable("MSBUILDNOINPROCNODE") == "1";
+            var inprocNodeDisabledViaEnvironmentVariable = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDNOINPROCNODE") == "1";
             ForceAffinityOutOfProc = ChangeWaves.AreFeaturesEnabled(ChangeWaves.Wave17_0)
                 ? inprocNodeDisabledViaEnvironmentVariable || _componentHost.BuildParameters.DisableInProcNode
                 : inprocNodeDisabledViaEnvironmentVariable;
@@ -848,7 +848,7 @@ namespace Microsoft.Build.BackEnd
 
             if (_customRequestSchedulingAlgorithm == null)
             {
-                string customScheduler = Environment.GetEnvironmentVariable("MSBUILDCUSTOMSCHEDULER");
+                string customScheduler = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDCUSTOMSCHEDULER");
 
                 if (!String.IsNullOrEmpty(customScheduler))
                 {
@@ -893,7 +893,7 @@ namespace Microsoft.Build.BackEnd
                     {
                         _customRequestSchedulingAlgorithm = AssignUnscheduledRequestsUsingCustomSchedulerForSQL;
 
-                        string multiplier = Environment.GetEnvironmentVariable("MSBUILDCUSTOMSCHEDULERFORSQLCONFIGURATIONLIMITMULTIPLIER");
+                        string multiplier = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDCUSTOMSCHEDULERFORSQLCONFIGURATIONLIMITMULTIPLIER");
                         double convertedMultiplier = 0;
                         if (!Double.TryParse(multiplier, out convertedMultiplier) || convertedMultiplier < 1)
                         {

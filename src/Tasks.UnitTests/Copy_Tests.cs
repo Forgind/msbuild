@@ -64,8 +64,8 @@ namespace Microsoft.Build.UnitTests
         public Copy_Tests(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
-            _alwaysOverwriteReadOnlyFiles = Environment.GetEnvironmentVariable(Copy.AlwaysOverwriteReadOnlyFilesEnvVar);
-            _alwaysRetry = Environment.GetEnvironmentVariable(Copy.AlwaysRetryEnvVar);
+            _alwaysOverwriteReadOnlyFiles = EnvironmentUtilities.GetEnvironmentVariable(Copy.AlwaysOverwriteReadOnlyFilesEnvVar);
+            _alwaysRetry = EnvironmentUtilities.GetEnvironmentVariable(Copy.AlwaysRetryEnvVar);
 
             Environment.SetEnvironmentVariable(Copy.AlwaysOverwriteReadOnlyFilesEnvVar, String.Empty);
             Environment.SetEnvironmentVariable(Copy.AlwaysRetryEnvVar, String.Empty);
@@ -202,7 +202,7 @@ namespace Microsoft.Build.UnitTests
         {
             string source = FileUtilities.GetTemporaryFile();
             string destination = FileUtilities.GetTemporaryFile();
-            string oldAlwaysOverwriteValue = Environment.GetEnvironmentVariable(Copy.AlwaysOverwriteReadOnlyFilesEnvVar);
+            string oldAlwaysOverwriteValue = EnvironmentUtilities.GetEnvironmentVariable(Copy.AlwaysOverwriteReadOnlyFilesEnvVar);
 
             try
             {
@@ -268,7 +268,7 @@ namespace Microsoft.Build.UnitTests
         {
             string source = FileUtilities.GetTemporaryFile();
             string destination = FileUtilities.GetTemporaryFile();
-            string oldAlwaysRetryValue = Environment.GetEnvironmentVariable(Copy.AlwaysRetryEnvVar);
+            string oldAlwaysRetryValue = EnvironmentUtilities.GetEnvironmentVariable(Copy.AlwaysRetryEnvVar);
 
             try
             {

@@ -162,7 +162,7 @@ namespace Microsoft.Build.Evaluation
         /// <summary>
         /// For debugging leaks, a way to disable caching expression trees, to reduce noise
         /// </summary>
-        private static readonly bool s_disableExpressionCaching = (Environment.GetEnvironmentVariable("MSBUILDDONOTCACHEEXPRESSIONS") == "1");
+        private static readonly bool s_disableExpressionCaching = (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDONOTCACHEEXPRESSIONS") == "1");
 
         /// <summary>
         /// Evaluates a string representing a condition from a "condition" attribute.

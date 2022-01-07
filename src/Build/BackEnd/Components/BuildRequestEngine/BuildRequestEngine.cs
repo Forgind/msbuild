@@ -123,8 +123,8 @@ namespace Microsoft.Build.BackEnd
             _debugDumpState = Traits.Instance.DebugScheduler;
             _debugDumpPath = ChangeWaves.AreFeaturesEnabled(ChangeWaves.Wave17_0)
                 ? DebugUtils.DebugPath
-                : Environment.GetEnvironmentVariable("MSBUILDDEBUGPATH");
-            _debugForceCaching = Environment.GetEnvironmentVariable("MSBUILDDEBUGFORCECACHING") == "1";
+                : EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDEBUGPATH");
+            _debugForceCaching = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDEBUGFORCECACHING") == "1";
 
             if (String.IsNullOrEmpty(_debugDumpPath))
             {

@@ -37,7 +37,7 @@ namespace Microsoft.Build.UnitTests
             string oldValueForMSBuildOldOM = null;
             try
             {
-                oldValueForMSBuildOldOM = Environment.GetEnvironmentVariable("MSBuildOldOM");
+                oldValueForMSBuildOldOM = EnvironmentUtilities.GetEnvironmentVariable("MSBuildOldOM");
                 Environment.SetEnvironmentVariable("MSBuildOldOM", "");
 
                 // Create schema files in the temp folder
@@ -77,7 +77,7 @@ namespace Microsoft.Build.UnitTests
             string oldValueForMSBuildOldOM = null;
             try
             {
-                oldValueForMSBuildOldOM = Environment.GetEnvironmentVariable("MSBuildOldOM");
+                oldValueForMSBuildOldOM = EnvironmentUtilities.GetEnvironmentVariable("MSBuildOldOM");
                 Environment.SetEnvironmentVariable("MSBuildOldOM", "");
 
                 // Create schema files in the temp folder
@@ -117,7 +117,7 @@ namespace Microsoft.Build.UnitTests
 
             try
             {
-                oldValueForMSBuildOldOM = Environment.GetEnvironmentVariable("MSBuildOldOM");
+                oldValueForMSBuildOldOM = EnvironmentUtilities.GetEnvironmentVariable("MSBuildOldOM");
                 Environment.SetEnvironmentVariable("MSBuildOldOM", "");
 
                 // Create schema files in the temp folder
@@ -177,7 +177,7 @@ namespace Microsoft.Build.UnitTests
 
             try
             {
-                oldValueForMSBuildOldOM = Environment.GetEnvironmentVariable("MSBuildOldOM");
+                oldValueForMSBuildOldOM = EnvironmentUtilities.GetEnvironmentVariable("MSBuildOldOM");
                 Environment.SetEnvironmentVariable("MSBuildOldOM", "");
 
                 // Create schema files in the temp folder
@@ -230,7 +230,7 @@ namespace Microsoft.Build.UnitTests
 
             try
             {
-                oldValueForMSBuildOldOM = Environment.GetEnvironmentVariable("MSBuildOldOM");
+                oldValueForMSBuildOldOM = EnvironmentUtilities.GetEnvironmentVariable("MSBuildOldOM");
                 Environment.SetEnvironmentVariable("MSBuildOldOM", "");
 
                 // Create schema files in the temp folder

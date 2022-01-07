@@ -116,7 +116,7 @@ namespace Microsoft.Build.Tasks.AssemblyFoldersFromConfig
 
                     _wasMatch = true;
 
-                    bool useCache = Environment.GetEnvironmentVariable("MSBUILDDISABLEASSEMBLYFOLDERSEXCACHE") == null;
+                    bool useCache = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDISABLEASSEMBLYFOLDERSEXCACHE") == null;
                     string key = "6f7de854-47fe-4ae2-9cfe-9b33682abd91" + searchPathElement;
                     
                     if (useCache && _buildEngine != null)

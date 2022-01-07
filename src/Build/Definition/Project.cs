@@ -52,7 +52,7 @@ namespace Microsoft.Build.Evaluation
         /// <summary>
         /// Whether to write information about why we evaluate to debug output.
         /// </summary>
-        private static readonly bool s_debugEvaluation = (Environment.GetEnvironmentVariable("MSBUILDDEBUGEVALUATION") != null);
+        private static readonly bool s_debugEvaluation = (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDEBUGEVALUATION") != null);
 
         /// <summary>
         /// * and ? are invalid file name characters, but they occur in globs as wild cards.

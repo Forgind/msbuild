@@ -1795,7 +1795,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
                 key.SetValue("Value", "%" + envVar + "%", RegistryValueKind.ExpandString);
                 string result = expander.ExpandIntoStringLeaveEscaped(@"$(Registry:HKEY_CURRENT_USER\Software\Microsoft\MSBuild_test@Value)", ExpanderOptions.ExpandProperties, MockElementLocation.Instance);
 
-                Assert.Equal(Environment.GetEnvironmentVariable(envVar), result);
+                Assert.Equal(EnvironmentUtilities.GetEnvironmentVariable(envVar), result);
             }
             finally
             {
@@ -2214,7 +2214,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
             Expander<ProjectPropertyInstance, ProjectItemInstance> expander = new Expander<ProjectPropertyInstance, ProjectItemInstance>(pg, FileSystems.Default);
 
             string result = expander.ExpandIntoStringLeaveEscaped("$([System.Environment]::GetEnvironmentVariables())", ExpanderOptions.ExpandProperties, MockElementLocation.Instance).ToUpperInvariant();
-            string expected = ("OS=" + Environment.GetEnvironmentVariable("OS")).ToUpperInvariant();
+            string expected = ("OS=" + EnvironmentUtilities.GetEnvironmentVariable("OS")).ToUpperInvariant();
 
             Assert.Contains(expected, result);
         }
@@ -2558,7 +2558,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
 
             Expander<ProjectPropertyInstance, ProjectItemInstance> expander = new Expander<ProjectPropertyInstance, ProjectItemInstance>(pg, FileSystems.Default);
 
-            string env = Environment.GetEnvironmentVariable("MSBUILDENABLEALLPROPERTYFUNCTIONS");
+            string env = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDENABLEALLPROPERTYFUNCTIONS");
 
             try
             {
@@ -2587,7 +2587,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
 
             Expander<ProjectPropertyInstance, ProjectItemInstance> expander = new Expander<ProjectPropertyInstance, ProjectItemInstance>(pg, FileSystems.Default);
 
-            string env = Environment.GetEnvironmentVariable("MSBUILDENABLEALLPROPERTYFUNCTIONS");
+            string env = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDENABLEALLPROPERTYFUNCTIONS");
 
             try
             {
@@ -3332,7 +3332,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
         [Fact]
         public void PropertyFunctionDoesTaskHostExist_NonexistentTaskHost()
         {
-            string taskHostName = Environment.GetEnvironmentVariable("MSBUILDTASKHOST_EXE_NAME");
+            string taskHostName = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTASKHOST_EXE_NAME");
             try
             {
                 Environment.SetEnvironmentVariable("MSBUILDTASKHOST_EXE_NAME", "asdfghjkl.exe");
@@ -3489,7 +3489,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
                 key.SetValue("Value", "%" + envVar + "%", RegistryValueKind.ExpandString);
                 string result = expander.ExpandIntoStringLeaveEscaped(@"$([MSBuild]::GetRegistryValue('HKEY_CURRENT_USER\Software\Microsoft\MSBuild_test', '$(SomeProperty)'))", ExpanderOptions.ExpandProperties, MockElementLocation.Instance);
 
-                Assert.Equal(Environment.GetEnvironmentVariable(envVar), result);
+                Assert.Equal(EnvironmentUtilities.GetEnvironmentVariable(envVar), result);
             }
             finally
             {
@@ -3512,7 +3512,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
                 key.SetValue(String.Empty, "%" + envVar + "%", RegistryValueKind.ExpandString);
                 string result = expander.ExpandIntoStringLeaveEscaped(@"$([MSBuild]::GetRegistryValue('HKEY_CURRENT_USER\Software\Microsoft\MSBuild_test', null))", ExpanderOptions.ExpandProperties, MockElementLocation.Instance);
 
-                Assert.Equal(Environment.GetEnvironmentVariable(envVar), result);
+                Assert.Equal(EnvironmentUtilities.GetEnvironmentVariable(envVar), result);
             }
             finally
             {
@@ -3535,7 +3535,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
                 key.SetValue(String.Empty, "%" + envVar + "%", RegistryValueKind.ExpandString);
                 string result = expander.ExpandIntoStringLeaveEscaped(@"$([MSBuild]::GetRegistryValueFromView('HKEY_CURRENT_USER\Software\Microsoft\MSBuild_test', null, null, RegistryView.Default, RegistryView.Default))", ExpanderOptions.ExpandProperties, MockElementLocation.Instance);
 
-                Assert.Equal(Environment.GetEnvironmentVariable(envVar), result);
+                Assert.Equal(EnvironmentUtilities.GetEnvironmentVariable(envVar), result);
             }
             finally
             {
@@ -3558,7 +3558,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
                 key.SetValue(String.Empty, "%" + envVar + "%", RegistryValueKind.ExpandString);
                 string result = expander.ExpandIntoStringLeaveEscaped(@"$([MSBuild]::GetRegistryValueFromView('HKEY_CURRENT_USER\Software\Microsoft\MSBuild_test', null, null, Microsoft.Win32.RegistryView.Default))", ExpanderOptions.ExpandProperties, MockElementLocation.Instance);
 
-                Assert.Equal(Environment.GetEnvironmentVariable(envVar), result);
+                Assert.Equal(EnvironmentUtilities.GetEnvironmentVariable(envVar), result);
             }
             finally
             {

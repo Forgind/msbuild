@@ -821,7 +821,7 @@ namespace Microsoft.Build.Tasks
                     CompilerResults compilerResults = provider.CompileAssemblyFromSource(compilerParameters, fullCode);
 
                     string outputPath = null;
-                    if (compilerResults.Errors.Count > 0 || Environment.GetEnvironmentVariable("MSBUILDLOGCODETASKFACTORYOUTPUT") != null)
+                    if (compilerResults.Errors.Count > 0 || EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLOGCODETASKFACTORYOUTPUT") != null)
                     {
                         string tempDirectory = Path.GetTempPath();
                         string fileName = Guid.NewGuid().ToString() + ".txt";

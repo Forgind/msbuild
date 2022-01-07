@@ -197,7 +197,7 @@ namespace Microsoft.Build.BackEnd
 
             if (String.IsNullOrEmpty(msbuildLocation))
             {
-                string msbuildExeName = Environment.GetEnvironmentVariable("MSBUILD_EXE_NAME");
+                string msbuildExeName = EnvironmentUtilities.GetEnvironmentVariable("MSBUILD_EXE_NAME");
 
                 if (!String.IsNullOrEmpty(msbuildExeName))
                 {
@@ -448,7 +448,7 @@ namespace Microsoft.Build.BackEnd
                 creationFlags = BackendNativeMethods.NORMALPRIORITYCLASS;
             }
 
-            if (String.IsNullOrEmpty(Environment.GetEnvironmentVariable("MSBUILDNODEWINDOW")))
+            if (String.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("MSBUILDNODEWINDOW")))
             {
                 if (!Traits.Instance.EscapeHatches.EnsureStdOutForChildNodesIsPrimaryStdout)
                 {

@@ -21,7 +21,7 @@ namespace Microsoft.Build.BackEnd.Logging
         /// <summary>
         /// Should target outputs be logged also.
         /// </summary>
-        private static bool s_enableTargetOutputLogging = !String.IsNullOrEmpty(Environment.GetEnvironmentVariable("MSBUILDTARGETOUTPUTLOGGING"));
+        private static bool s_enableTargetOutputLogging = !String.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTARGETOUTPUTLOGGING"));
 
         /// <summary>
         /// The project to which this target is attached.

@@ -41,7 +41,7 @@ namespace Microsoft.Build.UnitTests.Shared
         {
             if (NativeMethodsShared.IsWindows)
             {
-                var comSpec = Environment.GetEnvironmentVariable("ComSpec");
+                var comSpec = EnvironmentUtilities.GetEnvironmentVariable("ComSpec");
 
                 // /D: Do not load AutoRun configuration from the registry (perf)
                 arguments = $"/D /C \"{pathToExecutable} {arguments}\"";

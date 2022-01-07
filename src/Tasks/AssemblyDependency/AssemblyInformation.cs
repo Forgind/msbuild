@@ -279,7 +279,7 @@ namespace Microsoft.Build.Tasks
 #if !FEATURE_ASSEMBLYLOADCONTEXT && !MONO
             if (!NativeMethodsShared.IsWindows)
             {
-                if (String.Equals(Environment.GetEnvironmentVariable("MONO29679"), "1", StringComparison.OrdinalIgnoreCase))
+                if (String.Equals(EnvironmentUtilities.GetEnvironmentVariable("MONO29679"), "1", StringComparison.OrdinalIgnoreCase))
                 {
                     // Getting custom attributes in CoreFx contract assemblies is busted
                     // https://bugzilla.xamarin.com/show_bug.cgi?id=29679

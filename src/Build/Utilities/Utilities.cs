@@ -30,25 +30,25 @@ namespace Microsoft.Build.Internal
         /// Save off the contents of the environment variable that specifies whether we should treat higher toolsversions as the current 
         /// toolsversion.  (Some hosts require this.)
         /// </summary>
-        private static bool s_shouldTreatHigherToolsVersionsAsCurrent = (Environment.GetEnvironmentVariable("MSBUILDTREATHIGHERTOOLSVERSIONASCURRENT") != null);
+        private static bool s_shouldTreatHigherToolsVersionsAsCurrent = (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTREATHIGHERTOOLSVERSIONASCURRENT") != null);
 
         /// <summary>
         /// Save off the contents of the environment variable that specifies whether we should treat all toolsversions, regardless of 
         /// whether they are higher or lower, as the current toolsversion.  (Some hosts require this.)
         /// </summary>
-        private static bool s_shouldTreatOtherToolsVersionsAsCurrent = (Environment.GetEnvironmentVariable("MSBUILDTREATALLTOOLSVERSIONSASCURRENT") != null);
+        private static bool s_shouldTreatOtherToolsVersionsAsCurrent = (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTREATALLTOOLSVERSIONSASCURRENT") != null);
 
         /// <summary>
         /// If set, default to the ToolsVersion from the project file (or if that doesn't isn't set, default to 2.0).  Otherwise, use Dev12+ 
         /// defaulting logic: first check the MSBUILDDEFAULTTOOLSVERSION environment variable, then check for a DefaultOverrideToolsVersion, 
         /// then if both fail, use the current ToolsVersion. 
         /// </summary>
-        private static bool s_uselegacyDefaultToolsVersionBehavior = (Environment.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION") != null);
+        private static bool s_uselegacyDefaultToolsVersionBehavior = (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION") != null);
 
         /// <summary>
         /// If set, will be used as the ToolsVersion to build with (unless MSBUILDLEGACYDEFAULTTOOLSVERSION is set).
         /// </summary>
-        private static string s_defaultToolsVersionFromEnvironment = Environment.GetEnvironmentVariable("MSBUILDDEFAULTTOOLSVERSION");
+        private static string s_defaultToolsVersionFromEnvironment = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDEFAULTTOOLSVERSION");
 
         /// <summary>
         /// Delegate for a method that, given a ToolsVersion string, returns the matching Toolset.
@@ -64,10 +64,10 @@ namespace Microsoft.Build.Internal
         /// </summary>
         internal static void RefreshInternalEnvironmentValues()
         {
-            s_shouldTreatHigherToolsVersionsAsCurrent = (Environment.GetEnvironmentVariable("MSBUILDTREATHIGHERTOOLSVERSIONASCURRENT") != null);
-            s_shouldTreatOtherToolsVersionsAsCurrent = (Environment.GetEnvironmentVariable("MSBUILDTREATALLTOOLSVERSIONSASCURRENT") != null);
-            s_uselegacyDefaultToolsVersionBehavior = (Environment.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION") != null);
-            s_defaultToolsVersionFromEnvironment = Environment.GetEnvironmentVariable("MSBUILDDEFAULTTOOLSVERSION");
+            s_shouldTreatHigherToolsVersionsAsCurrent = (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTREATHIGHERTOOLSVERSIONASCURRENT") != null);
+            s_shouldTreatOtherToolsVersionsAsCurrent = (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTREATALLTOOLSVERSIONSASCURRENT") != null);
+            s_uselegacyDefaultToolsVersionBehavior = (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION") != null);
+            s_defaultToolsVersionFromEnvironment = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDEFAULTTOOLSVERSION");
         }
 
         /// <summary>
@@ -510,7 +510,7 @@ namespace Microsoft.Build.Internal
             // 32-bit and 64-bit machines.  We have a switch to continue using that behavior; however the default is now for
             // MSBuildExtensionsPath to always point to the same location as MSBuildExtensionsPath32. 
 
-            bool useLegacyMSBuildExtensionsPathBehavior = !String.IsNullOrEmpty(Environment.GetEnvironmentVariable("MSBUILDLEGACYEXTENSIONSPATH"));
+            bool useLegacyMSBuildExtensionsPathBehavior = !String.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLEGACYEXTENSIONSPATH"));
 
             string programFiles = FrameworkLocationHelper.programFiles;
             string extensionsPath;

@@ -53,7 +53,7 @@ namespace Microsoft.Build.UnitTests.Definition
             _currentVersionRegistryKey = Registry.CurrentUser.CreateSubKey(testRegistryPath + "\\" + Constants.AssemblyVersion);
             _toolsVersionsRegistryKey = Registry.CurrentUser.CreateSubKey(testRegistryPath + "\\ToolsVersions");
 
-            _oldVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVersion");
+            _oldVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVersion");
             Environment.SetEnvironmentVariable("VisualStudioVersion", null);
         }
 

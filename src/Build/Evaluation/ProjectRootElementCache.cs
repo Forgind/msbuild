@@ -128,15 +128,15 @@ namespace Microsoft.Build.Evaluation
         {
             // Configurable in case a customer has related perf problems after shipping and so that
             // we can measure different values for perf easily.
-            string userSpecifiedSize = Environment.GetEnvironmentVariable("MSBUILDPROJECTROOTELEMENTCACHESIZE");
+            string userSpecifiedSize = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDPROJECTROOTELEMENTCACHESIZE");
             if (!String.IsNullOrEmpty(userSpecifiedSize))
             {
                 // Not catching as this is an undocumented setting
                 s_maximumStrongCacheSize = Convert.ToInt32(userSpecifiedSize, NumberFormatInfo.InvariantInfo);
             }
 
-            s_debugLogCacheActivity = Environment.GetEnvironmentVariable("MSBUILDDEBUGXMLCACHE") == "1";
-            s_сheckFileContent = !String.IsNullOrEmpty(Environment.GetEnvironmentVariable("MSBUILDCACHECHECKFILECONTENT"));
+            s_debugLogCacheActivity = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDEBUGXMLCACHE") == "1";
+            s_сheckFileContent = !String.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("MSBUILDCACHECHECKFILECONTENT"));
         }
 
         /// <summary>

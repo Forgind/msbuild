@@ -41,7 +41,7 @@ namespace Microsoft.Build.BackEnd
         {
             _configurations = new Dictionary<int, BuildRequestConfiguration>();
             _configurationIdsByMetadata = new Dictionary<ConfigurationMetadata, int>();
-            if (!int.TryParse(Environment.GetEnvironmentVariable("MSBUILDCONFIGCACHESWEEPTHRESHHOLD"), out _sweepThreshhold))
+            if (!int.TryParse(EnvironmentUtilities.GetEnvironmentVariable("MSBUILDCONFIGCACHESWEEPTHRESHHOLD"), out _sweepThreshhold))
             {
                 _sweepThreshhold = 500;
             }
@@ -263,7 +263,7 @@ namespace Microsoft.Build.BackEnd
 
                 // Cache 10% of configurations to release some memory
                 int remainingToRelease = _configurations.Count;
-                if (String.IsNullOrEmpty(Environment.GetEnvironmentVariable("MSBUILDENABLEAGGRESSIVECACHING")))
+                if (String.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("MSBUILDENABLEAGGRESSIVECACHING")))
                 {
                     // Cache only 10% of configurations to release some memory
                     remainingToRelease = Convert.ToInt32(Math.Max(1, Math.Floor(_configurations.Count * 0.1)));

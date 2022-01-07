@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using Microsoft.Build.Shared;
 
 #nullable disable
 
@@ -54,7 +55,7 @@ namespace Microsoft.Build.Internal
         {
             s_counts = new Dictionary<string, int>();
 
-            string val = Environment.GetEnvironmentVariable("MSBUILDTRACEINTERVAL");
+            string val = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTRACEINTERVAL");
             double seconds;
             if (!String.IsNullOrEmpty(val) && System.Double.TryParse(val, out seconds))
             {

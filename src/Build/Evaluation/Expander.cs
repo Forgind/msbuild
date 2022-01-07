@@ -4647,7 +4647,7 @@ namespace Microsoft.Build.Evaluation
 
                 // Note the following code path is only entered when MSBUILDENABLEALLPROPERTYFUNCTIONS == 1.
                 // This environment variable must not be cached - it should be dynamically settable while the application is executing.
-                if (Environment.GetEnvironmentVariable("MSBUILDENABLEALLPROPERTYFUNCTIONS") == "1")
+                if (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDENABLEALLPROPERTYFUNCTIONS") == "1")
                 {
                     // We didn't find the type, so go probing. First in System
                     receiverType = GetTypeFromAssembly(typeName, "System");

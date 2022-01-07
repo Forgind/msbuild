@@ -455,7 +455,7 @@ namespace Microsoft.Build.UnitTests
                     </Project>";
 
             MockLogger mockLogger = Helpers.BuildProjectWithNewOMExpectFailure(projectFileContents, false);
-            mockLogger.AssertLogContains(Environment.GetEnvironmentVariable("SystemDrive") + '\\' + tempFileName);
+            mockLogger.AssertLogContains(EnvironmentUtilities.GetEnvironmentVariable("SystemDrive") + '\\' + tempFileName);
         }
 
         /// <summary>
@@ -1077,7 +1077,7 @@ namespace Microsoft.Build.UnitTests
                         </Target>
                     </Project>";
 
-            var oldTempPath = Environment.GetEnvironmentVariable("TMP");
+            var oldTempPath = EnvironmentUtilities.GetEnvironmentVariable("TMP");
             var newTempPath = Path.Combine(Path.GetFullPath(oldTempPath), Path.GetRandomFileName());
 
             try

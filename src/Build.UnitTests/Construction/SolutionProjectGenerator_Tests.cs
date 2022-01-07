@@ -47,7 +47,7 @@ namespace Microsoft.Build.UnitTests.Construction
             this.output = output;
 
             // Save off the value for use during cleanup
-            _originalVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVersion");
+            _originalVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVersion");
         }
 
         public void Dispose()
@@ -447,7 +447,7 @@ EndProject
             string[] projects = { classLibraryContentsToolsV4, classLibraryContentsToolsV4, classLibraryContentsToolsV12 };
             string[] logoutputs = { ".[11.0]. .[4.0].", ".[11.0]. .[4.0].", String.Format(".[{0}]. .[{0}].", ObjectModelHelpers.MSBuildDefaultToolsVersion) };
 
-            string previousLegacyEnvironmentVariable = Environment.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION");
+            string previousLegacyEnvironmentVariable = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION");
 
             try
             {
@@ -1719,7 +1719,7 @@ EndGlobal
         [Fact]
         public void SolutionGeneratorCanEmitSolutions()
         {
-            string oldValueForMSBuildEmitSolution = Environment.GetEnvironmentVariable("MSBuildEmitSolution");
+            string oldValueForMSBuildEmitSolution = EnvironmentUtilities.GetEnvironmentVariable("MSBuildEmitSolution");
 
             //  Clean up projects loaded by other tests
             ProjectCollection.GlobalProjectCollection.UnloadAllProjects();

@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using Microsoft.Build.Shared;
 
 namespace Microsoft.Build.Framework
 {
@@ -76,8 +77,8 @@ namespace Microsoft.Build.Framework
         /// </remarks>
         public FileClassifier()
         {
-            string? programFiles32 = Environment.GetEnvironmentVariable("ProgramFiles(x86)");
-            string? programFiles64 = Environment.GetEnvironmentVariable("ProgramW6432");
+            string? programFiles32 = EnvironmentUtilities.GetEnvironmentVariable("ProgramFiles(x86)");
+            string? programFiles64 = EnvironmentUtilities.GetEnvironmentVariable("ProgramW6432");
 
             if (!string.IsNullOrEmpty(programFiles32))
             {
@@ -94,7 +95,7 @@ namespace Microsoft.Build.Framework
 
             static string? GetVSInstallationDirectory()
             {
-                string? dir = Environment.GetEnvironmentVariable("VSAPPIDDIR");
+                string? dir = EnvironmentUtilities.GetEnvironmentVariable("VSAPPIDDIR");
 
                 if (dir != null)
                 {

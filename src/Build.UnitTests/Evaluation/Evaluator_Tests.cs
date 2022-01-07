@@ -463,7 +463,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
             string targetDirectory = Path.Combine(tempPath, "EmptyPropertyIsThenSet");
             string testTargetPath = Path.Combine(targetDirectory, "test.proj");
 
-            string originalValue = Environment.GetEnvironmentVariable("MSBUILDWARNONUNINITIALIZEDPROPERTY");
+            string originalValue = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDWARNONUNINITIALIZEDPROPERTY");
             try
             {
                 Environment.SetEnvironmentVariable("MSBUILDWARNONUNINITIALIZEDPROPERTY", "true");
@@ -505,7 +505,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
             string targetDirectory = Path.Combine(tempPath, "EmptyPropertyIsThenSet");
             string testTargetPath = Path.Combine(targetDirectory, "test.proj");
 
-            string originalValue = Environment.GetEnvironmentVariable("MSBUILDWARNONUNINITIALIZEDPROPERTY");
+            string originalValue = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDWARNONUNINITIALIZEDPROPERTY");
             bool originalValue2 = BuildParameters.WarnOnUninitializedProperty;
 
             try
@@ -551,7 +551,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
             string targetDirectory = Path.Combine(tempPath, "SetPropertyToItself");
             string testTargetPath = Path.Combine(targetDirectory, "test.proj");
 
-            string originalValue = Environment.GetEnvironmentVariable("MSBUILDWARNONUNINITIALIZEDPROPERTY");
+            string originalValue = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDWARNONUNINITIALIZEDPROPERTY");
             try
             {
                 Environment.SetEnvironmentVariable("MSBUILDWARNONUNINITIALIZEDPROPERTY", "true");
@@ -597,7 +597,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
             string targetDirectory = Path.Combine(tempPath, "UsePropertyInCondition");
             string testTargetPath = Path.Combine(targetDirectory, "test.proj");
 
-            string originalValue = Environment.GetEnvironmentVariable("MSBUILDWARNONUNINITIALIZEDPROPERTY");
+            string originalValue = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDWARNONUNINITIALIZEDPROPERTY");
             try
             {
                 Environment.SetEnvironmentVariable("MSBUILDWARNONUNINITIALIZEDPROPERTY", "true");
@@ -2240,11 +2240,11 @@ namespace Microsoft.Build.UnitTests.Evaluation
             string specialPropertyName = "MSBuildExtensionsPath";
 
             // Save the old copy of the MSBuildExtensionsPath, so we can restore it when the unit test is done.
-            string backupMSBuildExtensionsPath = Environment.GetEnvironmentVariable(specialPropertyName);
-            string backupMagicSwitch = Environment.GetEnvironmentVariable("MSBUILDLEGACYEXTENSIONSPATH");
-            string targetVar = Environment.GetEnvironmentVariable("Target");
-            string numberVar = Environment.GetEnvironmentVariable("0env");
-            string msbuildVar = Environment.GetEnvironmentVariable("msbuildtoolsversion");
+            string backupMSBuildExtensionsPath = EnvironmentUtilities.GetEnvironmentVariable(specialPropertyName);
+            string backupMagicSwitch = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLEGACYEXTENSIONSPATH");
+            string targetVar = EnvironmentUtilities.GetEnvironmentVariable("Target");
+            string numberVar = EnvironmentUtilities.GetEnvironmentVariable("0env");
+            string msbuildVar = EnvironmentUtilities.GetEnvironmentVariable("msbuildtoolsversion");
 
             try
             {
@@ -2284,12 +2284,12 @@ namespace Microsoft.Build.UnitTests.Evaluation
             string specialPropertyName32 = "MSBuildExtensionsPath32";
 
             // Save the old copy of the MSBuildExtensionsPath, so we can restore it when the unit test is done.
-            string backupMSBuildExtensionsPath = Environment.GetEnvironmentVariable(specialPropertyName);
-            string backupMSBuildExtensionsPath32 = Environment.GetEnvironmentVariable(specialPropertyName32);
-            string backupMagicSwitch = Environment.GetEnvironmentVariable("MSBUILDLEGACYEXTENSIONSPATH");
-            string targetVar = Environment.GetEnvironmentVariable("Target");
-            string numberVar = Environment.GetEnvironmentVariable("0env");
-            string msbuildVar = Environment.GetEnvironmentVariable("msbuildtoolsversion");
+            string backupMSBuildExtensionsPath = EnvironmentUtilities.GetEnvironmentVariable(specialPropertyName);
+            string backupMSBuildExtensionsPath32 = EnvironmentUtilities.GetEnvironmentVariable(specialPropertyName32);
+            string backupMagicSwitch = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLEGACYEXTENSIONSPATH");
+            string targetVar = EnvironmentUtilities.GetEnvironmentVariable("Target");
+            string numberVar = EnvironmentUtilities.GetEnvironmentVariable("0env");
+            string msbuildVar = EnvironmentUtilities.GetEnvironmentVariable("msbuildtoolsversion");
 
             try
             {
@@ -2324,7 +2324,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
         public void MSBuildExtensionsPathWithEnvironmentOverride()
         {
             // Save the old copy of the MSBuildExtensionsPath, so we can restore it when the unit test is done.
-            string backupMSBuildExtensionsPath = Environment.GetEnvironmentVariable("MSBuildExtensionsPath");
+            string backupMSBuildExtensionsPath = EnvironmentUtilities.GetEnvironmentVariable("MSBuildExtensionsPath");
 
             try
             {
@@ -2372,14 +2372,14 @@ namespace Microsoft.Build.UnitTests.Evaluation
         {
             // On a 64 bit machine we always want to use the program files x86.  If we are running as a 64 bit process then this variable will be set correctly
             // If we are on a 32 bit machine or running as a 32 bit process then this variable will be null and the programFiles variable will be correct.
-            string expected = Environment.GetEnvironmentVariable("ProgramFiles(x86)");
+            string expected = EnvironmentUtilities.GetEnvironmentVariable("ProgramFiles(x86)");
             if (String.IsNullOrEmpty(expected))
             {
                 // 32 bit box
                 expected = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
             }
 
-            string extensionsPath32Env = Environment.GetEnvironmentVariable("MSBuildExtensionsPath32");
+            string extensionsPath32Env = EnvironmentUtilities.GetEnvironmentVariable("MSBuildExtensionsPath32");
 
             try
             {
@@ -2404,7 +2404,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
         [Trait("Category", "mono-osx-failing")]
         public void MSBuildExtensionsPath32WithEnvironmentOverride()
         {
-            string originalMSBuildExtensionsPath32Value = Environment.GetEnvironmentVariable("MSBuildExtensionsPath32");
+            string originalMSBuildExtensionsPath32Value = EnvironmentUtilities.GetEnvironmentVariable("MSBuildExtensionsPath32");
 
             try
             {
@@ -2448,11 +2448,11 @@ namespace Microsoft.Build.UnitTests.Evaluation
             string expected = string.Empty;
 
             // If we are on a 32 bit machine then this variable will be null.
-            string programFiles32 = Environment.GetEnvironmentVariable("ProgramFiles(x86)");
+            string programFiles32 = EnvironmentUtilities.GetEnvironmentVariable("ProgramFiles(x86)");
             if (!String.IsNullOrEmpty(programFiles32))
             {
                 // only set in 32-bit windows on 64-bit machines
-                expected = Environment.GetEnvironmentVariable("ProgramW6432");
+                expected = EnvironmentUtilities.GetEnvironmentVariable("ProgramW6432");
 
                 if (string.IsNullOrEmpty(expected))
                 {
@@ -2479,7 +2479,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
         [Fact]
         public void MSBuildExtensionsPath64WithEnvironmentOverride()
         {
-            string originalMSBuildExtensionsPath64Value = Environment.GetEnvironmentVariable("MSBuildExtensionsPath64");
+            string originalMSBuildExtensionsPath64Value = EnvironmentUtilities.GetEnvironmentVariable("MSBuildExtensionsPath64");
 
             try
             {
@@ -2534,7 +2534,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
         [Fact]
         public void LocalAppDataWithEnvironmentOverride()
         {
-            string originalLocalAppDataValue = Environment.GetEnvironmentVariable("LocalAppData");
+            string originalLocalAppDataValue = EnvironmentUtilities.GetEnvironmentVariable("LocalAppData");
 
             try
             {
@@ -2931,7 +2931,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
         [Fact]
         public void VerifyTreatAsLocalPropertySpecificationWorksIfSpecificationIsItselfAProperty()
         {
-            string oldEnvironmentValue = Environment.GetEnvironmentVariable("EnvironmentProperty");
+            string oldEnvironmentValue = EnvironmentUtilities.GetEnvironmentVariable("EnvironmentProperty");
 
             try
             {
@@ -3680,7 +3680,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
                 return; // "TODO: Under Unix this fails unexpectedly"
             }
 
-            string originalVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVerson");
+            string originalVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVerson");
             try
             {
                 Environment.SetEnvironmentVariable("VisualStudioVersion", null);
@@ -3745,7 +3745,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
         [Fact]
         public void VerifyNoSubToolsetPropertiesAreEvaluatedWithInvalidSubToolset()
         {
-            string originalVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVerson");
+            string originalVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVerson");
             try
             {
                 Environment.SetEnvironmentVariable("VisualStudioVersion", "ABCDE");
@@ -3796,7 +3796,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
         [Fact]
         public void VerifyExplicitSubToolsetPropertiesAreEvaluated()
         {
-            string originalVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVerson");
+            string originalVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVerson");
             try
             {
                 Environment.SetEnvironmentVariable("VisualStudioVersion", "FakeSubToolset");
@@ -3847,7 +3847,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
         [Fact]
         public void VerifyExplicitNonExistentSubToolsetPropertiesAreEvaluated()
         {
-            string originalVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVerson");
+            string originalVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVerson");
             try
             {
                 Environment.SetEnvironmentVariable("VisualStudioVersion", "abcdef");
@@ -3898,9 +3898,9 @@ namespace Microsoft.Build.UnitTests.Evaluation
         [Fact]
         public void VerifySubToolsetPropertiesOverrideEnvironment()
         {
-            string originalVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVerson");
-            string originalC = Environment.GetEnvironmentVariable("C");
-            string originalD = Environment.GetEnvironmentVariable("D");
+            string originalVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVerson");
+            string originalC = EnvironmentUtilities.GetEnvironmentVariable("C");
+            string originalD = EnvironmentUtilities.GetEnvironmentVariable("D");
 
             try
             {
@@ -3959,7 +3959,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
         [Fact]
         public void VerifyGlobalPropertiesOverrideSubToolset()
         {
-            string originalVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVerson");
+            string originalVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVerson");
 
             try
             {
@@ -4019,7 +4019,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
         [Fact]
         public void VerifySubToolsetVersionSetByGlobalPropertyStillOverridable()
         {
-            string originalVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVerson");
+            string originalVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVerson");
 
             try
             {
@@ -4165,7 +4165,7 @@ namespace Microsoft.Build.UnitTests.Evaluation
         [Fact]
         public void VerifyVisualStudioVersionSetByToolset()
         {
-            string originalVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVerson");
+            string originalVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVerson");
 
             try
             {

@@ -213,7 +213,7 @@ namespace Microsoft.Build.UnitTests.BackEnd
             List<TaskItem> targetOutputs = new List<TaskItem>();
             targetOutputs.Add(item);
 
-            string _initialTargetOutputLogging = Environment.GetEnvironmentVariable("MSBUILDTARGETOUTPUTLOGGING");
+            string _initialTargetOutputLogging = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTARGETOUTPUTLOGGING");
             Environment.SetEnvironmentVariable("MSBUILDTARGETOUTPUTLOGGING", "1");
             try {
                 BuildEventArgs[] testArgs = new BuildEventArgs[]

@@ -683,7 +683,7 @@ namespace Microsoft.Build.UnitTests
                     FrameworkLocationHelper.GetPathToDotNetFrameworkV40(SharedDotNetFrameworkArchitecture.Bitness32)
                 );
 
-            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ProgramFiles(x86)")))
+            if (!string.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("ProgramFiles(x86)")))
             {
                 // 64-bit machine, so we should test the 64-bit overloads as well
                 ToolLocationHelper.GetPathToDotNetFramework(TargetDotNetFrameworkVersion.Version11, UtilitiesDotNetFrameworkArchitecture.Bitness64).ShouldBe(

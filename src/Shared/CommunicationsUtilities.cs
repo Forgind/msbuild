@@ -85,7 +85,7 @@ namespace Microsoft.Build.Internal
             // We currently use 7 bits of this 32-bit integer. Very old builds will instantly reject any handshake that does not start with F5 or 06; slightly old builds always lead with 00.
             // This indicates in the first byte that we are a modern build.
             options = (int)nodeType | (((int)CommunicationsUtilities.handshakeVersion) << 24);
-            string handshakeSalt = Environment.GetEnvironmentVariable("MSBUILDNODEHANDSHAKESALT");
+            string handshakeSalt = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDNODEHANDSHAKESALT");
             CommunicationsUtilities.Trace("Handshake salt is " + handshakeSalt);
             string toolsDirectory = (nodeType & HandshakeOptions.X64) == HandshakeOptions.X64 ? BuildEnvironmentHelper.Instance.MSBuildToolsDirectory64 : BuildEnvironmentHelper.Instance.MSBuildToolsDirectory32;
             CommunicationsUtilities.Trace("Tools directory is " + toolsDirectory);
@@ -570,7 +570,7 @@ namespace Microsoft.Build.Internal
         /// </summary>
         internal static int GetIntegerVariableOrDefault(string environmentVariable, int defaultValue)
         {
-            string environmentValue = Environment.GetEnvironmentVariable(environmentVariable);
+            string environmentValue = EnvironmentUtilities.GetEnvironmentVariable(environmentVariable);
             if (String.IsNullOrEmpty(environmentValue))
             {
                 return defaultValue;
@@ -604,11 +604,11 @@ namespace Microsoft.Build.Internal
                 {
                     s_debugDumpPath =
 #if CLR2COMPATIBILITY
-                        Environment.GetEnvironmentVariable("MSBUILDDEBUGPATH");
+                        EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDEBUGPATH");
 #else
                         ChangeWaves.AreFeaturesEnabled(ChangeWaves.Wave17_0)
                             ? DebugUtils.DebugPath
-                            : Environment.GetEnvironmentVariable("MSBUILDDEBUGPATH");
+                            : EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDEBUGPATH");
 #endif
 
                     if (String.IsNullOrEmpty(s_debugDumpPath))

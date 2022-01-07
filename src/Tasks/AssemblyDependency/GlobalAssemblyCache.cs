@@ -270,7 +270,7 @@ namespace Microsoft.Build.Tasks
         )
         {
             ConcurrentDictionary<AssemblyNameExtension, string> fusionNameToResolvedPath = null;
-            bool useGacRarCache = Environment.GetEnvironmentVariable("MSBUILDDISABLEGACRARCACHE") == null;
+            bool useGacRarCache = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDISABLEGACRARCACHE") == null;
             if (buildEngine != null && useGacRarCache)
             {
                 string key = "44d78b60-3bbe-48fe-9493-04119ebf515f" + "|" + targetProcessorArchitecture.ToString() + "|" + targetedRuntimeVersion.ToString() + "|" + fullFusionName.ToString() + "|" + specificVersion.ToString();

@@ -200,7 +200,7 @@ namespace Microsoft.Build.BackEnd
                 // We can only create additional in-proc nodes if we have decided not to save the operating environment.  This is the global
                 // DTAR case in Visual Studio, but other clients might enable this as well under certain special circumstances.
 
-                if (Environment.GetEnvironmentVariable("MSBUILDINPROCENVCHECK") == "1")
+                if (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDINPROCENVCHECK") == "1")
                 {
                     _exclusiveOperatingEnvironment = true;
                 }

@@ -283,7 +283,7 @@ namespace Microsoft.Build.BackEnd.Logging
             _nextProjectId = nodeId;
             _nextEvaluationId = nodeId;
 
-            string queueCapacityEnvironment = Environment.GetEnvironmentVariable("MSBUILDLOGGINGQUEUECAPACITY");
+            string queueCapacityEnvironment = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLOGGINGQUEUECAPACITY");
             if (!String.IsNullOrEmpty(queueCapacityEnvironment))
             {
                 uint localQueueCapacity;

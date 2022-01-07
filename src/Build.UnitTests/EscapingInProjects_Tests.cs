@@ -1006,7 +1006,7 @@ namespace Microsoft.Build.UnitTests.EscapingInProjects_Tests
         [Fact]
         public void SemicolonInConfiguration_UsingTaskHost()
         {
-            string originalOverrideTaskHostVariable = Environment.GetEnvironmentVariable("MSBUILDFORCEALLTASKSOUTOFPROC");
+            string originalOverrideTaskHostVariable = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDFORCEALLTASKSOUTOFPROC");
 
             try
             {
@@ -1131,7 +1131,7 @@ namespace Microsoft.Build.UnitTests.EscapingInProjects_Tests
         [Fact]
         public void SemicolonInAssemblyName_UsingTaskHost()
         {
-            string originalOverrideTaskHostVariable = Environment.GetEnvironmentVariable("MSBUILDFORCEALLTASKSOUTOFPROC");
+            string originalOverrideTaskHostVariable = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDFORCEALLTASKSOUTOFPROC");
 
             try
             {
@@ -1251,7 +1251,7 @@ namespace Microsoft.Build.UnitTests.EscapingInProjects_Tests
         [Fact]
         public void DollarSignInAssemblyName_UsingTaskHost()
         {
-            string originalOverrideTaskHostVariable = Environment.GetEnvironmentVariable("MSBUILDFORCEALLTASKSOUTOFPROC");
+            string originalOverrideTaskHostVariable = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDFORCEALLTASKSOUTOFPROC");
 
             try
             {
@@ -1371,7 +1371,7 @@ namespace Microsoft.Build.UnitTests.EscapingInProjects_Tests
         [Fact]
         public void SemicolonInSourceCodeFilename_UsingTaskHost()
         {
-            string originalOverrideTaskHostVariable = Environment.GetEnvironmentVariable("MSBUILDFORCEALLTASKSOUTOFPROC");
+            string originalOverrideTaskHostVariable = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDFORCEALLTASKSOUTOFPROC");
 
             try
             {
@@ -1604,7 +1604,7 @@ namespace Microsoft.Build.UnitTests.EscapingInProjects_Tests
         [Fact(Skip = "This is a known issue in Roslyn. This test should be enabled if Roslyn is updated for this scenario.")]
         public void SolutionWithLotsaCrazyCharacters_UsingTaskHost()
         {
-            string originalOverrideTaskHostVariable = Environment.GetEnvironmentVariable("MSBUILDFORCEALLTASKSOUTOFPROC");
+            string originalOverrideTaskHostVariable = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDFORCEALLTASKSOUTOFPROC");
 
             try
             {

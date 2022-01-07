@@ -674,7 +674,7 @@ namespace Microsoft.Build.UnitTests.BackEnd
         {
             bool[] returnsEnabled = new bool[] { false, true };
 
-            string loggingVariable = Environment.GetEnvironmentVariable("MSBUILDTARGETOUTPUTLOGGING");
+            string loggingVariable = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTARGETOUTPUTLOGGING");
             Environment.SetEnvironmentVariable("MSBUILDTARGETOUTPUTLOGGING", "1");
             try
             {
@@ -770,7 +770,7 @@ namespace Microsoft.Build.UnitTests.BackEnd
         {
             bool[] returnsEnabled = new bool[] { true, false };
 
-            string loggingVariable = Environment.GetEnvironmentVariable("MSBUILDTARGETOUTPUTLOGGING");
+            string loggingVariable = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTARGETOUTPUTLOGGING");
             Environment.SetEnvironmentVariable("MSBUILDTARGETOUTPUTLOGGING", null);
             bool originalTargetOutputLoggingValue = TargetLoggingContext.EnableTargetOutputLogging;
             TargetLoggingContext.EnableTargetOutputLogging = false;

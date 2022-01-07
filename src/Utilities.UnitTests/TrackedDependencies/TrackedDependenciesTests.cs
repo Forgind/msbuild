@@ -2223,8 +2223,8 @@ namespace Microsoft.Build.UnitTests.TrackedDependencies
                                     new TaskItem(Path.GetFullPath(Path.Combine("TestFiles", "two.cpp"))),
                                     new TaskItem(Path.GetFullPath(Path.Combine("TestFiles", "three.cpp")))};
 
-            string oldTempPath = Environment.GetEnvironmentVariable("TEMP");
-            string oldTmpPath = Environment.GetEnvironmentVariable("TMP");
+            string oldTempPath = EnvironmentUtilities.GetEnvironmentVariable("TEMP");
+            string oldTmpPath = EnvironmentUtilities.GetEnvironmentVariable("TMP");
             string newTempPath = Path.GetFullPath(Path.Combine("TestFiles", "ThisIsAReallyVeryLongTemporaryPlace", "ThatIsLongerThanTheSourcePaths"));
 
             Directory.CreateDirectory(newTempPath);

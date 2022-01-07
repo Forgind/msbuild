@@ -22,17 +22,17 @@ namespace Microsoft.Build.BackEnd.SdkResolution
         private static readonly CoreClrAssemblyLoader s_loader = new CoreClrAssemblyLoader();
 #endif
 
-        private readonly string IncludeDefaultResolver = Environment.GetEnvironmentVariable("MSBUILDINCLUDEDEFAULTSDKRESOLVER");
+        private readonly string IncludeDefaultResolver = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDINCLUDEDEFAULTSDKRESOLVER");
 
         //  Test hook for loading SDK Resolvers from additional folders.  Support runtime-specific test hook environment variables,
         //  as an SDK resolver built for .NET Framework probably won't work on .NET Core, and vice versa.
-        private readonly string AdditionalResolversFolder = Environment.GetEnvironmentVariable(
+        private readonly string AdditionalResolversFolder = EnvironmentUtilities.GetEnvironmentVariable(
 #if NETFRAMEWORK
             "MSBUILDADDITIONALSDKRESOLVERSFOLDER_NETFRAMEWORK"
 #elif NET
             "MSBUILDADDITIONALSDKRESOLVERSFOLDER_NET"
 #endif
-            ) ?? Environment.GetEnvironmentVariable("MSBUILDADDITIONALSDKRESOLVERSFOLDER");
+            ) ?? EnvironmentUtilities.GetEnvironmentVariable("MSBUILDADDITIONALSDKRESOLVERSFOLDER");
 
         internal virtual IList<SdkResolver> LoadResolvers(LoggingContext loggingContext,
             ElementLocation location)

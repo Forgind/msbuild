@@ -60,7 +60,7 @@ namespace Microsoft.Build.UnitTests.Definition
             _currentVersionRegistryKey = Registry.CurrentUser.CreateSubKey(testRegistryPath + "\\" + Constants.AssemblyVersion);
             _toolsVersionsRegistryKey = Registry.CurrentUser.CreateSubKey(testRegistryPath + "\\ToolsVersions");
 
-            _oldVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVersion");
+            _oldVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVersion");
 
             Environment.SetEnvironmentVariable("VisualStudioVersion", null);
         }
@@ -2110,7 +2110,7 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact]
         public void ToolsVersionAttributeNotSpecifiedOnProjectElementAndDefaultVersionSpecifiedInRegistry()
         {
-            string oldValue = Environment.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION");
+            string oldValue = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION");
 
             try
             {

@@ -354,7 +354,7 @@ namespace Microsoft.Build.Utilities
         /// <returns>The old value of PATH</returns>
         public static string EnsureFileTrackerOnPath(string rootPath)
         {
-            string oldPath = Environment.GetEnvironmentVariable(pathEnvironmentVariableName);
+            string oldPath = EnvironmentUtilities.GetEnvironmentVariable(pathEnvironmentVariableName);
             string fileTrackerPath = GetFileTrackerPath(ExecutableType.SameAsCurrentProcess, rootPath);
 
             if (!string.IsNullOrEmpty(fileTrackerPath))
@@ -373,7 +373,7 @@ namespace Microsoft.Build.Utilities
         
         public static string FindTrackerOnPath()
         {
-            string[] paths = Environment.GetEnvironmentVariable(pathEnvironmentVariableName).Split(pathSeparatorArray, StringSplitOptions.RemoveEmptyEntries);
+            string[] paths = EnvironmentUtilities.GetEnvironmentVariable(pathEnvironmentVariableName).Split(pathSeparatorArray, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (string path in paths)
             {

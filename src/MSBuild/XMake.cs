@@ -218,7 +218,7 @@ namespace Microsoft.Build.CommandLine
         {
             using PerformanceLogEventListener eventListener = PerformanceLogEventListener.Create();
 
-            if (Environment.GetEnvironmentVariable("MSBUILDDUMPPROCESSCOUNTERS") == "1")
+            if (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDUMPPROCESSCOUNTERS") == "1")
             {
                 DumpCounters(true /* initialize only */);
             }
@@ -232,7 +232,7 @@ namespace Microsoft.Build.CommandLine
 #endif
             ) == ExitType.Success) ? 0 : 1);
 
-            if (Environment.GetEnvironmentVariable("MSBUILDDUMPPROCESSCOUNTERS") == "1")
+            if (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDUMPPROCESSCOUNTERS") == "1")
             {
                 DumpCounters(false /* log to console */);
             }
@@ -492,7 +492,7 @@ namespace Microsoft.Build.CommandLine
             // with our OM and modify and save them. They'll never do this for Microsoft.*.targets, though,
             // and those form the great majority of our unnecessary memory use.
             Environment.SetEnvironmentVariable("MSBuildLoadMicrosoftTargetsReadOnly", "true");
-            switch (Environment.GetEnvironmentVariable("MSBUILDDEBUGONSTART"))
+            switch (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDEBUGONSTART"))
             {
 #if FEATURE_DEBUG_LAUNCH
                 case "1":
@@ -651,7 +651,7 @@ namespace Microsoft.Build.CommandLine
                     else // regular build
                     {
 #if !STANDALONEBUILD
-                    if (Environment.GetEnvironmentVariable("MSBUILDOLDOM") != "1")
+                    if (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDOLDOM") != "1")
 #endif
                         {
                             // if everything checks out, and sufficient information is available to start building
@@ -700,7 +700,7 @@ namespace Microsoft.Build.CommandLine
 
                     TimeSpan elapsedTime = t2.Subtract(t1);
 
-                    string timerOutputFilename = Environment.GetEnvironmentVariable("MSBUILDTIMEROUTPUTS");
+                    string timerOutputFilename = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTIMEROUTPUTS");
 
                     if (!string.IsNullOrEmpty(timerOutputFilename))
                     {
@@ -828,7 +828,7 @@ namespace Microsoft.Build.CommandLine
 #endif
                 // rethrow, in case Watson is enabled on the machine -- if not, the CLR will write out exception details
                 // allow the build lab to set an env var to avoid jamming the build
-                if (Environment.GetEnvironmentVariable("MSBUILDDONOTLAUNCHDEBUGGER") != "1")
+                if (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDONOTLAUNCHDEBUGGER") != "1")
                 {
                     throw;
                 }
@@ -1153,7 +1153,7 @@ namespace Microsoft.Build.CommandLine
 
                     // By default we log synchronously to the console for compatibility with previous versions,
                     // but it is slightly slower
-                    if (!string.Equals(Environment.GetEnvironmentVariable("MSBUILDLOGASYNC"), "1", StringComparison.Ordinal))
+                    if (!string.Equals(EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLOGASYNC"), "1", StringComparison.Ordinal))
                     {
                         parameters.UseSynchronousLogging = true;
                     }
@@ -1190,7 +1190,7 @@ namespace Microsoft.Build.CommandLine
                         parameters.DefaultToolsVersion = toolsVersion;
                     }
 
-                    string memoryUseLimit = Environment.GetEnvironmentVariable("MSBUILDMEMORYUSELIMIT");
+                    string memoryUseLimit = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDMEMORYUSELIMIT");
                     if (!string.IsNullOrEmpty(memoryUseLimit))
                     {
                         parameters.MemoryUseLimit = Convert.ToInt32(memoryUseLimit, CultureInfo.InvariantCulture);
@@ -2426,7 +2426,7 @@ namespace Microsoft.Build.CommandLine
             enableNodeReuse = false;
 #endif
 
-            if (Environment.GetEnvironmentVariable("MSBUILDDISABLENODEREUSE") == "1") // For example to disable node reuse in a gated checkin, without using the flag
+            if (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDISABLENODEREUSE") == "1") // For example to disable node reuse in a gated checkin, without using the flag
             {
                 enableNodeReuse = false;
             }
@@ -3137,7 +3137,7 @@ namespace Microsoft.Build.CommandLine
 
                 // Check to see if there is a possibility we will be logging from an out-of-proc node.
                 // If so (we're multi-proc or the in-proc node is disabled), we register a distributed logger.
-                if (cpuCount == 1 && Environment.GetEnvironmentVariable("MSBUILDNOINPROCNODE") != "1")
+                if (cpuCount == 1 && EnvironmentUtilities.GetEnvironmentVariable("MSBUILDNOINPROCNODE") != "1")
                 {
                     // We've decided to use the MP logger even in single proc mode.
                     // Switch it on here, rather than in the logger, so that other hosts that use
@@ -3203,7 +3203,7 @@ namespace Microsoft.Build.CommandLine
 
                 // Check to see if there is a possibility we will be logging from an out-of-proc node.
                 // If so (we're multi-proc or the in-proc node is disabled), we register a distributed logger.
-                if (cpuCount == 1 && Environment.GetEnvironmentVariable("MSBUILDNOINPROCNODE") != "1")
+                if (cpuCount == 1 && EnvironmentUtilities.GetEnvironmentVariable("MSBUILDNOINPROCNODE") != "1")
                 {
                     // We've decided to use the MP logger even in single proc mode.
                     // Switch it on here, rather than in the logger, so that other hosts that use

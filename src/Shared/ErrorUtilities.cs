@@ -28,8 +28,8 @@ namespace Microsoft.Build.Shared
         /// and fortuitously it happens that ignoring the VerifyThrow allows execution to continue in a reasonable way,
         /// then we can give them this undocumented environment variable as an immediate workaround.
         /// </summary>
-        private static readonly bool s_throwExceptions = String.IsNullOrEmpty(Environment.GetEnvironmentVariable("MSBUILDDONOTTHROWINTERNAL"));
-        private static readonly bool s_enableMSBuildDebugTracing = !String.IsNullOrEmpty(Environment.GetEnvironmentVariable("MSBUILDENABLEDEBUGTRACING"));
+        private static readonly bool s_throwExceptions = String.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDONOTTHROWINTERNAL"));
+        private static readonly bool s_enableMSBuildDebugTracing = !String.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("MSBUILDENABLEDEBUGTRACING"));
 
         #region DebugTracing
         public static void DebugTraceMessage(string category, string formatstring, params object[] parameters)

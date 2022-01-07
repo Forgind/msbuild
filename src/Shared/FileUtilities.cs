@@ -779,12 +779,12 @@ namespace Microsoft.Build.Shared
         internal static void DeleteDirectoryNoThrow(string path, bool recursive, int retryCount = 0, int retryTimeOut = 0)
         {
             // Try parse will set the out parameter to 0 if the string passed in is null, or is outside the range of an int.
-            if (!int.TryParse(Environment.GetEnvironmentVariable("MSBUILDDIRECTORYDELETERETRYCOUNT"), out retryCount))
+            if (!int.TryParse(EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDIRECTORYDELETERETRYCOUNT"), out retryCount))
             {
                 retryCount = 0;
             }
 
-            if (!int.TryParse(Environment.GetEnvironmentVariable("MSBUILDDIRECTORYDELETRETRYTIMEOUT"), out retryTimeOut))
+            if (!int.TryParse(EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDIRECTORYDELETRETRYTIMEOUT"), out retryTimeOut))
             {
                 retryTimeOut = 0;
             }

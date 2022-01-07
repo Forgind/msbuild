@@ -2147,7 +2147,7 @@ namespace Microsoft.Build.Tasks
                         return false;
                     }
 
-                    _logVerboseSearchResults = Environment.GetEnvironmentVariable("MSBUILDLOGVERBOSERARSEARCHRESULTS") != null;
+                    _logVerboseSearchResults = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLOGVERBOSERARSEARCHRESULTS") != null;
 
                     // Loop through all the target framework directories that were passed in,
                     // and ensure that they all have a trailing slash.  This is necessary
@@ -2830,7 +2830,7 @@ namespace Microsoft.Build.Tasks
                 return;
             }
 
-            string dumpFrameworkSubsetList = Environment.GetEnvironmentVariable("MSBUILDDUMPFRAMEWORKSUBSETLIST");
+            string dumpFrameworkSubsetList = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDUMPFRAMEWORKSUBSETLIST");
             if (dumpFrameworkSubsetList == null)
             {
                 return;

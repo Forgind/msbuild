@@ -310,7 +310,7 @@ namespace Microsoft.Build.UnitTests.OM.Instance
         [Fact]
         public void GetSubToolsetVersion()
         {
-            string originalVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVersion");
+            string originalVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVersion");
 
             try
             {
@@ -344,7 +344,7 @@ namespace Microsoft.Build.UnitTests.OM.Instance
         [Trait("Category", "mono-osx-failing")]
         public void GetSubToolsetVersion_FromEnvironment()
         {
-            string originalVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVersion");
+            string originalVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVersion");
 
             try
             {
@@ -368,7 +368,7 @@ namespace Microsoft.Build.UnitTests.OM.Instance
         [Fact]
         public void GetSubToolsetVersion_FromProjectGlobalProperties()
         {
-            string originalVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVersion");
+            string originalVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVersion");
 
             try
             {
@@ -396,7 +396,7 @@ namespace Microsoft.Build.UnitTests.OM.Instance
         [Fact]
         public void GetSubToolsetVersion_FromConstructor()
         {
-            string originalVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVersion");
+            string originalVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVersion");
 
             try
             {

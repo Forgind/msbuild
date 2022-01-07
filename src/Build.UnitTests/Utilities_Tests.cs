@@ -85,7 +85,7 @@ namespace Microsoft.Build.UnitTests
             string input = FileUtilities.GetTemporaryFile();
             string output = FileUtilities.GetTemporaryFile();
 
-            string _initialLoadFilesWriteable = Environment.GetEnvironmentVariable("MSBUILDLOADALLFILESASWRITEABLE");
+            string _initialLoadFilesWriteable = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLOADALLFILESASWRITEABLE");
             try
             {
                 Environment.SetEnvironmentVariable("MSBUILDLOADALLFILESASWRITEABLE", "1");

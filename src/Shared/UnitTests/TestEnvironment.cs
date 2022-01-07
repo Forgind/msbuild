@@ -144,7 +144,7 @@ namespace Microsoft.Build.UnitTests
         public TestInvariant WithEnvironmentVariableInvariant(string environmentVariableName)
         {
             return WithInvariant(new StringInvariant(environmentVariableName,
-                () => Environment.GetEnvironmentVariable(environmentVariableName)));
+                () => EnvironmentUtilities.GetEnvironmentVariable(environmentVariableName)));
         }
         /// <summary>
         /// Creates a test invariant which asserts that the environment variables do not change
@@ -540,13 +540,13 @@ namespace Microsoft.Build.UnitTests
         {
             var tempPaths = new TempPaths
             {
-                [TMP] = Environment.GetEnvironmentVariable(TMP),
-                [TEMP] = Environment.GetEnvironmentVariable(TEMP)
+                [TMP] = EnvironmentUtilities.GetEnvironmentVariable(TMP),
+                [TEMP] = EnvironmentUtilities.GetEnvironmentVariable(TEMP)
             };
 
             if (NativeMethodsShared.IsUnixLike)
             {
-                tempPaths[TMPDIR] = Environment.GetEnvironmentVariable(TMPDIR);
+                tempPaths[TMPDIR] = EnvironmentUtilities.GetEnvironmentVariable(TMPDIR);
             }
 
             return tempPaths;
@@ -659,7 +659,7 @@ namespace Microsoft.Build.UnitTests
         public TransientTestEnvironmentVariable(string environmentVariableName, string newValue)
         {
             _environmentVariableName = environmentVariableName;
-            _originalValue = Environment.GetEnvironmentVariable(environmentVariableName);
+            _originalValue = EnvironmentUtilities.GetEnvironmentVariable(environmentVariableName);
 
             Environment.SetEnvironmentVariable(environmentVariableName, newValue);
         }

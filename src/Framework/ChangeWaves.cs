@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using Microsoft.Build.Shared;
 
 #nullable disable
 
@@ -116,7 +117,7 @@ namespace Microsoft.Build.Framework
                 return;
             }
 
-            string msbuildDisableFeaturesFromVersion = Environment.GetEnvironmentVariable("MSBUILDDISABLEFEATURESFROMVERSION");
+            string msbuildDisableFeaturesFromVersion = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDISABLEFEATURESFROMVERSION");
 
             // Most common case, `MSBuildDisableFeaturesFromVersion` unset
             if (string.IsNullOrEmpty(msbuildDisableFeaturesFromVersion))

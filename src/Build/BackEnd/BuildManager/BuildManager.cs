@@ -594,7 +594,7 @@ namespace Microsoft.Build.Execution
                 return;
             }
 
-            switch (Environment.GetEnvironmentVariable("MSBuildDebugBuildManagerOnStart"))
+            switch (EnvironmentUtilities.GetEnvironmentVariable("MSBuildDebugBuildManagerOnStart"))
             {
 #if FEATURE_DEBUG_LAUNCH
                 case "1":
@@ -2202,7 +2202,7 @@ namespace Microsoft.Build.Execution
                 }
             }
 
-            if (Environment.GetEnvironmentVariable("MSBUILDCLEARXMLCACHEONBUILDMANAGER") == "1")
+            if (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDCLEARXMLCACHEONBUILDMANAGER") == "1")
             {
                 // Optionally clear out the cache. This has the advantage of releasing memory,
                 // but the disadvantage of causing the next build to repeat the load and parse.

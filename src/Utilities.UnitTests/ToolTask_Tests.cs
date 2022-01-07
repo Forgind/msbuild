@@ -652,7 +652,7 @@ namespace Microsoft.Build.UnitTests
                 {
                     string tempDirectory = env.CreateFolder().Path;
                     env.SetCurrentDirectory(tempDirectory);
-                    env.SetEnvironmentVariable("PATH", $"{tempDirectory}{Path.PathSeparator}{Environment.GetEnvironmentVariable("PATH")}");
+                    env.SetEnvironmentVariable("PATH", $"{tempDirectory}{Path.PathSeparator}{EnvironmentUtilities.GetEnvironmentVariable("PATH")}");
                     Directory.SetCurrentDirectory(tempDirectory);
 
                     string directoryNamedSameAsTool = Directory.CreateDirectory(Path.Combine(tempDirectory, toolName)).FullName;

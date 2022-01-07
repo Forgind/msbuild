@@ -5,6 +5,8 @@ using System;
 using System.Diagnostics;
 using System.Runtime.Serialization;
 
+using Microsoft.Build.Shared;
+
 #nullable disable
 
 namespace Microsoft.Build.Framework
@@ -94,15 +96,15 @@ namespace Microsoft.Build.Framework
         {
             string innerMessage = (innerException == null) ? String.Empty : innerException.ToString();
 
-            if (Environment.GetEnvironmentVariable("MSBUILDLAUNCHDEBUGGER") != null)
+            if (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLAUNCHDEBUGGER") != null)
             {
                 LaunchDebugger(message, innerMessage);
                 return;
             }
 
 #if DEBUG
-            if (!RunningTests() && Environment.GetEnvironmentVariable("MSBUILDDONOTLAUNCHDEBUGGER") == null
-                && Environment.GetEnvironmentVariable("_NTROOT") == null)
+            if (!RunningTests() && EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDONOTLAUNCHDEBUGGER") == null
+                && EnvironmentUtilities.GetEnvironmentVariable("_NTROOT") == null)
             {
                 LaunchDebugger(message, innerMessage);
                 return;

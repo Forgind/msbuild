@@ -520,7 +520,7 @@ namespace Microsoft.Build.Tasks
                 // a bad path being returned above on Nano Server SKUs of Windows.
                 if (!FileSystems.Default.FileExists(systemCmd))
                 {
-                    return Environment.GetEnvironmentVariable("ComSpec");
+                    return EnvironmentUtilities.GetEnvironmentVariable("ComSpec");
                 }
 #endif
 

@@ -36,7 +36,7 @@ namespace Microsoft.Build.Tasks.AssemblyFoldersFromConfig
             AssemblyFoldersFromConfig = assemblyFoldersFromConfig;
             _fileExists = fileExists;
 
-            if (Environment.GetEnvironmentVariable("MSBUILDDISABLEASSEMBLYFOLDERSEXCACHE") != null)
+            if (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDISABLEASSEMBLYFOLDERSEXCACHE") != null)
             {
                 _useOriginalFileExists = true;
             }

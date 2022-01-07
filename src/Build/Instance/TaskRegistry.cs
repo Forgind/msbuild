@@ -65,7 +65,7 @@ namespace Microsoft.Build.Execution
         /// callbacks; as forcing those out of proc would be just setting them up for
         /// known failure.
         /// </summary>
-        private static bool s_forceTaskHostLaunch = (Environment.GetEnvironmentVariable("MSBUILDFORCEALLTASKSOUTOFPROC") == "1");
+        private static bool s_forceTaskHostLaunch = (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDFORCEALLTASKSOUTOFPROC") == "1");
 
         /// <summary>
         /// Simple name for the MSBuild tasks (v4), used for shimming in loading

@@ -661,7 +661,7 @@ namespace Microsoft.Build.UnitTests
 
             try
             {
-                oldValueForMSBuildOldOM = Environment.GetEnvironmentVariable("MSBuildOldOM");
+                oldValueForMSBuildOldOM = EnvironmentUtilities.GetEnvironmentVariable("MSBuildOldOM");
                 Environment.SetEnvironmentVariable("MSBuildOldOM", "");
 
                 startDirectory = CopyMSBuild();

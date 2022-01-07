@@ -201,7 +201,7 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact(Skip = "https://github.com/dotnet/msbuild/issues/4363")]
         public void TestDefaultWhenNoSubToolset()
         {
-            string originalVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVersion");
+            string originalVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVersion");
 
             try
             {
@@ -235,7 +235,7 @@ namespace Microsoft.Build.UnitTests.Definition
                 return; // "TODO: Under Unix this test throws. Investigate"
             }
 
-            string originalVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVersion");
+            string originalVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVersion");
 
             try
             {
@@ -266,7 +266,7 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact]
         public void TestNoSubToolset_GlobalPropertyOverrides()
         {
-            string originalVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVersion");
+            string originalVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVersion");
 
             try
             {
@@ -291,7 +291,7 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact]
         public void TestNoSubToolset_EnvironmentOverrides()
         {
-            string originalVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVersion");
+            string originalVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVersion");
 
             try
             {
@@ -313,7 +313,7 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact]
         public void TestNoSubToolset_ExplicitlyPassedGlobalPropertyOverrides()
         {
-            string originalVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVersion");
+            string originalVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVersion");
 
             try
             {
@@ -338,7 +338,7 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact]
         public void TestNoSubToolset_ExplicitlyPassedGlobalPropertyWins()
         {
-            string originalVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVersion");
+            string originalVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVersion");
 
             try
             {
@@ -366,7 +366,7 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact]
         public void TestGenerateSubToolsetVersion_GlobalPropertyOverrides()
         {
-            string originalVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVersion");
+            string originalVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVersion");
 
             try
             {
@@ -388,7 +388,7 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact]
         public void TestGenerateSubToolsetVersion_EnvironmentOverrides()
         {
-            string originalVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVersion");
+            string originalVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVersion");
 
             try
             {
@@ -407,7 +407,7 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact]
         public void TestGenerateSubToolsetVersion_ExplicitlyPassedGlobalPropertyOverrides()
         {
-            string originalVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVersion");
+            string originalVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVersion");
 
             try
             {
@@ -429,7 +429,7 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact]
         public void TestGenerateSubToolsetVersion_SolutionVersionOverrides()
         {
-            string originalVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVersion");
+            string originalVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVersion");
 
             try
             {
@@ -454,7 +454,7 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact]
         public void TestGenerateSubToolsetVersion_ExplicitlyPassedGlobalPropertyWins()
         {
-            string originalVisualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVersion");
+            string originalVisualStudioVersion = EnvironmentUtilities.GetEnvironmentVariable("VisualStudioVersion");
 
             try
             {

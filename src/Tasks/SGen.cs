@@ -300,7 +300,7 @@ namespace Microsoft.Build.Tasks
 
             // If COMPLUS_InstallRoot\COMPLUS_Version are set (the dogfood world), we want to find it there, instead of 
             // the SDK, which may or may not be installed. The following will look there.
-            if (!String.IsNullOrEmpty(Environment.GetEnvironmentVariable("COMPLUS_InstallRoot")) || !String.IsNullOrEmpty(Environment.GetEnvironmentVariable("COMPLUS_Version")))
+            if (!String.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("COMPLUS_InstallRoot")) || !String.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("COMPLUS_Version")))
             {
                 pathToTool = ToolLocationHelper.GetPathToDotNetFrameworkFile(ToolExe, TargetDotNetFrameworkVersion.Latest);
             }

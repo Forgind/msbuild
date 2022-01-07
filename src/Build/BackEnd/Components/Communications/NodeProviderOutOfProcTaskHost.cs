@@ -136,7 +136,7 @@ namespace Microsoft.Build.BackEnd
             {
                 if (s_msbuildTaskHostName == null)
                 {
-                    s_msbuildTaskHostName = Environment.GetEnvironmentVariable("MSBUILDTASKHOST_EXE_NAME");
+                    s_msbuildTaskHostName = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTASKHOST_EXE_NAME");
 
                     if (s_msbuildTaskHostName == null)
                     {
@@ -370,7 +370,7 @@ namespace Microsoft.Build.BackEnd
             {
                 if (s_msbuildName == null)
                 {
-                    s_msbuildName = Environment.GetEnvironmentVariable("MSBUILD_EXE_NAME");
+                    s_msbuildName = EnvironmentUtilities.GetEnvironmentVariable("MSBUILD_EXE_NAME");
 
                     if (s_msbuildName == null)
                     {
@@ -402,7 +402,7 @@ namespace Microsoft.Build.BackEnd
             {
                 if (s_pathToX64Clr2 == null)
                 {
-                    s_pathToX64Clr2 = Environment.GetEnvironmentVariable("MSBUILDTASKHOSTLOCATION64");
+                    s_pathToX64Clr2 = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTASKHOSTLOCATION64");
 
                     if (s_pathToX64Clr2 == null || !FileUtilities.FileExistsNoThrow(Path.Combine(s_pathToX64Clr2, toolName)))
                     {
@@ -416,7 +416,7 @@ namespace Microsoft.Build.BackEnd
             {
                 if (s_pathToX32Clr2 == null)
                 {
-                    s_pathToX32Clr2 = Environment.GetEnvironmentVariable("MSBUILDTASKHOSTLOCATION");
+                    s_pathToX32Clr2 = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTASKHOSTLOCATION");
                     if (s_pathToX32Clr2 == null || !FileUtilities.FileExistsNoThrow(Path.Combine(s_pathToX32Clr2, toolName)))
                     {
                         s_pathToX32Clr2 = s_baseTaskHostPath;

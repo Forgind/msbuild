@@ -2955,7 +2955,7 @@ namespace Microsoft.Build.Utilities
         private static List<string> GetTargetPlatformMonikerDiskRoots(string[] diskRoots)
         {
             var sdkDiskRoots = new List<string>();
-            string sdkDirectoryRootsFromEnvironment = Environment.GetEnvironmentVariable("MSBUILDSDKREFERENCEDIRECTORY");
+            string sdkDirectoryRootsFromEnvironment = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDSDKREFERENCEDIRECTORY");
             ExtractSdkDiskRootsFromEnvironment(sdkDiskRoots, sdkDirectoryRootsFromEnvironment);
             if (sdkDiskRoots.Count == 0)
             {
@@ -2982,7 +2982,7 @@ namespace Microsoft.Build.Utilities
         private static List<string> GetExtensionSdkDiskRoots(string[] diskRoots)
         {
             var sdkDiskRoots = new List<string>();
-            string sdkDirectoryRootsFromEnvironment = Environment.GetEnvironmentVariable("MSBUILDMULTIPLATFORMSDKREFERENCEDIRECTORY");
+            string sdkDirectoryRootsFromEnvironment = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDMULTIPLATFORMSDKREFERENCEDIRECTORY");
             ExtractSdkDiskRootsFromEnvironment(sdkDiskRoots, sdkDirectoryRootsFromEnvironment);
             if (sdkDiskRoots.Count == 0 && diskRoots?.Length > 0)
             {
@@ -3002,7 +3002,7 @@ namespace Microsoft.Build.Utilities
         {
             ErrorUtilities.DebugTraceMessage("GetTargetPlatformMonikerRegistryRoots", "RegistryRoot passed in '{0}'", registryRootLocation ?? string.Empty);
 
-            string disableRegistryForSDKLookup = Environment.GetEnvironmentVariable("MSBUILDDISABLEREGISTRYFORSDKLOOKUP");
+            string disableRegistryForSDKLookup = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDISABLEREGISTRYFORSDKLOOKUP");
             // If we are not disabling the registry for platform sdk lookups then lets look in the default location.
             string registryRoot = string.Empty;
             if (disableRegistryForSDKLookup == null)

@@ -199,7 +199,7 @@ namespace Microsoft.Build.Internal
 
         private static List<Regex> PopulateRegexFromEnvironment()
         {
-            string wildCards = Environment.GetEnvironmentVariable("MsBuildSkipEagerWildCardEvaluationRegexes");
+            string wildCards = EnvironmentUtilities.GetEnvironmentVariable("MsBuildSkipEagerWildCardEvaluationRegexes");
             if (string.IsNullOrEmpty(wildCards))
             {
                 return new List<Regex>(0);

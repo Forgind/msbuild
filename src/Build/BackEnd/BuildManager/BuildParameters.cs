@@ -402,7 +402,7 @@ namespace Microsoft.Build.Execution
         public bool EnableNodeReuse
         {
             get => _enableNodeReuse;
-            set => _enableNodeReuse = Environment.GetEnvironmentVariable("MSBUILDDISABLENODEREUSE") == "1" ? false : value;
+            set => _enableNodeReuse = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDISABLENODEREUSE") == "1" ? false : value;
         }
 
         /// <summary>
@@ -883,7 +883,7 @@ namespace Microsoft.Build.Execution
         {
             if (!backing.HasValue)
             {
-                backing = !String.IsNullOrEmpty(Environment.GetEnvironmentVariable(environmentVariable)) || @default;
+                backing = !String.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable(environmentVariable)) || @default;
             }
 
             return backing.Value;
@@ -896,7 +896,7 @@ namespace Microsoft.Build.Execution
         {
             if (!backingValue.HasValue)
             {
-                string environmentValue = Environment.GetEnvironmentVariable(environmentVariable);
+                string environmentValue = EnvironmentUtilities.GetEnvironmentVariable(environmentVariable);
                 if (String.IsNullOrEmpty(environmentValue))
                 {
                     backingValue = defaultValue;
@@ -921,12 +921,12 @@ namespace Microsoft.Build.Execution
             ResetCaches = true;
             _toolsetProvider = toolsetProvider;
 
-            if (Environment.GetEnvironmentVariable("MSBUILDDISABLENODEREUSE") == "1") // For example to disable node reuse within Visual Studio
+            if (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDISABLENODEREUSE") == "1") // For example to disable node reuse within Visual Studio
             {
                 _enableNodeReuse = false;
             }
 
-            if (Environment.GetEnvironmentVariable("MSBUILDDETAILEDSUMMARY") == "1") // For example to get detailed summary within Visual Studio
+            if (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDETAILEDSUMMARY") == "1") // For example to get detailed summary within Visual Studio
             {
                 DetailedSummary = true;
             }

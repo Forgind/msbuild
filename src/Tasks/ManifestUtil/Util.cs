@@ -24,8 +24,8 @@ namespace Microsoft.Build.Tasks.Deployment.ManifestUtilities
 {
     internal static class Util
     {
-        internal static readonly string Schema = Environment.GetEnvironmentVariable("VSPSCHEMA");
-        internal static readonly bool logging = !String.IsNullOrEmpty(Environment.GetEnvironmentVariable("VSPLOG"));
+        internal static readonly string Schema = EnvironmentUtilities.GetEnvironmentVariable("VSPSCHEMA");
+        internal static readonly bool logging = !String.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("VSPLOG"));
         internal static readonly string logPath = GetLogPath();
         private static readonly char[] s_fileNameInvalidChars = { '\\', '/', ':', '*', '?', '"', '<', '>', '|' };
         private static StreamWriter s_logFileWriter;

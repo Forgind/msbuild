@@ -276,8 +276,8 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact]
         public void InvalidToolsVersionTooHighMappedToCurrent()
         {
-            string oldLegacyToolsVersion = Environment.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION");
-            string oldTreatHigherToolsVersions = Environment.GetEnvironmentVariable("MSBUILDTREATHIGHERTOOLSVERSIONASCURRENT");
+            string oldLegacyToolsVersion = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION");
+            string oldTreatHigherToolsVersions = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTREATHIGHERTOOLSVERSIONASCURRENT");
 
             try
             {
@@ -313,7 +313,7 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact]
         public void InvalidToolsVersionMissingLowMappedToCurrent()
         {
-            string oldLegacyToolsVersion = Environment.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION");
+            string oldLegacyToolsVersion = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION");
 
             try
             {
@@ -346,7 +346,7 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact]
         public void InvalidToolsVersionMissingMappedToCurrent()
         {
-            string oldLegacyToolsVersion = Environment.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION");
+            string oldLegacyToolsVersion = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION");
 
             try
             {
@@ -403,8 +403,8 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact]
         public void ToolsVersionMappedToCurrent()
         {
-            string oldLegacyToolsVersion = Environment.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION");
-            string oldForceToolsVersionToCurrent = Environment.GetEnvironmentVariable("MSBUILDTREATALLTOOLSVERSIONSASCURRENT");
+            string oldLegacyToolsVersion = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION");
+            string oldForceToolsVersionToCurrent = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTREATALLTOOLSVERSIONSASCURRENT");
 
             try
             {
@@ -508,7 +508,7 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact]
         public void ToolsVersionFromEnvironmentVariable()
         {
-            string oldDefaultToolsVersion = Environment.GetEnvironmentVariable("MSBUILDDEFAULTTOOLSVERSION");
+            string oldDefaultToolsVersion = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDEFAULTTOOLSVERSION");
 
             try
             {
@@ -546,7 +546,7 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact]
         public void InvalidToolsVersionFromEnvironmentVariable()
         {
-            string oldDefaultToolsVersion = Environment.GetEnvironmentVariable("MSBUILDDEFAULTTOOLSVERSION");
+            string oldDefaultToolsVersion = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDEFAULTTOOLSVERSION");
 
             try
             {
@@ -584,8 +584,8 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact]
         public void ToolsVersionMappedToCurrent_CreateProjectInstance()
         {
-            string oldLegacyToolsVersion = Environment.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION");
-            string oldForceToolsVersionToCurrent = Environment.GetEnvironmentVariable("MSBUILDTREATALLTOOLSVERSIONSASCURRENT");
+            string oldLegacyToolsVersion = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION");
+            string oldForceToolsVersionToCurrent = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTREATALLTOOLSVERSIONSASCURRENT");
 
             try
             {
@@ -654,7 +654,7 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact]
         public void ToolsVersionFromEnvironmentVariable_CreateProjectInstance()
         {
-            string oldDefaultToolsVersion = Environment.GetEnvironmentVariable("MSBUILDDEFAULTTOOLSVERSION");
+            string oldDefaultToolsVersion = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDEFAULTTOOLSVERSION");
 
             try
             {
@@ -695,7 +695,7 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact]
         public void InvalidToolsVersionFromEnvironmentVariable_CreateProjectInstance()
         {
-            string oldDefaultToolsVersion = Environment.GetEnvironmentVariable("MSBUILDDEFAULTTOOLSVERSION");
+            string oldDefaultToolsVersion = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDEFAULTTOOLSVERSION");
 
             try
             {
@@ -736,8 +736,8 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact]
         public void ToolsVersionMappedToCurrent_ProjectInstance()
         {
-            string oldLegacyToolsVersion = Environment.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION");
-            string oldForceToolsVersionToCurrent = Environment.GetEnvironmentVariable("MSBUILDTREATALLTOOLSVERSIONSASCURRENT");
+            string oldLegacyToolsVersion = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLEGACYDEFAULTTOOLSVERSION");
+            string oldForceToolsVersionToCurrent = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTREATALLTOOLSVERSIONSASCURRENT");
 
             try
             {
@@ -805,7 +805,7 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact]
         public void ToolsVersionFromEnvironmentVariable_ProjectInstance()
         {
-            string oldDefaultToolsVersion = Environment.GetEnvironmentVariable("MSBUILDDEFAULTTOOLSVERSION");
+            string oldDefaultToolsVersion = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDEFAULTTOOLSVERSION");
 
             try
             {
@@ -846,7 +846,7 @@ namespace Microsoft.Build.UnitTests.Definition
         [Fact]
         public void InvalidToolsVersionFromEnvironmentVariable_ProjectInstance()
         {
-            string oldDefaultToolsVersion = Environment.GetEnvironmentVariable("MSBUILDDEFAULTTOOLSVERSION");
+            string oldDefaultToolsVersion = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDEFAULTTOOLSVERSION");
 
             try
             {

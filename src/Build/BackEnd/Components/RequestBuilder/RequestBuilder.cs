@@ -684,7 +684,7 @@ namespace Microsoft.Build.BackEnd
                 // create threads with MTA semantics.  We provide this
                 // switch so that those few tasks which may require it 
                 // can be made to work.
-                if (Environment.GetEnvironmentVariable("MSBUILDFORCESTA") == "1")
+                if (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDFORCESTA") == "1")
                 {
                     _requestTask = Task.Factory.StartNew(
                         () =>

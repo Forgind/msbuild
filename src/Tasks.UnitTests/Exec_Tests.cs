@@ -319,7 +319,7 @@ namespace Microsoft.Build.UnitTests
         {
             string directoryWithAmpersand = "nospace&nospace";
             string newTmp = Path.Combine(Path.GetTempPath(), directoryWithAmpersand);
-            string oldTmp = Environment.GetEnvironmentVariable("TMP");
+            string oldTmp = EnvironmentUtilities.GetEnvironmentVariable("TMP");
 
             try
             {
@@ -353,7 +353,7 @@ namespace Microsoft.Build.UnitTests
         {
             string directoryWithAmpersand = "space &nospace";
             string newTmp = Path.Combine(Path.GetTempPath(), directoryWithAmpersand);
-            string oldTmp = Environment.GetEnvironmentVariable("TMP");
+            string oldTmp = EnvironmentUtilities.GetEnvironmentVariable("TMP");
 
             try
             {
@@ -388,7 +388,7 @@ namespace Microsoft.Build.UnitTests
         {
             string directoryWithAmpersand = "nospace& space";
             string newTmp = Path.Combine(Path.GetTempPath(), directoryWithAmpersand);
-            string oldTmp = Environment.GetEnvironmentVariable("TMP");
+            string oldTmp = EnvironmentUtilities.GetEnvironmentVariable("TMP");
 
             try
             {
@@ -422,7 +422,7 @@ namespace Microsoft.Build.UnitTests
         {
             string directoryWithAmpersand = "space & space";
             string newTmp = Path.Combine(Path.GetTempPath(), directoryWithAmpersand);
-            string oldTmp = Environment.GetEnvironmentVariable("TMP");
+            string oldTmp = EnvironmentUtilities.GetEnvironmentVariable("TMP");
 
             try
             {
@@ -819,7 +819,7 @@ namespace Microsoft.Build.UnitTests
         [Fact]
         public void AnyExistingEnvVarCalledErrorLevelIsIgnored()
         {
-            string oldValue = Environment.GetEnvironmentVariable("errorlevel");
+            string oldValue = EnvironmentUtilities.GetEnvironmentVariable("errorlevel");
 
             try
             {

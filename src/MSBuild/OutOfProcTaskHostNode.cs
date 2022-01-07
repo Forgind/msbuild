@@ -747,7 +747,7 @@ namespace Microsoft.Build.CommandLine
             if (wrapper?.CancelTask() == false)
             {
                 // Create a possibility for the task to be aborted if the user really wants it dropped dead asap
-                if (Environment.GetEnvironmentVariable("MSBUILDTASKHOSTABORTTASKONCANCEL") == "1")
+                if (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTASKHOSTABORTTASKONCANCEL") == "1")
                 {
                     // Don't bother aborting the task if it has passed the actual user task Execute()
                     // It means we're already in the process of shutting down - Wait for the taskCompleteEvent to be set instead.

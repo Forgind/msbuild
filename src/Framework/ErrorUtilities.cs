@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Build.Shared;
 
 #nullable disable
 
@@ -22,7 +23,7 @@ namespace Microsoft.Build.Framework
         /// and fortuitously it happens that ignoring the VerifyThrow allows execution to continue in a reasonable way,
         /// then we can give them this undocumented environment variable as an immediate workaround.
         /// </summary>
-        private static readonly bool s_throwExceptions = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("MSBUILDDONOTTHROWINTERNAL"));
+        private static readonly bool s_throwExceptions = string.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDONOTTHROWINTERNAL"));
 
         /// <summary>
         /// This method should be used in places where one would normally put

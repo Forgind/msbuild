@@ -28,7 +28,7 @@ namespace Microsoft.Build.Shared
             /// <summary>
             /// Whether to dump when a modifier is in the "wrong" (slow) casing
             /// </summary>       
-            private static readonly bool s_traceModifierCasing = (!String.IsNullOrEmpty(Environment.GetEnvironmentVariable("MSBUILDTRACEMODIFIERCASING")));
+            private static readonly bool s_traceModifierCasing = !String.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTRACEMODIFIERCASING"));
 #endif
 
             // NOTE: If you add an item here that starts with a new letter, you need to update the case 

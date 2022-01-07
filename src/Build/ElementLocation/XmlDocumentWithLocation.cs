@@ -380,18 +380,18 @@ namespace Microsoft.Build.Construction
             {
                 s_readOnlyFlags = ReadOnlyLoadFlags.LoadAllWriteable;
 
-                if (String.Equals(Environment.GetEnvironmentVariable("MSBuildLoadMicrosoftTargetsReadOnly"), "true", StringComparison.OrdinalIgnoreCase))
+                if (String.Equals(EnvironmentUtilities.GetEnvironmentVariable("MSBuildLoadMicrosoftTargetsReadOnly"), "true", StringComparison.OrdinalIgnoreCase))
                 {
                     s_readOnlyFlags = ReadOnlyLoadFlags.LoadReadOnlyIfAppropriate;
                 }
 
-                if (String.Equals(Environment.GetEnvironmentVariable("MSBUILDLOADALLFILESASREADONLY"), "1", StringComparison.OrdinalIgnoreCase))
+                if (String.Equals(EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLOADALLFILESASREADONLY"), "1", StringComparison.OrdinalIgnoreCase))
                 {
                     s_readOnlyFlags = ReadOnlyLoadFlags.LoadAllReadOnly;
                 }
 
                 // "Escape hatch" should someone really need to edit these - since we'll be switching it on in VS and msbuild.exe wholesale.
-                if (String.Equals(Environment.GetEnvironmentVariable("MSBUILDLOADALLFILESASWRITEABLE"), "1", StringComparison.OrdinalIgnoreCase))
+                if (String.Equals(EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLOADALLFILESASWRITEABLE"), "1", StringComparison.OrdinalIgnoreCase))
                 {
                     s_readOnlyFlags = ReadOnlyLoadFlags.LoadAllWriteable;
                 }

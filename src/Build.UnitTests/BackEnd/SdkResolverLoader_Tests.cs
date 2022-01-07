@@ -276,7 +276,7 @@ namespace Microsoft.Build.Engine.UnitTests.BackEnd
         {
             using (var env = TestEnvironment.Create(_output))
             {
-                var origIncludeDefault = Environment.GetEnvironmentVariable("MSBUILDINCLUDEDEFAULTSDKRESOLVER");
+                var origIncludeDefault = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDINCLUDEDEFAULTSDKRESOLVER");
                 try
                 {
                     var testRoot = env.CreateFolder().Path;
@@ -303,7 +303,7 @@ namespace Microsoft.Build.Engine.UnitTests.BackEnd
         {
             using (var env = TestEnvironment.Create(_output))
             {
-                var origResolversFolder = Environment.GetEnvironmentVariable("MSBUILDADDITIONALSDKRESOLVERSFOLDER");
+                var origResolversFolder = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDADDITIONALSDKRESOLVERSFOLDER");
                 try
                 {
                     var testRoot = env.CreateFolder().Path;

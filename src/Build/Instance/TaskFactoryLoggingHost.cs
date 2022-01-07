@@ -266,7 +266,7 @@ namespace Microsoft.Build.BackEnd
             // for garbage collection
             int initialLeaseTime = 1;
 
-            string initialLeaseTimeFromEnvironment = Environment.GetEnvironmentVariable("MSBUILDENGINEPROXYINITIALLEASETIME");
+            string initialLeaseTimeFromEnvironment = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDENGINEPROXYINITIALLEASETIME");
 
             if (!String.IsNullOrEmpty(initialLeaseTimeFromEnvironment))
             {
@@ -287,7 +287,7 @@ namespace Microsoft.Build.BackEnd
             // When a new lease is requested lets make it last 1 minutes longer. 
             int leaseExtensionTime = 1;
 
-            string leaseExtensionTimeFromEnvironment = Environment.GetEnvironmentVariable("MSBUILDENGINEPROXYLEASEEXTENSIONTIME");
+            string leaseExtensionTimeFromEnvironment = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDENGINEPROXYLEASEEXTENSIONTIME");
             if (!String.IsNullOrEmpty(leaseExtensionTimeFromEnvironment))
             {
                 int leaseExtensionFromEnvironment;

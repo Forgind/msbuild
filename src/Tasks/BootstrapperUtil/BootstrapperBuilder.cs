@@ -28,7 +28,7 @@ namespace Microsoft.Build.Tasks.Deployment.Bootstrapper
     [ComVisible(true), Guid("1D9FE38A-0226-4b95-9C6B-6DFFA2236270"), ClassInterface(ClassInterfaceType.None)]
     public class BootstrapperBuilder : IBootstrapperBuilder
     {
-        private static readonly bool s_logging = !String.IsNullOrEmpty(Environment.GetEnvironmentVariable("VSPLOG"));
+        private static readonly bool s_logging = !String.IsNullOrEmpty(EnvironmentUtilities.GetEnvironmentVariable("VSPLOG"));
         private static readonly string s_logPath = GetLogPath();
 
         private string _path;

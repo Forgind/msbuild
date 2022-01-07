@@ -418,7 +418,7 @@ namespace Microsoft.Build.Shared
 
         private static string GetEnvironmentVariable(string variable)
         {
-            return Environment.GetEnvironmentVariable(variable);
+            return EnvironmentUtilities.GetEnvironmentVariable(variable);
         }
 
         /// <summary>
@@ -606,7 +606,7 @@ namespace Microsoft.Build.Shared
                 }
 
                 // Allow an environment-variable override of the default SDK location
-                return Environment.GetEnvironmentVariable("MSBuildSDKsPath") ?? defaultSdkPath;
+                return EnvironmentUtilities.GetEnvironmentVariable("MSBuildSDKsPath") ?? defaultSdkPath;
             }
         }
 

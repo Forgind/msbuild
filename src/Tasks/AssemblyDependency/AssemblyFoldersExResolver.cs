@@ -163,7 +163,7 @@ namespace Microsoft.Build.Tasks
                     }
                     _wasMatch = true;
 
-                    bool useCache = Environment.GetEnvironmentVariable("MSBUILDDISABLEASSEMBLYFOLDERSEXCACHE") == null;
+                    bool useCache = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDISABLEASSEMBLYFOLDERSEXCACHE") == null;
                     string key = "ca22615d-aa83-444b-80b9-b32f3d5db097" + this.searchPathElement;
                     if (useCache && _buildEngine != null)
                     {
@@ -302,7 +302,7 @@ namespace Microsoft.Build.Tasks
             AssemblyFoldersEx = assemblyFoldersEx;
             _fileExists = fileExists;
 
-            if (Environment.GetEnvironmentVariable("MSBUILDDISABLEASSEMBLYFOLDERSEXCACHE") != null)
+            if (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDISABLEASSEMBLYFOLDERSEXCACHE") != null)
             {
                 _useOriginalFileExists = true;
             }

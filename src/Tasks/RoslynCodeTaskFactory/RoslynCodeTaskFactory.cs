@@ -639,7 +639,7 @@ namespace Microsoft.Build.Tasks
 
             // Delete the code file unless compilation failed or the environment variable MSBUILDLOGCODETASKFACTORYOUTPUT
             // is set (which allows for debugging problems)
-            bool deleteSourceCodeFile = Environment.GetEnvironmentVariable("MSBUILDLOGCODETASKFACTORYOUTPUT") == null;
+            bool deleteSourceCodeFile = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDLOGCODETASKFACTORYOUTPUT") == null;
 
             try
             {
@@ -658,7 +658,7 @@ namespace Microsoft.Build.Tasks
                         NoStandardLib = true,
                     };
 
-                    string toolExe = Environment.GetEnvironmentVariable("CscToolExe");
+                    string toolExe = EnvironmentUtilities.GetEnvironmentVariable("CscToolExe");
 
                     if (!String.IsNullOrEmpty(toolExe))
                     {
@@ -674,7 +674,7 @@ namespace Microsoft.Build.Tasks
                         RootNamespace = "InlineCode",
                     };
 
-                    string toolExe = Environment.GetEnvironmentVariable("VbcToolExe");
+                    string toolExe = EnvironmentUtilities.GetEnvironmentVariable("VbcToolExe");
 
                     if (!String.IsNullOrEmpty(toolExe))
                     {

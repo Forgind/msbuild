@@ -50,11 +50,11 @@ namespace Microsoft.Build.Shared
             string debugPath =
 // Cannot access change wave logic from these assemblies (https://github.com/dotnet/msbuild/issues/6707)
 #if CLR2COMPATIBILITY || MICROSOFT_BUILD_ENGINE_OM_UNITTESTS
-                        Environment.GetEnvironmentVariable("MSBUILDDEBUGPATH");
+                        EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDEBUGPATH");
 #else
                 ChangeWaves.AreFeaturesEnabled(ChangeWaves.Wave17_0)
                     ? DebugUtils.DebugPath
-                    : Environment.GetEnvironmentVariable("MSBUILDDEBUGPATH");
+                    : EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDEBUGPATH");
 #endif
 
             return !string.IsNullOrEmpty(debugPath)

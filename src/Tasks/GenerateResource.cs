@@ -1966,7 +1966,7 @@ namespace Microsoft.Build.Tasks
 
                         // In case we need more information from the customer (given this has been heavily reported
                         // and we don't understand it properly) let the usual debug switch dump the stack.
-                        if (Environment.GetEnvironmentVariable("MSBUILDDEBUG") == "1")
+                        if (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDEBUG") == "1")
                         {
                             Log.LogErrorFromException(e, /* stack */ true, /* inner exceptions */ true, null);
                         }

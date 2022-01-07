@@ -925,7 +925,7 @@ namespace Microsoft.Build.Utilities
 
             string message;
 
-            if (!showDetail && (Environment.GetEnvironmentVariable("MSBUILDDIAGNOSTICS") == null)) // This env var is also used in ToolTask
+            if (!showDetail && (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDIAGNOSTICS") == null)) // This env var is also used in ToolTask
             {
                 message = exception.Message;
 
@@ -1484,7 +1484,7 @@ namespace Microsoft.Build.Utilities
                 // for garbage collection
                 int initialLeaseTime = 1;
 
-                string initialLeaseTimeFromEnvironment = Environment.GetEnvironmentVariable("MSBUILDTASKLOGGINGHELPERINITIALLEASETIME");
+                string initialLeaseTimeFromEnvironment = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTASKLOGGINGHELPERINITIALLEASETIME");
 
                 if (!String.IsNullOrEmpty(initialLeaseTimeFromEnvironment))
                 {
@@ -1504,7 +1504,7 @@ namespace Microsoft.Build.Utilities
                 // When a new lease is requested lets make it last 1 minutes longer.
                 int leaseExtensionTime = 1;
 
-                string leaseExtensionTimeFromEnvironment = Environment.GetEnvironmentVariable("MSBUILDTASKLOGGINGHELPERLEASEEXTENSIONTIME");
+                string leaseExtensionTimeFromEnvironment = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTASKLOGGINGHELPERLEASEEXTENSIONTIME");
                 if (!String.IsNullOrEmpty(leaseExtensionTimeFromEnvironment))
                 {
                     if (int.TryParse(leaseExtensionTimeFromEnvironment, out int leaseExtensionFromEnvironment) && leaseExtensionFromEnvironment > 0)

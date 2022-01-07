@@ -60,7 +60,7 @@ namespace Microsoft.Build.Utilities
     // we want to use resources from Utilities. Use LogPrivate (for private Utilities resources) and LogShared (for shared MSBuild resources)
     public abstract class ToolTask : Task, ICancelableTask
     {
-        private static readonly bool s_preserveTempFiles = string.Equals(Environment.GetEnvironmentVariable("MSBUILDPRESERVETOOLTEMPFILES"), "1", StringComparison.Ordinal);
+        private static readonly bool s_preserveTempFiles = string.Equals(EnvironmentUtilities.GetEnvironmentVariable("MSBUILDPRESERVETOOLTEMPFILES"), "1", StringComparison.Ordinal);
 
         #region Constructors
 
@@ -951,7 +951,7 @@ namespace Microsoft.Build.Utilities
                 }
 
                 int timeout = 5000;
-                string timeoutFromEnvironment = Environment.GetEnvironmentVariable("MSBUILDTOOLTASKCANCELPROCESSWAITTIMEOUT");
+                string timeoutFromEnvironment = EnvironmentUtilities.GetEnvironmentVariable("MSBUILDTOOLTASKCANCELPROCESSWAITTIMEOUT");
                 if (timeoutFromEnvironment != null)
                 {
                     if (int.TryParse(timeoutFromEnvironment, out int result) && result >= 0)
@@ -1266,7 +1266,7 @@ namespace Microsoft.Build.Utilities
         internal static string FindOnPath(string filename)
         {
             // Get path from the environment and split path separator
-            return Environment.GetEnvironmentVariable("PATH")?
+            return EnvironmentUtilities.GetEnvironmentVariable("PATH")?
                 .Split(MSBuildConstants.PathSeparatorChar)?
                 .Where(path =>
                 {

@@ -1237,7 +1237,7 @@ namespace Microsoft.Build.BackEnd
         /// By default we do not sort target inputs and outputs as it has significant perf impact.
         /// But allow suites to enable this so they get consistent results.
         /// </summary>
-        private static readonly bool s_sortInputsOutputs = (Environment.GetEnvironmentVariable("MSBUILDSORTINPUTSOUTPUTS") == "1");
+        private static readonly bool s_sortInputsOutputs = (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDSORTINPUTSOUTPUTS") == "1");
 
         /// <summary>
         /// The unique target inputs.

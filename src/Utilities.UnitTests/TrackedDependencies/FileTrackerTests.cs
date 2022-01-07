@@ -55,7 +55,7 @@ namespace Microsoft.Build.UnitTests.FileTracking
                 : Environment.ExpandEnvironmentVariables(@"%windir%\System32\cmd.exe");
 
             // blank out the path so that we know we're not inadvertently depending on it.
-            s_oldPath = Environment.GetEnvironmentVariable("PATH");
+            s_oldPath = EnvironmentUtilities.GetEnvironmentVariable("PATH");
 
             if (Environment.OSVersion.Platform == PlatformID.MacOSX || Environment.OSVersion.Platform == PlatformID.Unix)
             {
@@ -2088,7 +2088,7 @@ class X
         public void LaunchMultipleOfSameTool_DifferentCommands4()
         {
             string testDir = Path.Combine(Path.GetTempPath(), "LaunchMultipleOfSameTool_DifferentCommands4");
-            string oldPath = Environment.GetEnvironmentVariable("PATH");
+            string oldPath = EnvironmentUtilities.GetEnvironmentVariable("PATH");
 
             try
             {

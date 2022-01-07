@@ -83,12 +83,12 @@ namespace Microsoft.Build.Tasks
         /// normally there's no point, but occasionally things get into a bad state temporarily, and retrying does actually 
         /// succeed.  So keeping around a secret environment variable to allow forcing that behavior if necessary.  
         /// </summary>
-        private static bool s_alwaysRetryCopy = Environment.GetEnvironmentVariable(AlwaysRetryEnvVar) != null;
+        private static bool s_alwaysRetryCopy = EnvironmentUtilities.GetEnvironmentVariable(AlwaysRetryEnvVar) != null;
 
         /// <summary>
         /// Global flag to force on UseSymboliclinksIfPossible since Microsoft.Common.targets doesn't expose the functionality.
         /// </summary>
-        private static readonly bool s_forceSymlinks = Environment.GetEnvironmentVariable("MSBuildUseSymboliclinksIfPossible") != null;
+        private static readonly bool s_forceSymlinks = EnvironmentUtilities.GetEnvironmentVariable("MSBuildUseSymboliclinksIfPossible") != null;
 
         private static readonly int s_parallelism = GetParallelismFromEnvironment();
 
@@ -202,7 +202,7 @@ namespace Microsoft.Build.Tasks
         /// </summary>
         internal static void RefreshInternalEnvironmentValues()
         {
-            s_alwaysRetryCopy = Environment.GetEnvironmentVariable(AlwaysRetryEnvVar) != null;
+            s_alwaysRetryCopy = EnvironmentUtilities.GetEnvironmentVariable(AlwaysRetryEnvVar) != null;
         }
 
         /// <summary>
@@ -395,7 +395,7 @@ namespace Microsoft.Build.Tasks
             }
 
             // Environment variable stomps on user-requested value if it's set. 
-            if (Environment.GetEnvironmentVariable(AlwaysOverwriteReadOnlyFilesEnvVar) != null)
+            if (EnvironmentUtilities.GetEnvironmentVariable(AlwaysOverwriteReadOnlyFilesEnvVar) != null)
             {
                 OverwriteReadOnlyFiles = true;
             }

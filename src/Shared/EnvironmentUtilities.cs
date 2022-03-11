@@ -9,11 +9,12 @@ namespace Microsoft.Build.Shared
 {
     internal static partial class EnvironmentUtilities
     {
-        public static bool Is64BitProcess => Marshal.SizeOf<IntPtr>() == 8;
+        public static bool Is64BitProcess => Marshal.SizeOf(new IntPtr()) == 8;
 
-        private static bool DoNotUseEnvironmentVariables = Environment.GetEnvironmentVariable("MSBUILDDONOTUSEENVIRONMENTVARIABLES") == "1";
+        private static readonly bool DoNotUseEnvironmentVariables = Environment.GetEnvironmentVariable("MSBUILDDONOTUSEENVIRONMENTVARIABLES") == "1";
         internal static Dictionary<string, string> EnvironmentVariablesUsed { get; } = new() { { "MSBUILDDONOTUSEENVIRONMENTVARIABLES", Environment.GetEnvironmentVariable("MSBUILDDONOTUSEENVIRONMENTVARIABLES") } };
 
+#if !NET35
         public static bool Is64BitOperatingSystem =>
 #if FEATURE_64BIT_ENVIRONMENT_QUERY
             Environment.Is64BitOperatingSystem;
@@ -21,6 +22,8 @@ namespace Microsoft.Build.Shared
             RuntimeInformation.OSArchitecture == Architecture.Arm64 ||
             RuntimeInformation.OSArchitecture == Architecture.X64;
 #endif
+#endif
+
         public static string? GetEnvironmentVariable(string name)
         {
             if (DoNotUseEnvironmentVariables)
@@ -32,6 +35,7 @@ namespace Microsoft.Build.Shared
             return value;
         }
 
+#if FEATURE_SPAN
         public static string? GetEnvironmentVariable(ReadOnlySpan<char> name)
         {
             if (DoNotUseEnvironmentVariables)
@@ -44,5 +48,6 @@ namespace Microsoft.Build.Shared
             EnvironmentVariablesUsed[stringForm] = value;
             return value;
         }
+#endif
     }
 }

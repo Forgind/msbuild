@@ -81,7 +81,7 @@ namespace Microsoft.Build.CommandLine
         /// </returns>
         internal static ExitType Execute()
         {
-            switch (Environment.GetEnvironmentVariable("MSBUILDDEBUGONSTART"))
+            switch (EnvironmentUtilities.GetEnvironmentVariable("MSBUILDDEBUGONSTART"))
             {
 #if FEATURE_DEBUG_LAUNCH
                 case "1":

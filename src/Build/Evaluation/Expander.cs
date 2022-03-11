@@ -1468,7 +1468,11 @@ namespace Microsoft.Build.Evaluation
             /// </summary>
             private static object LookupProperty(IPropertyProvider<T> properties, string propertyName, int startIndex, int endIndex, IElementLocation elementLocation, UsedUninitializedProperties usedUninitializedProperties)
             {
+#if FEATURE_SPAN
                 EnvironmentUtilities.GetEnvironmentVariable(propertyName.AsSpan().Slice(startIndex, endIndex - startIndex + 1));
+#else
+                EnvironmentUtilities.GetEnvironmentVariable(propertyName.Substring(startIndex, endIndex - startIndex + 1));
+#endif
                 T property = properties.GetProperty(propertyName, startIndex, endIndex);
 
                 object propertyValue;

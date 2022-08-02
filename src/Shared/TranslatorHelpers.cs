@@ -215,7 +215,6 @@ namespace Microsoft.Build.BackEnd
             string name = null;
             Version version = null;
             AssemblyNameFlags flags = default;
-            ProcessorArchitecture processorArchitecture = default;
             CultureInfo cultureInfo = null;
             AssemblyHashAlgorithm hashAlgorithm = default;
             AssemblyVersionCompatibility versionCompatibility = default;
@@ -229,7 +228,6 @@ namespace Microsoft.Build.BackEnd
                 name = assemblyName.Name;
                 version = assemblyName.Version;
                 flags = assemblyName.Flags;
-                processorArchitecture = assemblyName.ProcessorArchitecture;
                 cultureInfo = assemblyName.CultureInfo;
                 hashAlgorithm = assemblyName.HashAlgorithm;
                 versionCompatibility = assemblyName.VersionCompatibility;
@@ -242,7 +240,6 @@ namespace Microsoft.Build.BackEnd
             translator.Translate(ref name);
             translator.Translate(ref version);
             translator.TranslateEnum(ref flags, (int)flags);
-            translator.TranslateEnum(ref processorArchitecture, (int)processorArchitecture);
             translator.Translate(ref cultureInfo);
             translator.TranslateEnum(ref hashAlgorithm, (int)hashAlgorithm);
             translator.TranslateEnum(ref versionCompatibility, (int)versionCompatibility);
@@ -258,7 +255,6 @@ namespace Microsoft.Build.BackEnd
                     Name = name,
                     Version = version,
                     Flags = flags,
-                    ProcessorArchitecture = processorArchitecture,
                     CultureInfo = cultureInfo,
                     HashAlgorithm = hashAlgorithm,
                     VersionCompatibility = versionCompatibility,

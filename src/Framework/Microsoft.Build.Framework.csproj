@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Collections" PrivateAssets="all" />
+    <PackageReference Include="System.Reflection.Metadata" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'">

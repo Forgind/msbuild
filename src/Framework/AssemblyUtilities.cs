@@ -3,9 +3,11 @@
 
 using System;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
-
+using System.Reflection.Metadata;
+using System.Reflection.PortableExecutable;
 using Microsoft.Build.Framework;
 
 // Declare this to get init properties. See https://github.com/dotnet/roslyn/issues/45510#issuecomment-694977239
@@ -87,7 +89,6 @@ namespace Microsoft.Build.Shared
             name.SetPublicKeyToken(assemblyNameToClone.GetPublicKeyToken());
             name.Version = assemblyNameToClone.Version;
             name.Flags = assemblyNameToClone.Flags;
-            name.ProcessorArchitecture = assemblyNameToClone.ProcessorArchitecture;
 
 #if !RUNTIME_TYPE_NETCORE
             name.CultureInfo = assemblyNameToClone.CultureInfo;
@@ -106,6 +107,15 @@ namespace Microsoft.Build.Shared
 #endif
 
         }
+
+#if !CLR2COMPATIBILITY
+        public static Machine GetFileMachineType(string path)
+        {
+            using FileStream stream = File.OpenRead(path);
+            using PEReader reader = new(stream);
+            return reader.PEHeaders.CoffHeader.Machine;
+        }
+#endif
 
 #if !FEATURE_CULTUREINFO_GETCULTURES
         public static bool CultureInfoHasGetCultures()

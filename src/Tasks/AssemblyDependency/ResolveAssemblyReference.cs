@@ -9,6 +9,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.PortableExecutable;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml.Linq;
 
@@ -2551,41 +2553,14 @@ namespace Microsoft.Build.Tasks
 
                             if (fileExists(item.ItemSpec) && !Reference.IsFrameworkFile(item.ItemSpec, _targetFrameworkDirectories))
                             {
-                                try
-                                {
-                                    assemblyName = getAssemblyName(item.ItemSpec);
-                                }
-                                catch (System.IO.FileLoadException)
-                                {
-                                    // Its pretty hard to get here, you need an assembly that contains a valid reference
-                                    // to a dependent assembly that, in turn, throws a FileLoadException during GetAssemblyName.
-                                    // Still it happened once, with an older version of the CLR.
+                                Machine assemblyArchitecture = AssemblyUtilities.GetFileMachineType(item.ItemSpec);
 
-                                    // ...falling through and relying on the targetAssemblyName==null behavior below...
-                                }
-                                catch (System.IO.FileNotFoundException)
-                                {
-                                    // Its pretty hard to get here, also since we do a file existence check right before calling this method so it can only happen if the file got deleted between that check and this call.
-                                }
-                                catch (UnauthorizedAccessException)
-                                {
-                                }
-                                catch (BadImageFormatException)
-                                {
-                                }
-                            }
-
-                            if (assemblyName != null)
-                            {
-                                SystemProcessorArchitecture assemblyArch = assemblyName.ProcessorArchitecture;
-
-                                // If the assembly is MSIL or none it can work anywhere so there does not need to be any warning ect.
-                                if (assemblyArch == SystemProcessorArchitecture.MSIL || assemblyArch == SystemProcessorArchitecture.None)
+                                // If the processor architecture does not match then we should continue to see if there is a better match.
+                                if (assemblyArchitecture == Machine.I386)
                                 {
                                     continue;
                                 }
-
-                                if (processorArchitecture != assemblyArch)
+                                else if (assemblyArchitecture != RuntimeInformation.ProcessArchitecture; ProcessorArchitecture.CurrentProcessArchitecture)
                                 {
                                     if (_warnOrErrorOnTargetArchitectureMismatch == WarnOrErrorOnTargetArchitectureMismatchBehavior.Error)
                                     {

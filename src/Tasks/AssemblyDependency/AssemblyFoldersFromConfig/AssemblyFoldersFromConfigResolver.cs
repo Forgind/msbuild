@@ -10,6 +10,7 @@ using Microsoft.Build.Framework;
 using Microsoft.Build.Shared.FileSystem;
 using Microsoft.Build.Utilities;
 using ProcessorArchitecture = System.Reflection.ProcessorArchitecture;
+using System.Reflection.PortableExecutable;
 
 #nullable disable
 
@@ -212,12 +213,9 @@ namespace Microsoft.Build.Tasks.AssemblyFoldersFromConfig
                                     foundPath = candidatePath;
                                     return true;
                                 }
-                                
-                                // Lets see if the processor architecture matches, note this this method will cache the result when it was first called.
-                                AssemblyNameExtension foundAssembly = getAssemblyName(candidatePath);
 
                                 // If the processor architecture does not match then we should continue to see if there is a better match.
-                                if (foundAssembly != null && (foundAssembly.AssemblyName.ProcessorArchitecture == ProcessorArchitecture.MSIL || foundAssembly.AssemblyName.ProcessorArchitecture == ProcessorArchitecture.None))
+                                if (AssemblyUtilities.GetFileMachineType(candidatePath) == Machine.I386)
                                 {
                                     foundPath = candidatePath;
                                     return true;

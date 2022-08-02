@@ -542,7 +542,6 @@ namespace Microsoft.Build.UnitTests.BackEnd
                 Name = "a",
                 Version = new Version(1, 2, 3),
                 Flags = AssemblyNameFlags.PublicKey,
-                ProcessorArchitecture = ProcessorArchitecture.X86,
                 CultureInfo = new CultureInfo("zh-HK"),
                 HashAlgorithm = System.Configuration.Assemblies.AssemblyHashAlgorithm.SHA256,
                 VersionCompatibility = AssemblyVersionCompatibility.SameMachine,
@@ -583,7 +582,6 @@ namespace Microsoft.Build.UnitTests.BackEnd
             actual.Name.ShouldBe(expected.Name);
             actual.Version.ShouldBe(expected.Version);
             actual.Flags.ShouldBe(expected.Flags);
-            actual.ProcessorArchitecture.ShouldBe(expected.ProcessorArchitecture);
             actual.CultureInfo.ShouldBe(expected.CultureInfo);
             actual.HashAlgorithm.ShouldBe(expected.HashAlgorithm);
             actual.VersionCompatibility.ShouldBe(expected.VersionCompatibility);

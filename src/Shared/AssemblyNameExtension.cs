@@ -138,7 +138,6 @@ namespace Microsoft.Build.Shared
                 var publicKeyToken = (byte[]) info.GetValue("pkt", typeof(byte[]));
                 var version = (Version)info.GetValue("ver", typeof(Version));
                 var flags = (AssemblyNameFlags) info.GetInt32("flags");
-                var processorArchitecture = (ProcessorArchitecture) info.GetInt32("cpuarch");
 
                 CultureInfo cultureInfo = null;
                 var hasCultureInfo = info.GetBoolean("hasCI");
@@ -156,7 +155,6 @@ namespace Microsoft.Build.Shared
                     Name = name,
                     Version = version,
                     Flags = flags,
-                    ProcessorArchitecture = processorArchitecture,
                     CultureInfo = cultureInfo,
                     HashAlgorithm = hashAlgorithm,
                     VersionCompatibility = versionCompatibility,
@@ -276,12 +274,6 @@ namespace Microsoft.Build.Shared
                 return asAssemblyName.Name;
             }
         }
-
-        /// <summary>
-        /// Gets the backing AssemblyName, this can be None.
-        /// </summary>
-        internal ProcessorArchitecture ProcessorArchitecture =>
-            asAssemblyName?.ProcessorArchitecture ?? ProcessorArchitecture.None;
 
         /// <summary>
         /// The assembly's version number.
@@ -957,7 +949,6 @@ namespace Microsoft.Build.Shared
                 info.AddValue("pkt", asAssemblyName.GetPublicKeyToken());
                 info.AddValue("ver", asAssemblyName.Version);
                 info.AddValue("flags", (int) asAssemblyName.Flags);
-                info.AddValue("cpuarch", (int) asAssemblyName.ProcessorArchitecture);
 
                 info.AddValue("hasCI", asAssemblyName.CultureInfo != null);
                 if (asAssemblyName.CultureInfo != null)

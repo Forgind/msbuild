@@ -6,8 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.Metadata;
-using System.Reflection.PortableExecutable;
+using System.Runtime.InteropServices;
 using Microsoft.Build.Framework;
 
 // Declare this to get init properties. See https://github.com/dotnet/roslyn/issues/45510#issuecomment-694977239
@@ -92,11 +91,8 @@ namespace Microsoft.Build.Shared
 
 #if !RUNTIME_TYPE_NETCORE
             name.CultureInfo = assemblyNameToClone.CultureInfo;
-            name.HashAlgorithm = assemblyNameToClone.HashAlgorithm;
-            name.VersionCompatibility = assemblyNameToClone.VersionCompatibility;
             name.CodeBase = assemblyNameToClone.CodeBase;
             name.KeyPair = assemblyNameToClone.KeyPair;
-            name.VersionCompatibility = assemblyNameToClone.VersionCompatibility;
 #elif !MONO
             // Setting the culture name creates a new CultureInfo, leading to many allocations. Only set CultureName when the CultureInfo member is not available.
             // CultureName not available on Mono
@@ -109,11 +105,10 @@ namespace Microsoft.Build.Shared
         }
 
 #if !CLR2COMPATIBILITY
-        public static Machine GetFileMachineType(string path)
+        public static bool IsMSIL(string path, out ProcessorArchitecture architecture)
         {
-            using FileStream stream = File.OpenRead(path);
-            using PEReader reader = new(stream);
-            return reader.PEHeaders.CoffHeader.Machine;
+            architecture = ProcessorArchitecture.None;
+            return false;
         }
 #endif
 

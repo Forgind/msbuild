@@ -156,8 +156,6 @@ namespace Microsoft.Build.Shared
                     Version = version,
                     Flags = flags,
                     CultureInfo = cultureInfo,
-                    HashAlgorithm = hashAlgorithm,
-                    VersionCompatibility = versionCompatibility,
                     CodeBase = codeBase,
                 };
 
@@ -956,8 +954,6 @@ namespace Microsoft.Build.Shared
                     info.AddValue("ci", asAssemblyName.CultureInfo.LCID);
                 }
 
-                info.AddValue("hashAlg", asAssemblyName.HashAlgorithm);
-                info.AddValue("verCompat", asAssemblyName.VersionCompatibility);
                 info.AddValue("codebase", asAssemblyName.CodeBase);
             }
 

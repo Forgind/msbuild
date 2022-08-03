@@ -229,8 +229,6 @@ namespace Microsoft.Build.BackEnd
                 version = assemblyName.Version;
                 flags = assemblyName.Flags;
                 cultureInfo = assemblyName.CultureInfo;
-                hashAlgorithm = assemblyName.HashAlgorithm;
-                versionCompatibility = assemblyName.VersionCompatibility;
                 codeBase = assemblyName.CodeBase;
 
                 publicKey = assemblyName.GetPublicKey(); // TODO: no need to serialize, public key is not used anywhere in context of RAR, only public key token
@@ -256,8 +254,6 @@ namespace Microsoft.Build.BackEnd
                     Version = version,
                     Flags = flags,
                     CultureInfo = cultureInfo,
-                    HashAlgorithm = hashAlgorithm,
-                    VersionCompatibility = versionCompatibility,
                     CodeBase = codeBase,
                 };
 

@@ -543,8 +543,6 @@ namespace Microsoft.Build.UnitTests.BackEnd
                 Version = new Version(1, 2, 3),
                 Flags = AssemblyNameFlags.PublicKey,
                 CultureInfo = new CultureInfo("zh-HK"),
-                HashAlgorithm = System.Configuration.Assemblies.AssemblyHashAlgorithm.SHA256,
-                VersionCompatibility = AssemblyVersionCompatibility.SameMachine,
                 CodeBase = "C:\\src",
                 ContentType = AssemblyContentType.WindowsRuntime,
                 CultureName = "zh-HK",
@@ -583,8 +581,6 @@ namespace Microsoft.Build.UnitTests.BackEnd
             actual.Version.ShouldBe(expected.Version);
             actual.Flags.ShouldBe(expected.Flags);
             actual.CultureInfo.ShouldBe(expected.CultureInfo);
-            actual.HashAlgorithm.ShouldBe(expected.HashAlgorithm);
-            actual.VersionCompatibility.ShouldBe(expected.VersionCompatibility);
             actual.CodeBase.ShouldBe(expected.CodeBase);
 
             actual.GetPublicKey().ShouldBe(expected.GetPublicKey());

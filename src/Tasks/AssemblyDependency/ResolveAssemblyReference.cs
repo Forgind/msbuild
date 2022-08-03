@@ -9,8 +9,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.PortableExecutable;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml.Linq;
 
@@ -1821,11 +1819,12 @@ namespace Microsoft.Build.Tasks
                                 break;
                             }
                         case NoMatchReason.ProcessorArchitectureDoesNotMatch:
+                            AssemblyUtilities.IsMSIL(location.SearchPath, out SystemProcessorArchitecture architecture);
                             Log.LogMessage(
                                 importance,
                                 Strings.TargetedProcessorArchitectureDoesNotMatch,
                                 location.FileNameAttempted,
-                                location.AssemblyName.AssemblyName.ProcessorArchitecture.ToString(),
+                                architecture.ToString(),
                                 _targetProcessorArchitecture);
                             break;
                         default:
@@ -2549,18 +2548,14 @@ namespace Microsoft.Build.Tasks
                     {
                         foreach (ITaskItem item in _resolvedFiles)
                         {
-                            AssemblyNameExtension assemblyName = null;
-
                             if (fileExists(item.ItemSpec) && !Reference.IsFrameworkFile(item.ItemSpec, _targetFrameworkDirectories))
                             {
-                                Machine assemblyArchitecture = AssemblyUtilities.GetFileMachineType(item.ItemSpec);
-
-                                // If the processor architecture does not match then we should continue to see if there is a better match.
-                                if (assemblyArchitecture == Machine.I386)
+                                // If the assembly is MSIL or none it can work anywhere so there does not need to be any warning ect.
+                                if (AssemblyUtilities.IsMSIL(item.ItemSpec, out SystemProcessorArchitecture assemblyArch))
                                 {
                                     continue;
                                 }
-                                else if (assemblyArchitecture != RuntimeInformation.ProcessArchitecture; ProcessorArchitecture.CurrentProcessArchitecture)
+                                else if (processorArchitecture == assemblyArch)
                                 {
                                     if (_warnOrErrorOnTargetArchitectureMismatch == WarnOrErrorOnTargetArchitectureMismatchBehavior.Error)
                                     {

@@ -237,11 +237,12 @@ namespace Microsoft.Build.Tasks
                     // If we are targeting a given processor architecture check to see if they match, if we are targeting MSIL then any architecture will do.
                     if (compareProcessorArchitecture)
                     {
+                        AssemblyUtilities.IsMSIL(pathToCandidateAssembly, out ProcessorArchitecture architecture);
                         // Only reject the assembly if the target processor architecture does not match the assemby processor architecture and the assembly processor architecture is not NONE or MSIL.
                         if (
-                              targetAssemblyName.AssemblyName.ProcessorArchitecture != targetProcessorArchitecture &&  /* The target and assembly architectures do not match*/
-                              (targetProcessorArchitecture != ProcessorArchitecture.None && targetAssemblyName.AssemblyName.ProcessorArchitecture != ProcessorArchitecture.None)  /*The assembly is not none*/
-                              && (targetProcessorArchitecture != ProcessorArchitecture.MSIL && targetAssemblyName.AssemblyName.ProcessorArchitecture != ProcessorArchitecture.MSIL) /*The assembly is not MSIL*/
+                              architecture != targetProcessorArchitecture && /* The target and assembly architectures do not match*/
+                              (targetProcessorArchitecture != ProcessorArchitecture.None && architecture != ProcessorArchitecture.None)  /*The assembly is not none*/
+                              && (targetProcessorArchitecture != ProcessorArchitecture.MSIL && architecture != ProcessorArchitecture.MSIL) /*The assembly is not MSIL*/
                            )
                         {
                             if (searchLocation != null)
@@ -360,7 +361,7 @@ namespace Microsoft.Build.Tasks
                             AssemblyNameExtension foundAssembly = getAssemblyName(fullPath);
 
                             // If the processor architecture does not match the we should continue to see if there is a better match.
-                            if (foundAssembly?.AssemblyName.ProcessorArchitecture == ProcessorArchitecture.MSIL)
+                            if (AssemblyUtilities.IsMSIL(fullPath, out _))
                             {
                                 return fullPath;
                             }

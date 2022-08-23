@@ -1078,6 +1078,7 @@ namespace Microsoft.Build.Construction
                 item.SetMetadata("ToolsVersion", GetToolsVersionMetadataForDirectMSBuildTask(traversalProject));
                 item.SetMetadata("SkipNonexistentProjects", "False"); // Skip if it doesn't exist on disk.
                 item.SetMetadata("AdditionalProperties", GetPropertiesMetadataForProjectReference(traversalProject, GetConfigurationAndPlatformPropertiesString(projectConfiguration)));
+                item.SetMetadata("BuildableProject", "True");
             }
             else
             {
@@ -1086,6 +1087,7 @@ namespace Microsoft.Build.Construction
                 item.SetMetadata("ToolsVersion", traversalProject.ToolsVersion);
                 item.SetMetadata("SkipNonexistentProjects", "Build"); // Instruct the MSBuild task to try to build even though the file doesn't exist on disk.
                 item.SetMetadata("AdditionalProperties", GetPropertiesMetadataForProjectReference(traversalProject, SolutionConfigurationAndPlatformProperties));
+                item.SetMetadata("BuildableProject", "False");
             }
 
             // Set raw config and platform for custom build steps to use if they wish

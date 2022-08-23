@@ -338,6 +338,18 @@ namespace Microsoft.Build.Construction
                         return _canBeMSBuildProjectFile;
                     }
 
+                    if (emptyNamespace && projectDocument.Name.EndsWith("dwproj"))
+                    {
+                        foreach (XmlNode childNode in projectDocument.ChildNodes)
+                        {
+                            if (childNode.Name.Contains("Database"))
+                            {
+                                _canBeMSBuildProjectFile = false;
+                                return _canBeMSBuildProjectFile;
+                            }
+                        }
+                    }
+
                     // This is a bit of a special case, but an rptproj file will contain a Project with no schema that is
                     // not an MSBuild file. It will however have ToolsVersion="2.0" which is not supported with an empty
                     // schema. This is not a great solution, but it should cover the customer reported issue. See:

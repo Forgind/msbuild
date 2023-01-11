@@ -27,16 +27,10 @@ steps:
     filename: set
   condition: always()
 
-- task: CmdLine@1
-  displayName: Bogus build to have nerdbank.GitVersioning set the version for the swix plugin
+ # Required by MicroBuildBuildVSBootstrapper
+- task: MicroBuildSwixPlugin@4
   inputs:
-    filename: '$(comspec)'
-    arguments: '/c "call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\Tools\VsDevCmd.bat" & msbuild /restore $(Build.Repository.LocalPath)\build\SetMicrobuildVersion\SetMicrobuildVersion.csproj"'
-
-- task: ms-vseng.MicroBuildTasks.32f78468-e895-4f47-962c-58a699361df8.MicroBuildSwixPlugin@1
-  displayName: Install Swix Plugin
-  inputs:
-    dropName: 'Products/$(System.TeamProject)/$(Build.Repository.Name)/$(Build.SourceBranchName)/$(Build.BuildNumber)/$(Build.BuildId)'
+    dropName: $(VisualStudio.DropName)
 
 - task: CmdLine@1
   displayName: restore build number

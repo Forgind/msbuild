@@ -1,5 +1,5 @@
 queue:
-  name: VSEngSS-MicroBuild2022-1ES
+  name: VSEngSS-MicroBuild2017-1ES
   timeoutInMinutes: 360
 trigger: none
 variables:

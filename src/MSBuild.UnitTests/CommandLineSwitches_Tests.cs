@@ -1049,6 +1049,7 @@ namespace Microsoft.Build.UnitTests
                                         graphBuildOptions: null,
                                         lowPriority: false,
                                         question: false,
+                                        getProperty: Array.Empty<string>(),
                                         inputResultsCaches: null,
                                         outputResultsCache: null,
                                         commandLine: null);

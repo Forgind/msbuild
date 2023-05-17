@@ -160,6 +160,15 @@ namespace Microsoft.Build.Graph
             ProjectGraphEntryPoints = projectGraphEntryPoints;
         }
 
+        public GraphBuildRequestData(IEnumerable<ProjectGraphEntryPoint> projectGraphEntryPoints, ICollection<string> targetsToBuild, string[] getProperties, HostServices hostServices, BuildRequestDataFlags flags, GraphBuildOptions graphBuildOptions)
+            : this(targetsToBuild, hostServices, flags, graphBuildOptions)
+        {
+            ErrorUtilities.VerifyThrowArgumentNull(projectGraphEntryPoints, nameof(projectGraphEntryPoints));
+
+            ProjectGraphEntryPoints = projectGraphEntryPoints;
+            GetProperties = getProperties;
+        }
+
         /// <summary>
         /// Common constructor.
         /// </summary>
@@ -196,6 +205,8 @@ namespace Microsoft.Build.Graph
         /// </summary>
         /// <value>An array of targets in the project to be built.</value>
         public ICollection<string> TargetNames { get; }
+
+        public string[] GetProperties { get; }
 
         /// <summary>
         /// Extra flags for this BuildRequest.

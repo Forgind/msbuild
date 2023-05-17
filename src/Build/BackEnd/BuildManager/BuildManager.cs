@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Configuration;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -1272,6 +1273,29 @@ namespace Microsoft.Build.Execution
                         submission.BuildRequestData.Flags.HasFlag(BuildRequestDataFlags.ReplaceExistingProjectInstance));
 
                     resolvedConfiguration.ExplicitlyLoaded = true;
+
+                    if (submission.BuildRequestData.GetPropertyNames is not null)
+                    {
+                        if (!resolvedConfiguration.IsLoaded)
+                        {
+                            resolvedConfiguration.LoadProjectIntoConfiguration(
+                                this,
+                                submission.BuildRequestData.Flags,
+                                submission.SubmissionId,
+                                Scheduler.InProcNodeId);
+
+                            // If we're taking the time to evaluate, avoid having other nodes to repeat the same evaluation.
+                            // Based on the assumption that ProjectInstance serialization is faster than evaluating from scratch.
+                            resolvedConfiguration.Project.TranslateEntireState = true;
+                        }
+
+                        foreach (string propertyName in submission.BuildRequestData.GetPropertyNames)
+                        {
+                            LogMessage($"\"{propertyName}\": \"{resolvedConfiguration.Project.GetPropertyValue(propertyName)}\"");
+                        }
+
+                        return;
+                    }
 
                     // assign shutting down to local variable to avoid race condition: "setting _shuttingDown after this point during this method execution"
                     shuttingDown = _shuttingDown;

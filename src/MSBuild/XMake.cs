@@ -706,6 +706,7 @@ namespace Microsoft.Build.CommandLine
                 string[] inputResultsCaches = null;
                 string outputResultsCache = null;
                 bool question = false;
+                string[] getProperty = Array.Empty<string>();
 
                 GatherAllSwitches(commandLine, out var switchesFromAutoResponseFile, out var switchesNotFromAutoResponseFile, out _);
                 bool buildCanBeInvoked = ProcessCommandLineSwitches(
@@ -742,6 +743,7 @@ namespace Microsoft.Build.CommandLine
                                             ref outputResultsCache,
                                             ref lowPriority,
                                             ref question,
+                                            ref getProperty,
                                             recursing: false,
 #if FEATURE_GET_COMMANDLINE
                                             commandLine);
@@ -813,6 +815,7 @@ namespace Microsoft.Build.CommandLine
                                     graphBuildOptions,
                                     lowPriority,
                                     question,
+                                    getProperty,
                                     inputResultsCaches,
                                     outputResultsCache,
                                     commandLine))
@@ -1134,6 +1137,7 @@ namespace Microsoft.Build.CommandLine
             GraphBuildOptions graphBuildOptions,
             bool lowPriority,
             bool question,
+            string[] getProperty,
             string[] inputResultsCaches,
             string outputResultsCache,
 #if FEATURE_GET_COMMANDLINE
@@ -1404,11 +1408,11 @@ namespace Microsoft.Build.CommandLine
                             {
                                 if (graphBuildOptions != null)
                                 {
-                                    graphBuildRequest = new GraphBuildRequestData(new[] { new ProjectGraphEntryPoint(projectFile, globalProperties) }, targets, null, BuildRequestDataFlags.None, graphBuildOptions);
+                                    graphBuildRequest = new GraphBuildRequestData(new[] { new ProjectGraphEntryPoint(projectFile, globalProperties) }, targets, getProperty, null, BuildRequestDataFlags.None, graphBuildOptions);
                                 }
                                 else
                                 {
-                                    buildRequest = new BuildRequestData(projectFile, globalProperties, toolsVersion, targets, null);
+                                    buildRequest = new BuildRequestData(projectFile, globalProperties, toolsVersion, targets, getProperty, null);
                                 }
                             }
 
@@ -1641,6 +1645,7 @@ namespace Microsoft.Build.CommandLine
                 restoreGlobalProperties,
                 toolsVersion,
                 targetsToBuild: new[] { MSBuildConstants.RestoreTargetName },
+                getProperties: Array.Empty<string>(),
                 hostServices: null,
                 flags: BuildRequestDataFlags.ClearCachesAfterBuild | BuildRequestDataFlags.SkipNonexistentTargets | BuildRequestDataFlags.IgnoreMissingEmptyAndInvalidImports | BuildRequestDataFlags.FailOnUnresolvedSdk);
 
@@ -2253,6 +2258,7 @@ namespace Microsoft.Build.CommandLine
             ref string outputResultsCache,
             ref bool lowPriority,
             ref bool question,
+            ref string[] getProperty,
             bool recursing,
             string commandLine)
         {
@@ -2369,12 +2375,16 @@ namespace Microsoft.Build.CommandLine
                                                            ref outputResultsCache,
                                                            ref lowPriority,
                                                            ref question,
+                                                           ref getProperty,
                                                            recursing: true,
                                                            commandLine);
                     }
 
                     // figure out which targets we are building
                     targets = ProcessTargetSwitch(commandLineSwitches[CommandLineSwitches.ParameterizedSwitch.Target]);
+
+                    // If we are looking for the value of a specific property or properties post-evaluation, figure that out now
+                    getProperty = commandLineSwitches[CommandLineSwitches.ParameterizedSwitch.GetProperty];
 
                     // figure out which ToolsVersion has been set on the command line
                     toolsVersion = ProcessToolsVersionSwitch(commandLineSwitches[CommandLineSwitches.ParameterizedSwitch.ToolsVersion]);

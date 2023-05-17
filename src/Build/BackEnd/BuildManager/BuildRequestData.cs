@@ -179,8 +179,8 @@ namespace Microsoft.Build.Execution
         /// <param name="toolsVersion">The tools version to use for the build.  May be null.</param>
         /// <param name="targetsToBuild">The targets to build.</param>
         /// <param name="hostServices">The host services to use.  May be null.</param>
-        public BuildRequestData(string projectFullPath, IDictionary<string, string> globalProperties, string toolsVersion, string[] targetsToBuild, HostServices hostServices)
-            : this(projectFullPath, globalProperties, toolsVersion, targetsToBuild, hostServices, BuildRequestDataFlags.None)
+        public BuildRequestData(string projectFullPath, IDictionary<string, string> globalProperties, string toolsVersion, string[] targetsToBuild, string[] getProperties, HostServices hostServices)
+            : this(projectFullPath, globalProperties, toolsVersion, targetsToBuild, getProperties, hostServices, BuildRequestDataFlags.None)
         {
         }
 
@@ -195,9 +195,9 @@ namespace Microsoft.Build.Execution
         /// <param name="flags">The <see cref="BuildRequestDataFlags"/> to use.</param>
         /// <param name="requestedProjectState">A <see cref="Execution.RequestedProjectState"/> describing properties, items, and metadata that should be returned. Requires setting <see cref="BuildRequestDataFlags.ProvideSubsetOfStateAfterBuild"/>.</param>
         public BuildRequestData(string projectFullPath, IDictionary<string, string> globalProperties,
-            string toolsVersion, string[] targetsToBuild, HostServices hostServices, BuildRequestDataFlags flags,
+            string toolsVersion, string[] targetsToBuild, string[] getProperties, HostServices hostServices, BuildRequestDataFlags flags,
             RequestedProjectState requestedProjectState)
-            : this(projectFullPath, globalProperties, toolsVersion, targetsToBuild, hostServices, flags)
+            : this(projectFullPath, globalProperties, toolsVersion, targetsToBuild, getProperties, hostServices, flags)
         {
             ErrorUtilities.VerifyThrowArgumentNull(requestedProjectState, nameof(requestedProjectState));
 
@@ -213,8 +213,8 @@ namespace Microsoft.Build.Execution
         /// <param name="targetsToBuild">The targets to build.</param>
         /// <param name="hostServices">The host services to use.  May be null.</param>
         /// <param name="flags">The <see cref="BuildRequestDataFlags"/> to use.</param>
-        public BuildRequestData(string projectFullPath, IDictionary<string, string> globalProperties, string toolsVersion, string[] targetsToBuild, HostServices hostServices, BuildRequestDataFlags flags)
-            : this(targetsToBuild, hostServices, flags)
+        public BuildRequestData(string projectFullPath, IDictionary<string, string> globalProperties, string toolsVersion, string[] targetsToBuild, string[] getProperties, HostServices hostServices, BuildRequestDataFlags flags)
+            : this(targetsToBuild, getProperties, hostServices, flags)
         {
             ErrorUtilities.VerifyThrowArgumentLength(projectFullPath, nameof(projectFullPath));
             ErrorUtilities.VerifyThrowArgumentNull(globalProperties, nameof(globalProperties));
@@ -232,12 +232,13 @@ namespace Microsoft.Build.Execution
         /// <summary>
         /// Common constructor.
         /// </summary>
-        private BuildRequestData(string[] targetsToBuild, HostServices hostServices, BuildRequestDataFlags flags)
+        private BuildRequestData(string[] targetsToBuild, string[] getProperties, HostServices hostServices, BuildRequestDataFlags flags)
         {
             ErrorUtilities.VerifyThrowArgumentNull(targetsToBuild, nameof(targetsToBuild));
 
             HostServices = hostServices;
             TargetNames = new List<string>(targetsToBuild);
+            GetPropertyNames = getProperties;
             Flags = flags;
         }
 
@@ -260,6 +261,11 @@ namespace Microsoft.Build.Execution
         /// </summary>
         /// <value>An array of targets in the project to be built.</value>
         public ICollection<string> TargetNames { get; }
+
+        /// <summary>
+        /// The name(s) of the property or properties to access and return post-evaluation
+        /// </summary>
+        public ICollection<string> GetPropertyNames { get; }
 
         /// <summary>
         /// Extra flags for this BuildRequest.
